@@ -1,0 +1,15 @@
+将服务器的代码同步到本地：
+git clone ssh://yonghao@10.200.13.100:29418/ct15_mcu
+
+将某个文件或所有文件同步到本地备份库：
+git add app.c    或   git add *
+
+添加本次修改的备注：
+git commit -m "modify the APP.c"
+
+将本地库同步到服务器：
+git push origin master:refs/for/master
+
+
++(SECOND(E20)-SECOND(D20))*1/3600
+
