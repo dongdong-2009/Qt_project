@@ -1,0 +1,10 @@
+QObject::connect: Parentheses expected, slot Widget::sett in ../Protocol_test/widget.cpp:13
+QObject::connect:  (receiver name: 'Widget')
+QTimer* tim = new QTimer;
+    connect(tim, SIGNAL(timeout()), this, SLOT(sett)); 错误
+    tim->start(3000);
+    
+    
+    QTimer* tim = new QTimer;
+    connect(tim, SIGNAL(timeout()), this, SLOT(sett())); 正确
+    tim->start(3000);
