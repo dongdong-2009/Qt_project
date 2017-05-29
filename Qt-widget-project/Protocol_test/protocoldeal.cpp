@@ -154,3 +154,4 @@ unsigned char Protocoldeal::BstBvtGetFrameDatLen(e_IDTYPE_T id)
     }
     return len;
 }
+

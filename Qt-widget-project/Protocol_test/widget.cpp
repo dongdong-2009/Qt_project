@@ -7,9 +7,9 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-//    ui->label_floor->setTextFormat(Qt::RichText);
+    ui->label_floor->setTextFormat(Qt::RichText);
     ui->label_floor->setText("1");
-    QTimer* tim = new QTimer;
+    QTimer* tim = new QTimer(parent);
     connect(tim, SIGNAL(timeout()), this, SLOT(sett()));
     tim->start(3000);
 }
