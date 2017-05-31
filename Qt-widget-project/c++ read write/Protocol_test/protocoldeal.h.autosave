@@ -105,10 +105,6 @@ protected:
 signals:
     void AcceptDataFormBottom(QString s);
     void AcceptDataFormTop();
-public slots:
-    void ReadyreadSlots();
-private:
-    QSerialPort *my_serialport;
 };
 
 #endif // PROTOCOLDEAL_H

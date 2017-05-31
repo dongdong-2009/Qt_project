@@ -29,7 +29,7 @@ Protocoldeal::Protocoldeal()
 
 Protocoldeal::~Protocoldeal()
 {
-    delete my_serialport;
+
 }
 
 void Protocoldeal::BstBvtPtlInit()
@@ -210,7 +210,7 @@ void Protocoldeal::RedFile()
 void Protocoldeal::run()
 {
     cout << __PRETTY_FUNCTION__<<endl;
-    SetSerialArgument();
+    RedFile();
 }
 
 bool Protocoldeal::JudgeChange(char str[], char str2[])
@@ -248,42 +248,4 @@ QSerialPortInfo Protocoldeal::FindSerial()
     return com_info;
 }
 
-void Protocoldeal::SetSerialArgument()
-{
-    my_serialport = new QSerialPort;
-//    QSerialPort my_serialport;
-//    my_serialport.setPort(FindSerial());
-    my_serialport->setPortName("/dev/ttymxc1");
-    if (my_serialport->open(QIODevice::ReadOnly))
-    {
-        cout << "enter funtion"<<endl;
-        //设置波特率
-        my_serialport->setBaudRate(QSerialPort::Baud9600);
-        //设置数据位
-        my_serialport->setDataBits(QSerialPort::Data8);
-        //设置校验位
-        my_serialport->setParity(QSerialPort::NoParity);
-        //设置流控制
-        my_serialport->setFlowControl(QSerialPort::NoFlowControl);
-        //设置停止位
-        my_serialport->setStopBits(QSerialPort::OneStop);
-        my_serialport->clearError();
-        my_serialport->clear();
-        connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()));
-    }
-//    my_serialport.error();
-    cout << "end funtion"<<endl;
-}
 
-void Protocoldeal::ReadyreadSlots()
-{
-//    QSerialPort my_serialport;
-    QByteArray arr = my_serialport->readAll();
-    QString s;
-    s.clear();
-    s.prepend(arr);
-    qDebug()<< "s = " << s <<endl;
-    cout << "setting sth\n";
-    emit AcceptDataFormBottom(s);
-    cout << "the string changes"<< endl;
-}

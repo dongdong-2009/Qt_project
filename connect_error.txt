@@ -12,3 +12,29 @@ QTimer* tim = new QTimer;
     
     QObject::connect: Cannot queue arguments of type 'char[]'
 (Make sure 'char[]' is registered using qRegisterMetaType().)
+
+
+QObject::connect: Cannot queue arguments of type 'char[]' (Make sure 'char[]' is registered using qRegisterMetaType().)
+
+
+背景：一个线程通过signal-slot发送PVCI_CAN_OBJ类型的值到主线程中，
+
+错误提示：
+
+QObject::connect: Cannot queue arguments of type 'PVCI_CAN_OBJ'
+
+(Make sure 'PVCI_CAN_OBJ' is registered using qRegisterMetaType().)
+
+原因：在线程中通过signal-slot传递信息时，参数默认放到队列中的，但PVCI_CAN_OBJ是自定义的参数，不是Qt自带的参数结构。
+
+解决方法：
+
+将不识别的参数结构进行注册，让Qt能够识别。
+
+ 包含头文件
+
+#include <QMetaType>
+
+在构造函数中调用其方法完成注册：
+qRegisterMetaType<PVCI_CAN_OBJ>("PVCI_CAN_OBJ");//注册PVCI_CAN_OBJ类型
+分类: Qt

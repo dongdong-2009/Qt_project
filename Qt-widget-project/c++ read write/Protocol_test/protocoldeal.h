@@ -92,7 +92,6 @@ public:
     bool JudgeChange(char str[], char str2[]);
     QString ChartoQString(char str[]);
     QSerialPortInfo FindSerial();
-    void SetSerialArgument();
 protected:
     unsigned char BstBvtRecvMonitor(void);
     void BstBvtSendMonitor(void);
@@ -105,10 +104,6 @@ protected:
 signals:
     void AcceptDataFormBottom(QString s);
     void AcceptDataFormTop();
-public slots:
-    void ReadyreadSlots();
-private:
-    QSerialPort *my_serialport;
 };
 
 #endif // PROTOCOLDEAL_H
