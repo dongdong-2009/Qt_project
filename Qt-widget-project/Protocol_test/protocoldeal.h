@@ -1,7 +1,7 @@
 #ifndef PROTOCOLDEAL_H
 #define PROTOCOLDEAL_H
-//#define FILE_DEVICE ("/dev/ttymxc1")
-#define FILE_DEVICE ("test")
+#define FILE_DEVICE ("/dev/ttymxc1")
+//#define FILE_DEVICE ("test")
 #include <QObject>
 #include <QThread>
 #include <QDebug>

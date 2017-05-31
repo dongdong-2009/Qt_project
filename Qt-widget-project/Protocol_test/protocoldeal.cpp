@@ -254,6 +254,7 @@ void Protocoldeal::SetSerialArgument()
 //    QSerialPort my_serialport;
 //    my_serialport.setPort(FindSerial());
     my_serialport->setPortName("/dev/ttymxc1");
+    qDebug() << "Name : " << my_serialport->portName();
     if (my_serialport->open(QIODevice::ReadOnly))
     {
         cout << "enter funtion"<<endl;
@@ -267,9 +268,12 @@ void Protocoldeal::SetSerialArgument()
         my_serialport->setFlowControl(QSerialPort::NoFlowControl);
         //设置停止位
         my_serialport->setStopBits(QSerialPort::OneStop);
-        my_serialport->clearError();
-        my_serialport->clear();
+//        my_serialport->clearError();
+//        my_serialport->clear();
+        cout << "before connect"<<endl;
         connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()));
+        cout << "after connect"<<endl;
+        RedFile();
     }
 //    my_serialport.error();
     cout << "end funtion"<<endl;
