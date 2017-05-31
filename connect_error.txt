@@ -8,3 +8,7 @@ QTimer* tim = new QTimer;
     QTimer* tim = new QTimer;
     connect(tim, SIGNAL(timeout()), this, SLOT(sett())); 正确
     tim->start(3000);
+    
+    
+    QObject::connect: Cannot queue arguments of type 'char[]'
+(Make sure 'char[]' is registered using qRegisterMetaType().)

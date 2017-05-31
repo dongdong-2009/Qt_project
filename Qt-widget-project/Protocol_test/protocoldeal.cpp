@@ -1,5 +1,9 @@
 #include "protocoldeal.h"
-
+#include <QThread>
+#include <fcntl.h>
+#include <iostream>
+#include <fstream>
+using namespace std;
 #define BVT_ESC 0x1B	/* 转换字符 */
 #define BVT_STX 0x02	/* 帧起始字符 */
 #define BVT_ETX 0x03	/* 帧结束字符 */
@@ -16,7 +20,8 @@
 static unsigned char gBvtRecStatus = 0;
 static unsigned char gBvtRecCnt = 0;
 static unsigned char gBvtFrameBuf[BVT_MAX_FRAME_LENTH];
-
+static char prestr[BVT_MAX_FRAME_LENTH];
+static char curstr[BVT_MAX_FRAME_LENTH];
 Protocoldeal::Protocoldeal()
 {
 
@@ -154,4 +159,74 @@ unsigned char Protocoldeal::BstBvtGetFrameDatLen(e_IDTYPE_T id)
     }
     return len;
 }
+// return a file fd
+int Protocoldeal::RetFileLength(char filename[])
+{
+    long size;
+    ifstream in(filename, ios::in|ios::binary|ios::ate);   // need include namespace std;  ios::ate 放到文件末尾
+    size = in.tellg();  // 取得文件长度
+    in.seekg(0, ios::beg);
+    in.close();
+    return size;
+}
 
+void Protocoldeal::RedFile()
+{
+    while (1)
+    {
+        int size = RetFileLength(FILE_DEVICE);
+        if (size <= 0)
+        {
+            cout << FILE_DEVICE <<" is empty! "<< endl;
+            cout << __PRETTY_FUNCTION__<<endl;
+            continue;
+        }
+        cout <<" size = "<< size << endl;
+        ifstream in(FILE_DEVICE, ios::in|ios::binary);// need input namespace std;
+        char *buffer;
+        buffer = new char[size];
+        memset(buffer, 0, size);                      //全部清0
+        in.read(buffer, size - 1);                    // read the length of size to buffer
+        memcpy(gBvtFrameBuf, buffer, size - 1);       // 返回值之中包含了文件结束符，所以需要减掉一
+        memcpy(curstr, buffer, sizeof(buffer));
+        cout << "buffer = " << buffer << endl;
+        cout << "gBvtFrameBuf = " << gBvtFrameBuf << endl;
+        BstBvtRecoverFrame(gBvtFrameBuf, size - 1);   // 还原数据，去掉帧头帧尾或者数据中出现的帧头帧尾的处理
+        cout << __PRETTY_FUNCTION__<<endl;
+        memset(gBvtFrameBuf, 0, sizeof(gBvtFrameBuf));
+        if (JudgeChange(prestr, curstr))
+        {
+            QString s = ChartoQString(buffer);
+            cout << "setting sth\n";
+            emit AcceptDataFormBottom(s);
+            cout << "the string changes"<< endl;
+        }
+        memcpy(prestr, curstr, sizeof(curstr));
+        delete []buffer;
+        in.close();
+    }
+}
+
+void Protocoldeal::run()
+{
+    cout << __PRETTY_FUNCTION__<<endl;
+    RedFile();
+}
+
+bool Protocoldeal::JudgeChange(char str[], char str2[])
+{
+    if (0 == strcmp(str, str2))
+    {
+        return false;
+    }
+    return true;
+}
+
+QString Protocoldeal::ChartoQString(char str[])
+{
+    QString qtext;
+    qtext.clear();
+    qtext = QString("%1").arg(str);
+    qDebug() << "qtext = "<< qtext;
+    return qtext;  // 漏写，出现段错误
+}

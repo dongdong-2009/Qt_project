@@ -1,8 +1,13 @@
 #ifndef PROTOCOLDEAL_H
 #define PROTOCOLDEAL_H
-
+//#define FILE_DEVICE ("/dev/ttymxc1")
+#define FILE_DEVICE ("test")
 #include <QObject>
-
+#include <QThread>
+#include <QDebug>
+#include <iostream>
+#include <fstream>
+#include <QString>
 #pragma pack(push, 1) //按照1字节对齐
 
 //*ID = 0的帧内容*/
@@ -67,15 +72,22 @@ typedef enum _id_type_{
 
 #pragma pack(pop)
 
-class Protocoldeal
+class Protocoldeal : public QThread
 {
+    Q_OBJECT
+
 public:
     Protocoldeal();
     ~Protocoldeal();
+    void run();
     void BstBvtPtlInit(void);
     void BstBvtSetFrameData(e_IDTYPE_T id,void *dat);
     void BstBvtCopyFrameData(e_IDTYPE_T id,void *dat);
     e_IDTYPE_T BstBvtPtlMonitor(void);
+    int RetFileLength(char filename[]);
+    void RedFile();
+    bool JudgeChange(char str[], char str2[]);
+    QString ChartoQString(char str[]);
 protected:
     unsigned char BstBvtRecvMonitor(void);
     void BstBvtSendMonitor(void);
@@ -84,6 +96,10 @@ protected:
     unsigned long BstBvtRecoverFrame(void *src,unsigned long srclen);      // 数据还原
     void BstFifoMemCpy(unsigned char *pFrameBuf,void* dat, unsigned char DatLen);
     unsigned char BstBvtGetFrameDatLen(e_IDTYPE_T id);
+
+signals:
+    void AcceptDataFormBottom(QString s);
+    void AcceptDataFormTop();
 };
 
 #endif // PROTOCOLDEAL_H

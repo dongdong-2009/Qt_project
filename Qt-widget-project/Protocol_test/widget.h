@@ -3,7 +3,8 @@
 #define LCD_DEVICE ("/dev/ttyUSB0")
 
 #include <QWidget>
-
+#include "protocoldeal.h"
+#include <QString>
 namespace Ui {
 class Widget;
 }
@@ -14,12 +15,15 @@ class Widget : public QWidget
 public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
+    void DealData(char str[]);
 
 public slots:
     void sett();
+    void setstring(QString str);
 
 private:
     Ui::Widget *ui;
+    Protocoldeal *pro;
 
 };
 
