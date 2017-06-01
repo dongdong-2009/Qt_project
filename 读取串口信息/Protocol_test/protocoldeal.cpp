@@ -24,13 +24,12 @@ static char prestr[BVT_MAX_FRAME_LENTH];
 static char curstr[BVT_MAX_FRAME_LENTH];
 Protocoldeal::Protocoldeal()
 {
-    GetDataPthread = new ProducerFromBottom;
-    GetDataPthread->start();
+
 }
 
 Protocoldeal::~Protocoldeal()
 {
-//    delete my_serialport;
+    delete my_serialport;
 }
 
 void Protocoldeal::BstBvtPtlInit()
@@ -208,11 +207,11 @@ void Protocoldeal::RedFile()
     }
 }
 
-//void Protocoldeal::run()
-//{
-//    cout << __PRETTY_FUNCTION__<<endl;
-//    SetSerialArgument();
-//}
+void Protocoldeal::run()
+{
+    cout << __PRETTY_FUNCTION__<<endl;
+    SetSerialArgument();
+}
 
 bool Protocoldeal::JudgeChange(char str[], char str2[])
 {
@@ -248,13 +247,12 @@ QSerialPortInfo Protocoldeal::FindSerial()
     qDebug() << "serialNumber: " << com_info.serialNumber();
     return com_info;
 }
-/*
+
 void Protocoldeal::SetSerialArgument()
 {
     my_serialport = new QSerialPort;
     my_serialport->setPortName("/dev/ttymxc1");
     qDebug() << "Name : " << my_serialport->portName();
-//    connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()));
     if (my_serialport->open(QIODevice::ReadOnly))
     {
         cout << "enter funtion"<<endl;
@@ -277,87 +275,52 @@ void Protocoldeal::SetSerialArgument()
     }
     cout << "end funtion"<<endl;
 }
-*/
-/*
+
 void Protocoldeal::ReadyreadSlots()
 {
 //    QSerialPort my_serialport;
     QByteArray arr = my_serialport->readAll();
+    qDebug()<< "arr.length = "<< arr.length();
+
+    unsigned char *p;
+    p = (unsigned char *)malloc(arr.length() + 1);
+    memcpy(p, arr, arr.length());
+
+    qDebug()<< "p = "<< p[0]<< p[1];
     qDebug()<< "arr = " << arr;
-//    QString s;
-//    s.clear();
-//    s.prepend(arr);
-    QString s = arr.toHex();
-    qDebug()<< "s = " << s <<endl;
+
+    QString pre;
+    QString cur = arr.toHex();  // 转换成16进制
+    qDebug()<< "cur = " << cur;
     cout << "setting sth\n";
-    emit AcceptDataFormBottom(s);
-    cout << "the string changes"<< endl;
-}
-*/
-ProducerFromBottom::ProducerFromBottom()
-{
-
-}
-
-ProducerFromBottom::~ProducerFromBottom()
-{
-
-}
-
-void ProducerFromBottom::SetSerialArgument()
-{
-    my_serialport = new QSerialPort;
-    my_serialport->setPortName("/dev/ttymxc1");
-    qDebug() << "Name : " << my_serialport->portName();
-//    connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()));
-    if (my_serialport->open(QIODevice::ReadOnly))
+    if (pre != cur)
     {
-        cout << "enter funtion"<<endl;
-        //设置波特率
-        my_serialport->setBaudRate(QSerialPort::Baud9600);
-        //设置数据位
-        my_serialport->setDataBits(QSerialPort::Data8);
-        //设置校验位
-        my_serialport->setParity(QSerialPort::NoParity);
-        //设置流控制
-        my_serialport->setFlowControl(QSerialPort::NoFlowControl);
-        //设置停止位
-        my_serialport->setStopBits(QSerialPort::OneStop);
-        my_serialport->clearError();
-        my_serialport->clear();
-        cout << "before connect"<<endl;
-        connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()));
-        this->exec();  // 需要在子线程中调用线程的exec的函数，使得进入消息队列
-        cout << "after connect"<<endl;
+        emit AcceptDataFormBottom(cur);
+        QStringToChar(cur);
+        qDebug() <<"Judgecompletedata = "<< JudgeCompleteData(cur);
     }
-    cout << "end funtion"<<endl;
-}
-
-void ProducerFromBottom::ReadyreadSlots()
-{
-//    QSerialPort my_serialport;
-    QByteArray arr = my_serialport->readAll();
-    qDebug()<< "arr = " << arr;
-
-    QString s = arr.toHex();
-    qDebug()<< "s = " << s <<endl;
-    cout << "setting sth\n";
-//    emit AcceptDataFormBottom(s);
+    pre = cur;
     cout << "the string changes"<< endl;
 }
 
-void ProducerFromBottom::run()
+//判断收到的一帧数据是否是完整的包含了帧头帧尾
+bool Protocoldeal::JudgeCompleteData(QString s)
 {
-    cout << __PRETTY_FUNCTION__<<endl;
-    SetSerialArgument();
+    qDebug()<< s[0] << s[1] << s[s.length()-2] << s[s.length()-1];
+    if (s[0] == '8' && s[1] == '0'
+       && s[s.length()-2] == '8' && s[s.length()-1] == '1')
+    {
+        return true;
+    }
+    return false;
 }
 
-ConsumerFromBottom::ConsumerFromBottom()
+//将QString类型转换成char *类型
+void Protocoldeal::QStringToChar(QString s)
 {
-
+    unsigned char* ch;
+    QByteArray ba = s.toLatin1();
+    ch = (unsigned char *)ba.data();
+    qDebug() << "unsigned ch = " << ch;
 }
 
-ConsumerFromBottom::~ConsumerFromBottom()
-{
-
-}

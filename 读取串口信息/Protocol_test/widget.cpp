@@ -13,7 +13,8 @@ Widget::Widget(QWidget *parent) :
 //    connect(tim, SIGNAL(timeout()), this, SLOT(sett()));
 //    tim->start(3000);
     pro = new Protocoldeal;
-    connect(pro, SIGNAL(AcceptDataFormBottom(QString)), this, SLOT(setstring(QString)));
+    connect(pro, SIGNAL(AcceptDataFormBottom(QString)), this ,SLOT(setstring(QString)));
+    pro->start();
 }
 
 Widget::~Widget()

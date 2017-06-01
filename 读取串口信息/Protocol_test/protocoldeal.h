@@ -75,38 +75,14 @@ typedef enum _id_type_{
 
 #pragma pack(pop)
 
-class ProducerFromBottom : public QThread
-{
-    Q_OBJECT
-public:
-    ProducerFromBottom();
-    ~ProducerFromBottom();
-    void run();
-    void SetSerialArgument();
-public:
-    QSerialPort *my_serialport;
-public slots:
-    void ReadyreadSlots();
-};
-
-class ConsumerFromBottom : public QThread
-{
-    Q_OBJECT
-public:
-    ConsumerFromBottom();
-    ~ConsumerFromBottom();
-//    void run();
-//    void SetSerialArgument();
-};
-
-class Protocoldeal: public QObject
+class Protocoldeal : public QThread
 {
     Q_OBJECT
 
 public:
     Protocoldeal();
     ~Protocoldeal();
-//    void run();
+    void run();
     void BstBvtPtlInit(void);
     void BstBvtSetFrameData(e_IDTYPE_T id,void *dat);
     void BstBvtCopyFrameData(e_IDTYPE_T id,void *dat);
@@ -116,7 +92,7 @@ public:
     bool JudgeChange(char str[], char str2[]);
     QString ChartoQString(char str[]);
     QSerialPortInfo FindSerial();
-//    void SetSerialArgument();
+    void SetSerialArgument();
     bool JudgeCompleteData(QString s);
     void QStringToChar(QString s);
 
@@ -132,14 +108,10 @@ protected:
 signals:
     void AcceptDataFormBottom(QString s);
     void AcceptDataFormTop();
-//public slots:
-//    void ReadyreadSlots();
+public slots:
+    void ReadyreadSlots();
 private:
-    ProducerFromBottom *GetDataPthread;
-    ConsumerFromBottom *ReadDataPthread;
-//    QSerialPort *my_serialport;
+    QSerialPort *my_serialport;
 };
-
-
 
 #endif // PROTOCOLDEAL_H
