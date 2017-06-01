@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <fstream>
+
 using namespace std;
 #define BVT_ESC 0x1B	/* 转换字符 */
 #define BVT_STX 0x02	/* 帧起始字符 */
@@ -16,12 +17,15 @@ using namespace std;
 #define BVT_RECV_CHANNEL_SIZE 1	/* 接收通道数据类型大小 */
 #define BVT_PTL_FRAMEID_POS 1	/* 协议帧ID地址 */
 #define BVT_PTL_DATASTART_POS 2	/* 协议帧数据地址 */
+#define MAX_LENGTH 4096         /*缓冲区大小*/
+static unsigned char gBvtRecStatus ;
+static unsigned char gBvtRecCnt ;
+static unsigned char gBvtFrameBuf[BVT_MAX_FRAME_LENTH] ;
+static char prestr[BVT_MAX_FRAME_LENTH] ;
+static char curstr[BVT_MAX_FRAME_LENTH] ;
 
-static unsigned char gBvtRecStatus = 0;
-static unsigned char gBvtRecCnt = 0;
-static unsigned char gBvtFrameBuf[BVT_MAX_FRAME_LENTH];
-static char prestr[BVT_MAX_FRAME_LENTH];
-static char curstr[BVT_MAX_FRAME_LENTH];
+static unsigned char totalBuf[MAX_LENGTH]; // 串口读到的数据存储的数据缓冲区
+
 Protocoldeal::Protocoldeal()
 {
     GetDataPthread = new ProducerFromBottom;
@@ -30,7 +34,7 @@ Protocoldeal::Protocoldeal()
 
 Protocoldeal::~Protocoldeal()
 {
-//    delete my_serialport;
+    delete GetDataPthread;
 }
 
 void Protocoldeal::BstBvtPtlInit()
@@ -296,7 +300,8 @@ void Protocoldeal::ReadyreadSlots()
 */
 ProducerFromBottom::ProducerFromBottom()
 {
-
+    cout << __PRETTY_FUNCTION__<<endl;
+    ProducerFromBottom_pointer = totalBuf;
 }
 
 ProducerFromBottom::~ProducerFromBottom()
@@ -304,13 +309,14 @@ ProducerFromBottom::~ProducerFromBottom()
 
 }
 
+//配置串口参数，连接信号和槽
 void ProducerFromBottom::SetSerialArgument()
 {
     my_serialport = new QSerialPort;
     my_serialport->setPortName("/dev/ttymxc1");
     qDebug() << "Name : " << my_serialport->portName();
 //    connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()));
-    if (my_serialport->open(QIODevice::ReadOnly))
+    if (my_serialport->open(QIODevice::ReadOnly))  //使用只读的方式打开串口
     {
         cout << "enter funtion"<<endl;
         //设置波特率
@@ -335,15 +341,22 @@ void ProducerFromBottom::SetSerialArgument()
 
 void ProducerFromBottom::ReadyreadSlots()
 {
-//    QSerialPort my_serialport;
     QByteArray arr = my_serialport->readAll();
     qDebug()<< "arr = " << arr;
 
     QString s = arr.toHex();
     qDebug()<< "s = " << s <<endl;
+    CopySerialDataToBuf(arr);
     cout << "setting sth\n";
-//    emit AcceptDataFormBottom(s);
     cout << "the string changes"<< endl;
+}
+
+void ProducerFromBottom::CopySerialDataToBuf(QByteArray arr)
+{
+    memcpy(totalBuf, arr, arr.length());
+    ProducerFromBottom_pointer += arr.length() - 1;
+    qDebug()<<"ProducerFromBottom_pointer = "<< *ProducerFromBottom_pointer;
+    qDebug()<<"ProducerFromBottom_pointer = "<< *ProducerFromBottom_pointer;
 }
 
 void ProducerFromBottom::run()
@@ -354,7 +367,8 @@ void ProducerFromBottom::run()
 
 ConsumerFromBottom::ConsumerFromBottom()
 {
-
+    cout << __PRETTY_FUNCTION__<<endl;
+    ConsumerFromBottom_pointer = totalBuf;
 }
 
 ConsumerFromBottom::~ConsumerFromBottom()

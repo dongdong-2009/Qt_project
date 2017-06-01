@@ -83,10 +83,13 @@ public:
     ~ProducerFromBottom();
     void run();
     void SetSerialArgument();
+    void CopySerialDataToBuf(QByteArray arr);
 public:
     QSerialPort *my_serialport;
 public slots:
     void ReadyreadSlots();
+private:
+    unsigned char *ProducerFromBottom_pointer;
 };
 
 class ConsumerFromBottom : public QThread
@@ -97,6 +100,8 @@ public:
     ~ConsumerFromBottom();
 //    void run();
 //    void SetSerialArgument();
+private:
+    unsigned char *ConsumerFromBottom_pointer;
 };
 
 class Protocoldeal: public QObject
