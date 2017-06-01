@@ -1,3 +1,0 @@
-Starting /home/devin/Desktop/Qt-Quick-qml/Qt-widget-project/build-Protocol_test-Desktop_Qt_5_4_0_GCC_64bit-Debug/Protocol_test...
-QObject::connect: Parentheses expected, slot Widget::sett in ../Protocol_test/widget.cpp:12
-QObject::connect:  (receiver name: 'Widget')
