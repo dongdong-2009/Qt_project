@@ -3,11 +3,11 @@
 #include <fcntl.h>
 #include <iostream>
 #include <fstream>
-#include <stdio.h>
+
 using namespace std;
 #define BVT_ESC 0x1B	/* 转换字符 */
 #define BVT_STX 0x02	/* 帧起始字符 */
-#define BVT_ETX 0x81	/* 帧结束字符 */
+#define BVT_ETX 0x03	/* 帧结束字符 */
 #define BVT_STX_AF 0xE7	/* 帧起始转换后增加字符 */
 #define BVT_ETX_AF 0xE8	/* 帧结束转换后增加字符 */
 #define BVT_ESC_AF 0x00	/* 转换字符转换后增加字符 */
@@ -302,7 +302,6 @@ ProducerFromBottom::ProducerFromBottom()
 {
     cout << __PRETTY_FUNCTION__<<endl;
     ProducerFromBottom_pointer = totalBuf;
-    ProCounts = 0;
 }
 
 ProducerFromBottom::~ProducerFromBottom()
@@ -340,104 +339,21 @@ void ProducerFromBottom::SetSerialArgument()
     cout << "end funtion"<<endl;
 }
 
-//void ProducerFromBottom::ReadyreadSlots()
-//{
-//    QByteArray arr = my_serialport->readAll();
-//    qDebug()<< "arr = " << arr;
-
-//    QString s = arr.toHex();
-//    qDebug()<< "s = " << s <<endl;
-//    CopySerialDataToBuf(arr);
-//    cout << "setting sth\n";
-//    cout << "the string changes"<< endl;
-//}
-
 void ProducerFromBottom::ReadyreadSlots()
 {
-//    QByteArray arr = my_serialport->read(1);
-    static bool istrue = false;
-    char str;
-    my_serialport->read(&str, 1);
-//    memcpy(p, arr, 1);
-    if (str == 0x80)
-    {
-        istrue = true;
-        printf("%X\n", str);
-    }
-    while (istrue)
-    {
-        my_serialport->read(&str, 1);
-        if (str == 0x81)
-        {
-            istrue = false;
-        }
-        printf("%X\n", str);
-    }
-//    while(*p != BVT_ETX)
-//    {
-//        arr = my_serialport->read(1);
-//        memcpy(p, arr, 1);
-//        qDebug()<< "arr = " << arr;
-//        qDebug()<< "p = " << *p;
-//        if (*p == BVT_ETX)
-//            break;
-//    }
+    QByteArray arr = my_serialport->readAll();
+    qDebug()<< "arr = " << arr;
+
+    QString s = arr.toHex();
+    qDebug()<< "s = " << s <<endl;
+    CopySerialDataToBuf(arr);
     cout << "setting sth\n";
     cout << "the string changes"<< endl;
 }
 
-//将串口数据拷贝到缓冲区
 void ProducerFromBottom::CopySerialDataToBuf(QByteArray arr)
 {
-    static int position = 0;      //相对于数组首地址的偏移
-    ConsumerFromBottom CFormBottom;
-    int len = arr.length();
-    // 如果完整写数据的次数大于完整读数据的次数
-//    if (ProCounts > CFormBottom.GetConCounts())
-//    {
-
-//    }
-//    else if ()
-//    {
-
-//    }
-    // 当本次从串口获取的数据长度加上当前位置小于最大长度时，继续拷贝，否则从头拷贝
-    if (len + position < MAX_LENGTH)
-    {
-        // 完整写数据的次数超过完整读数据的次数一次时 0~4095计作完整的一次
-        if (1 == ProCounts - CFormBottom.GetConCounts())
-        {
-            // 完整写数据的次数超过完整读数据的次数一次时,
-            // 此时写数据的指针位置必须是比读指针的位置小的时候才能写入数据，否则会覆盖掉未读取的数据
-            if (totalBuf + position < CFormBottom.GetPointPosition())
-            {
-                memcpy(totalBuf + position, arr, len); // 从上一次结束的位置的下一个位置进行拷贝
-                position = position + len;             // 拷贝结束，更新position的值
-            }
-        }
-        // 完整写数据的次数等于完整读数据的次数时
-        else if (0 == ProCounts - CFormBottom.GetConCounts())
-        {
-            // 写数据的次数等于读数据的次数时
-            // 此时写数据的指针位置大于读数据的指针位置时，才可以继续写入数据
-            if (totalBuf + position > CFormBottom.GetPointPosition())
-            {
-                memcpy(totalBuf + position, arr, len); // 从上一次结束的位置的下一个位置进行拷贝
-                position = position + len;             // 拷贝结束，更新position的值
-            }
-        }
-        else
-        {
-            // 超过1次之后不能再往缓冲区写入数据
-        }
-    }
-    else
-    {
-        position = 0;
-        ProCounts ++;  // 0～4095计数一次计算完整的读写次数
-        memcpy(totalBuf + position, arr, len);
-        position = position + len;
-    }
+    memcpy(totalBuf, arr, arr.length());
     ProducerFromBottom_pointer += arr.length() - 1;
     qDebug()<<"ProducerFromBottom_pointer = "<< *ProducerFromBottom_pointer;
     qDebug()<<"ProducerFromBottom_pointer = "<< *ProducerFromBottom_pointer;
@@ -459,24 +375,3 @@ ConsumerFromBottom::~ConsumerFromBottom()
 {
 
 }
-
-unsigned char* ConsumerFromBottom::GetPointPosition()
-{
-    return ConsumerFromBottom_pointer;
-}
-
-int ConsumerFromBottom::GetConCounts()
-{
-    qDebug()<< __PRETTY_FUNCTION__ << "ConCounts = "<< ConCounts;
-    return ConCounts;
-}
-
-void ConsumerFromBottom::SetConCounts(int counts)
-{
-    qDebug() << __PRETTY_FUNCTION__ <<" before ConCounts = "<< ConCounts;
-    ConCounts = counts;
-    qDebug() << __PRETTY_FUNCTION__ <<" after ConCounts = "<< ConCounts;
-}
-
-
-

@@ -90,7 +90,6 @@ public slots:
     void ReadyreadSlots();
 private:
     unsigned char *ProducerFromBottom_pointer;
-    int ProCounts;
 };
 
 class ConsumerFromBottom : public QThread
@@ -101,12 +100,8 @@ public:
     ~ConsumerFromBottom();
 //    void run();
 //    void SetSerialArgument();
-    unsigned char *GetPointPosition();
-    int GetConCounts();
-    void SetConCounts(int counts);
 private:
     unsigned char *ConsumerFromBottom_pointer;
-    int ConCounts;
 };
 
 class Protocoldeal: public QObject
