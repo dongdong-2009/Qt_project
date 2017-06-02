@@ -84,6 +84,7 @@ public:
     void run();
     void SetSerialArgument();
     void CopySerialDataToBuf(QByteArray arr);
+    void StartThread(ProducerFromBottom *p);
 public:
     QSerialPort *my_serialport;
 public slots:
@@ -124,18 +125,18 @@ public:
     int RetFileLength(char filename[]);
     void RedFile();
     bool JudgeChange(char str[], char str2[]);
-    QString ChartoQString(char str[]);
+    QString ChartoQString(unsigned char *str);
     QSerialPortInfo FindSerial();
 //    void SetSerialArgument();
     bool JudgeCompleteData(QString s);
     void QStringToChar(QString s);
+    unsigned long BstBvtRecoverFrame(void *src,unsigned long srclen);      // 数据还原
 
 protected:
     unsigned char BstBvtRecvMonitor(void);
     void BstBvtSendMonitor(void);
     unsigned long BstBvtTransformFrame(void *src,unsigned long srclen,void *dst);
     unsigned char BstBvtVerify(unsigned char *data, unsigned long length); // CRC 数据校验
-    unsigned long BstBvtRecoverFrame(void *src,unsigned long srclen);      // 数据还原
     void BstFifoMemCpy(unsigned char *pFrameBuf,void* dat, unsigned char DatLen);
     unsigned char BstBvtGetFrameDatLen(e_IDTYPE_T id);
 

@@ -9,9 +9,6 @@ Widget::Widget(QWidget *parent) :
     ui->setupUi(this);
     ui->label_floor->setTextFormat(Qt::RichText);
     ui->label_floor->setText("1");
-//    QTimer* tim = new QTimer(parent);
-//    connect(tim, SIGNAL(timeout()), this, SLOT(sett()));
-//    tim->start(3000);
     pro = new Protocoldeal;
     connect(pro, SIGNAL(AcceptDataFormBottom(QString)), this, SLOT(setstring(QString)));
 }
@@ -29,7 +26,7 @@ void Widget::sett()
 
 void Widget::setstring(QString str)
 {
-
+    qDebug()<<__PRETTY_FUNCTION__<< "the slots is running !";
     ui->label_floor->setText(str);
 }
 

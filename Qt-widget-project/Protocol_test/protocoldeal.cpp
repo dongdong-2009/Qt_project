@@ -6,7 +6,7 @@
 #include <stdio.h>
 using namespace std;
 #define BVT_ESC 0x1B	/* 转换字符 */
-#define BVT_STX 0x02	/* 帧起始字符 */
+#define BVT_STX 0x80	/* 帧起始字符 */
 #define BVT_ETX 0x81	/* 帧结束字符 */
 #define BVT_STX_AF 0xE7	/* 帧起始转换后增加字符 */
 #define BVT_ETX_AF 0xE8	/* 帧结束转换后增加字符 */
@@ -29,11 +29,14 @@ static unsigned char totalBuf[MAX_LENGTH]; // 串口读到的数据存储的数�
 Protocoldeal::Protocoldeal()
 {
     GetDataPthread = new ProducerFromBottom;
-    GetDataPthread->start();
+    GetDataPthread->StartThread(GetDataPthread);
 }
 
 Protocoldeal::~Protocoldeal()
 {
+    GetDataPthread->requestInterruption();
+    GetDataPthread->quit();
+    GetDataPthread->wait();
     delete GetDataPthread;
 }
 
@@ -113,7 +116,7 @@ unsigned long Protocoldeal::BstBvtRecoverFrame(void *src, unsigned long srclen)
 {
     unsigned long Len = srclen - 2;/*去掉帧头和帧尾*/
     unsigned long TranLen = 2;/*恢复后长度,帧头和帧尾*/
-    unsigned char Cnt = 0;
+    unsigned long Cnt = 0;
     unsigned char *lDst = (unsigned char*)src;
     unsigned char *lSrc = (unsigned char*)src;
 
@@ -176,7 +179,7 @@ int Protocoldeal::RetFileLength(char filename[])
 }
 
 void Protocoldeal::RedFile()
-{
+{/*
     while (1)
     {
         int size = RetFileLength(FILE_DEVICE);
@@ -209,7 +212,7 @@ void Protocoldeal::RedFile()
         memcpy(prestr, curstr, sizeof(curstr));
         delete []buffer;
         in.close();
-    }
+    }*/
 }
 
 //void Protocoldeal::run()
@@ -227,11 +230,13 @@ bool Protocoldeal::JudgeChange(char str[], char str2[])
     return true;
 }
 
-QString Protocoldeal::ChartoQString(char str[])
+QString Protocoldeal::ChartoQString(unsigned char *str)
 {
     QString qtext;
-    qtext.clear();
-    qtext = QString("%1").arg(str);
+    qtext.clear();qtext = " ";
+//    qtext = QString("%1").arg(str);
+//    qtext = qtext.append(str);
+//    qtext += str;
     qDebug() << "qtext = "<< qtext;
     return qtext;  // 漏写，出现段错误
 }
@@ -354,34 +359,44 @@ void ProducerFromBottom::SetSerialArgument()
 
 void ProducerFromBottom::ReadyreadSlots()
 {
-//    QByteArray arr = my_serialport->read(1);
-    static bool istrue = false;
+    static bool Isstart = false;
     char str;
-    my_serialport->read(&str, 1);
-//    memcpy(p, arr, 1);
-    if (str == 0x80)
+    unsigned long i = 0;
+    unsigned long j = 0;
+    while(1)
     {
-        istrue = true;
+        my_serialport->read(&str, 1); // 每次读取一个字节到str中存储
         printf("%X\n", str);
-    }
-    while (istrue)
-    {
-        my_serialport->read(&str, 1);
-        if (str == 0x81)
+        if (BVT_STX == str)
         {
-            istrue = false;
+            Isstart = true;
+            totalBuf[i++] = (unsigned char)str;
         }
-        printf("%X\n", str);
+        else if(Isstart)      // 如果遇到帧头，则将遇到帧尾之前的所有数据保存下来
+        {
+            totalBuf[i++] = (unsigned char)str;
+
+            if (BVT_ETX == str)
+            {
+                Isstart = false;
+                j = i;
+                i = 0;
+                break;
+            }
+        }
     }
-//    while(*p != BVT_ETX)
-//    {
-//        arr = my_serialport->read(1);
-//        memcpy(p, arr, 1);
-//        qDebug()<< "arr = " << arr;
-//        qDebug()<< "p = " << *p;
-//        if (*p == BVT_ETX)
-//            break;
-//    }
+    Protocoldeal Protocol;
+    Protocol.BstBvtRecoverFrame(totalBuf, j);
+    emit Protocol.AcceptDataFormBottom("send");
+    cout << "send message"<< endl;
+    for(i = 0; i < j; i++)
+    {
+        //cout<< totalBuf[i]<< " ";
+        printf("%X ", totalBuf[i]);
+    }
+    printf("\n");printf("funck !!!\n");
+    qDebug() << "totalBuf"<< totalBuf <<endl;
+    cout << "i = "<< i <<" "<<"j = "<< j << endl;
     cout << "setting sth\n";
     cout << "the string changes"<< endl;
 }
@@ -392,15 +407,6 @@ void ProducerFromBottom::CopySerialDataToBuf(QByteArray arr)
     static int position = 0;      //相对于数组首地址的偏移
     ConsumerFromBottom CFormBottom;
     int len = arr.length();
-    // 如果完整写数据的次数大于完整读数据的次数
-//    if (ProCounts > CFormBottom.GetConCounts())
-//    {
-
-//    }
-//    else if ()
-//    {
-
-//    }
     // 当本次从串口获取的数据长度加上当前位置小于最大长度时，继续拷贝，否则从头拷贝
     if (len + position < MAX_LENGTH)
     {
@@ -447,6 +453,16 @@ void ProducerFromBottom::run()
 {
     cout << __PRETTY_FUNCTION__<<endl;
     SetSerialArgument();
+}
+
+// 开启线程
+void ProducerFromBottom::StartThread(ProducerFromBottom *p)
+{
+    cout << __PRETTY_FUNCTION__<<endl;
+    if (!(p->isRunning()))  // 当线程不在运行时，启动线程
+    {
+        p->start();
+    }
 }
 
 ConsumerFromBottom::ConsumerFromBottom()
