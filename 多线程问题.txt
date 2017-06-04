@@ -109,3 +109,15 @@ void ProducerFromBottom::ReadyreadSlots()
     cout << "the string changes"<< endl;
 }
 
+http://blog.chinaunix.net/uid-28394603-id-5588747.html
+http://blog.csdn.net/u012474678/article/details/39576659
+http://www.myexception.cn/qt/1755866.html
+http://blog.csdn.net/xytx_823/article/details/51819474
+http://blog.sina.com.cn/s/blog_607142c90100lhat.html
+http://www.2cto.com/kf/201608/536534.html
+http://bbs.csdn.net/topics/392084679
+
+
+
+
+
