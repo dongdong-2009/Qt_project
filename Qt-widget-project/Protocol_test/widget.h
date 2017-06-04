@@ -19,7 +19,7 @@ public:
 
 public slots:
     void sett();
-    void setstring(QString str);
+    void setstring(unsigned char s);
 
 private:
     Ui::Widget *ui;

@@ -20,3 +20,37 @@ ch=ba.data();
 这样就完成了QString向char*的转化。经测试程序运行时不会出现bug
 
 注意第三行，一定要加上，不可以str.toLatin1().data()这样一部完成，可能会出错。
+
+
+
+void ProducerFromBottom::ReadyreadSlots()
+{
+    QByteArray arr = my_serialport->readAll();
+    qDebug()<< "arr = " << arr;
+
+    QString s = arr.toHex();   // 转成16进制
+    qDebug()<< "s = " << s <<endl;
+    CopySerialDataToBuf(arr);
+    cout << "setting sth\n";
+    cout << "the string changes"<< endl;
+}
+
+
+QSerialPortInfo Protocoldeal::FindSerial()
+{
+    QSerialPortInfo com_info;
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
+    {
+        if( info.serialNumber() == FILE_DEVICE )
+        {
+            com_info = info;
+            break;
+        }
+    }
+    qDebug() << "Name : " << com_info.portName();
+    qDebug() << "Description : " << com_info.description();
+    qDebug() << "serialNumber: " << com_info.serialNumber();
+    return com_info;
+}
+
+

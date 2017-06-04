@@ -177,59 +177,6 @@ unsigned char Protocoldeal::BstBvtGetFrameDatLen(e_IDTYPE_T id)
     }
     return len;
 }
-// return a file fd
-int Protocoldeal::RetFileLength(char filename[])
-{
-    long size;
-    ifstream in(filename, ios::in|ios::binary|ios::ate);   // need include namespace std;  ios::ate 放到文件末尾
-    size = in.tellg();  // 取得文件长度
-    in.seekg(0, ios::beg);
-    in.close();
-    return size;
-}
-
-void Protocoldeal::RedFile()
-{/*
-    while (1)
-    {
-        int size = RetFileLength(FILE_DEVICE);
-        if (size <= 0)
-        {
-            cout << FILE_DEVICE <<" is empty! "<< endl;
-            cout << __PRETTY_FUNCTION__<<endl;
-            continue;
-        }
-        cout <<" size = "<< size << endl;
-        ifstream in(FILE_DEVICE, ios::in|ios::binary);// need input namespace std;
-        char *buffer;
-        buffer = new char[size];
-        memset(buffer, 0, size);                      //全部清0
-        in.read(buffer, size - 1);                    // read the length of size to buffer
-        memcpy(gBvtFrameBuf, buffer, size - 1);       // 返回值之中包含了文件结束符，所以需要减掉一
-        memcpy(curstr, buffer, sizeof(buffer));
-        cout << "buffer = " << buffer << endl;
-        cout << "gBvtFrameBuf = " << gBvtFrameBuf << endl;
-        BstBvtRecoverFrame(gBvtFrameBuf, size - 1);   // 还原数据，去掉帧头帧尾或者数据中出现的帧头帧尾的处理
-        cout << __PRETTY_FUNCTION__<<endl;
-        memset(gBvtFrameBuf, 0, sizeof(gBvtFrameBuf));
-        if (JudgeChange(prestr, curstr))
-        {
-            QString s = ChartoQString(buffer);
-            cout << "setting sth\n";
-            emit AcceptDataFormBottom(s);
-            cout << "the string changes"<< endl;
-        }
-        memcpy(prestr, curstr, sizeof(curstr));
-        delete []buffer;
-        in.close();
-    }*/
-}
-
-//void Protocoldeal::run()
-//{
-//    cout << __PRETTY_FUNCTION__<<endl;
-//    SetSerialArgument();
-//}
 
 bool Protocoldeal::JudgeChange(char str[], char str2[])
 {
@@ -251,68 +198,26 @@ QString Protocoldeal::ChartoQString(unsigned char *str)
     return qtext;  // 漏写，出现段错误
 }
 
-QSerialPortInfo Protocoldeal::FindSerial()
+void Protocoldeal::CopyStringFromProtocol(unsigned char Id, void *str)
 {
-    QSerialPortInfo com_info;
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
+    if (0x01 == Id)
     {
-        if( info.serialNumber() == "/dev/ttymxc1" )
-        {
-            com_info = info;
-            break;
-        }
+        totalBuf[0] = 0x01;
+        totalBuf[1] = 'A';
+        memcpy(str, totalBuf, 2);
+        cout << "Id == " << "0x01 in if()"<< endl;
     }
-    qDebug() << "Name : " << com_info.portName();
-    qDebug() << "Description : " << com_info.description();
-    qDebug() << "serialNumber: " << com_info.serialNumber();
-    return com_info;
-}
-/*
-void Protocoldeal::SetSerialArgument()
-{
-    my_serialport = new QSerialPort;
-    my_serialport->setPortName("/dev/ttymxc1");
-    qDebug() << "Name : " << my_serialport->portName();
-//    connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()));
-    if (my_serialport->open(QIODevice::ReadOnly))
+    else if (0x02 == Id)
     {
-        cout << "enter funtion"<<endl;
-        //设置波特率
-        my_serialport->setBaudRate(QSerialPort::Baud9600);
-        //设置数据位
-        my_serialport->setDataBits(QSerialPort::Data8);
-        //设置校验位
-        my_serialport->setParity(QSerialPort::NoParity);
-        //设置流控制
-        my_serialport->setFlowControl(QSerialPort::NoFlowControl);
-        //设置停止位
-        my_serialport->setStopBits(QSerialPort::OneStop);
-        my_serialport->clearError();
-        my_serialport->clear();
-        cout << "before connect"<<endl;
-        connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()));
-        this->exec();  // 需要在子线程中调用线程的exec的函数，使得进入消息队列
-        cout << "after connect"<<endl;
+        totalBuf[0] = 0x02;
+        totalBuf[1] = 'y';
+        totalBuf[2] = 'x';
+        memcpy(str, totalBuf, 3);
+        cout << "Id == " << "0x02 in else if()"<< endl;
     }
-    cout << "end funtion"<<endl;
+    printf("%X %X %c\n", Id, *(unsigned char *)str, *(unsigned char *)(str + 1));
 }
-*/
-/*
-void Protocoldeal::ReadyreadSlots()
-{
-//    QSerialPort my_serialport;
-    QByteArray arr = my_serialport->readAll();
-    qDebug()<< "arr = " << arr;
-//    QString s;
-//    s.clear();
-//    s.prepend(arr);
-    QString s = arr.toHex();
-    qDebug()<< "s = " << s <<endl;
-    cout << "setting sth\n";
-    emit AcceptDataFormBottom(s);
-    cout << "the string changes"<< endl;
-}
-*/
+
 ProducerFromBottom::ProducerFromBottom()
 {
     cout << __PRETTY_FUNCTION__<<endl;
@@ -329,9 +234,8 @@ ProducerFromBottom::~ProducerFromBottom()
 void ProducerFromBottom::SetSerialArgument()
 {
     my_serialport = new QSerialPort;
-    my_serialport->setPortName("/dev/ttymxc1");
+    my_serialport->setPortName(FILE_DEVICE);
     qDebug() << "Name : " << my_serialport->portName();
-//    connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()));
     if (my_serialport->open(QIODevice::ReadOnly))  //使用只读的方式打开串口
     {
         cout << "enter funtion"<<endl;
@@ -353,23 +257,12 @@ void ProducerFromBottom::SetSerialArgument()
         // 在子线程中使用this->exec()的话，将会导致，主线程的connect的槽函数收不到信号
         cout << "after connect"<<endl;
     }
-//    Protocoldeal *Protocol = Protocoldeal::GetInstance();
-////    Protocol->BstBvtRecoverFrame(totalBuf, j);
-//    emit Protocol->AcceptDataFormBottom("send");
-//    cout << "end funtion"<<endl;
+    Protocoldeal *Protocol = Protocoldeal::GetInstance();
+//    Protocol->BstBvtRecoverFrame(totalBuf, j);
+    unsigned char s = 0x01;
+    emit Protocol->AcceptDataFormBottom(s);
+    cout << "end funtion"<<endl;
 }
-
-//void ProducerFromBottom::ReadyreadSlots()
-//{
-//    QByteArray arr = my_serialport->readAll();
-//    qDebug()<< "arr = " << arr;
-
-//    QString s = arr.toHex();
-//    qDebug()<< "s = " << s <<endl;
-//    CopySerialDataToBuf(arr);
-//    cout << "setting sth\n";
-//    cout << "the string changes"<< endl;
-//}
 
 void ProducerFromBottom::ReadyreadSlots()
 {
@@ -401,7 +294,8 @@ void ProducerFromBottom::ReadyreadSlots()
     }
     Protocoldeal *Protocol = Protocoldeal::GetInstance();
     Protocol->BstBvtRecoverFrame(totalBuf, j);
-    emit Protocol->AcceptDataFormBottom("send");
+    unsigned char s = 0x01;
+    emit Protocol->AcceptDataFormBottom(s);
     cout << "send message"<< endl;
     for(i = 0; i < j; i++)
     {

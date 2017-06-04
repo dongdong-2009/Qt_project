@@ -1,7 +1,6 @@
 #ifndef PROTOCOLDEAL_H
 #define PROTOCOLDEAL_H
 #define FILE_DEVICE ("/dev/ttymxc1")
-//#define FILE_DEVICE ("test")
 #include <QObject>
 #include <QThread>
 #include <QDebug>
@@ -101,7 +100,6 @@ public:
     ConsumerFromBottom();
     ~ConsumerFromBottom();
 //    void run();
-//    void SetSerialArgument();
     unsigned char *GetPointPosition();
     int GetConCounts();
     void SetConCounts(int counts);
@@ -121,15 +119,12 @@ public:
     void BstBvtSetFrameData(e_IDTYPE_T id,void *dat);
     void BstBvtCopyFrameData(e_IDTYPE_T id,void *dat);
     e_IDTYPE_T BstBvtPtlMonitor(void);
-    int RetFileLength(char filename[]);
-    void RedFile();
     bool JudgeChange(char str[], char str2[]);
     QString ChartoQString(unsigned char *str);
-    QSerialPortInfo FindSerial();
-//    void SetSerialArgument();
     bool JudgeCompleteData(QString s);
     void QStringToChar(QString s);
-    unsigned long BstBvtRecoverFrame(void *src,unsigned long srclen);      // 数据还原
+    unsigned long BstBvtRecoverFrame(void *src, unsigned long srclen);      // 数据还原
+    void CopyStringFromProtocol(unsigned char Id, void *str);
 
 protected:
     Protocoldeal();
@@ -141,7 +136,8 @@ protected:
     unsigned char BstBvtGetFrameDatLen(e_IDTYPE_T id);
 
 signals:
-    void AcceptDataFormBottom(QString s);
+//    void AcceptDataFormBottom(QString s);
+    void AcceptDataFormBottom(unsigned char s);
     void AcceptDataFormTop();
 //public slots:
 //    void ReadyreadSlots();

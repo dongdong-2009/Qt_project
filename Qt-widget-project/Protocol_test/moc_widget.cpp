@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Widget_t {
     QByteArrayData data[5];
-    char stringdata[27];
+    char stringdata[25];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -33,10 +33,10 @@ QT_MOC_LITERAL(0, 0, 6), // "Widget"
 QT_MOC_LITERAL(1, 7, 4), // "sett"
 QT_MOC_LITERAL(2, 12, 0), // ""
 QT_MOC_LITERAL(3, 13, 9), // "setstring"
-QT_MOC_LITERAL(4, 23, 3) // "str"
+QT_MOC_LITERAL(4, 23, 1) // "s"
 
     },
-    "Widget\0sett\0\0setstring\0str"
+    "Widget\0sett\0\0setstring\0s"
 };
 #undef QT_MOC_LITERAL
 
@@ -59,7 +59,7 @@ static const uint qt_meta_data_Widget[] = {
 
  // slots: parameters
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,    4,
+    QMetaType::Void, QMetaType::UChar,    4,
 
        0        // eod
 };
@@ -70,7 +70,7 @@ void Widget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         Widget *_t = static_cast<Widget *>(_o);
         switch (_id) {
         case 0: _t->sett(); break;
-        case 1: _t->setstring((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 1: _t->setstring((*reinterpret_cast< unsigned char(*)>(_a[1]))); break;
         default: ;
         }
     }

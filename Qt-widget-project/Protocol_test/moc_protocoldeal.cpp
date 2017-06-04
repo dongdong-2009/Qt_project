@@ -216,7 +216,7 @@ static const uint qt_meta_data_Protocoldeal[] = {
        4,    0,   27,    2, 0x06 /* Public */,
 
  // signals: parameters
-    QMetaType::Void, QMetaType::QString,    3,
+    QMetaType::Void, QMetaType::UChar,    3,
     QMetaType::Void,
 
        0        // eod
@@ -227,7 +227,7 @@ void Protocoldeal::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
     if (_c == QMetaObject::InvokeMetaMethod) {
         Protocoldeal *_t = static_cast<Protocoldeal *>(_o);
         switch (_id) {
-        case 0: _t->AcceptDataFormBottom((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 0: _t->AcceptDataFormBottom((*reinterpret_cast< unsigned char(*)>(_a[1]))); break;
         case 1: _t->AcceptDataFormTop(); break;
         default: ;
         }
@@ -235,7 +235,7 @@ void Protocoldeal::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
-            typedef void (Protocoldeal::*_t)(QString );
+            typedef void (Protocoldeal::*_t)(unsigned char );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Protocoldeal::AcceptDataFormBottom)) {
                 *result = 0;
             }
@@ -286,7 +286,7 @@ int Protocoldeal::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void Protocoldeal::AcceptDataFormBottom(QString _t1)
+void Protocoldeal::AcceptDataFormBottom(unsigned char _t1)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
