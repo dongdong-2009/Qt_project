@@ -152,6 +152,7 @@ unsigned long Protocoldeal::BstBvtRecoverFrame(void *src, unsigned long srclen)
     *lDst = *lSrc;/*取出帧尾数据*/
     return TranLen;
 }
+
 //内存拷贝
 void Protocoldeal::BstFifoMemCpy(unsigned char *pFrameBuf,void* dat, unsigned char DatLen)
 {
@@ -252,16 +253,10 @@ void ProducerFromBottom::SetSerialArgument()
         my_serialport->clearError();
         my_serialport->clear();
         cout << "before connect"<<endl;
-        connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()), Qt::DirectConnection);
-        //this->exec();  // 需要在子线程中调用线程的exec的函数，使得进入消息队列
-        // 在子线程中使用this->exec()的话，将会导致，主线程的connect的槽函数收不到信号
-        cout << "after connect"<<endl;
+        bool flag = connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()), Qt::BlockingQueuedConnection);
+        cout << "flag = " << flag << endl;
+        this->exec();  // 需要在子线程中调用线程的exec的函数，使得进入消息队列
     }
-    Protocoldeal *Protocol = Protocoldeal::GetInstance();
-//    Protocol->BstBvtRecoverFrame(totalBuf, j);
-    unsigned char s = 0x01;
-    emit Protocol->AcceptDataFormBottom(s);
-    cout << "end funtion"<<endl;
 }
 
 void ProducerFromBottom::ReadyreadSlots()

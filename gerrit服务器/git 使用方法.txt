@@ -1,15 +1,24 @@
-½«·şÎñÆ÷µÄ´úÂëÍ¬²½µ½±¾µØ£º
-git clone ssh://yonghao@10.200.13.100:29418/ct15_mcu
+windows ä¸‹git clone å‡ºç°é”™è¯¯æ—¶
+è¿™ä¸ªå‡ºé”™çš„æƒ…å†µï¼Œä½¿ç”¨
+ ssh-add ~/.ssh/libo1ï¼Œæœ‰å‡ºç°å¦‚ä¸‹é”™è¯¯
 
-½«Ä³¸öÎÄ¼ş»òËùÓĞÎÄ¼şÍ¬²½µ½±¾µØ±¸·İ¿â£º
-git add app.c    »ò   git add *
-
-Ìí¼Ó±¾´ÎĞŞ¸ÄµÄ±¸×¢£º
-git commit -m "modify the APP.c"
-
-½«±¾µØ¿âÍ¬²½µ½·şÎñÆ÷£º
-git push origin master:refs/for/master
+å¯ä»¥ä½¿ç”¨ ssh-agent bash
+æˆ–è€…å¯ä»¥ä½¿ç”¨
 
 
-+(SECOND(E20)-SECOND(D20))*1/3600
+down vote
+Could not open a connection to your authentication agent
+
+To resolve this error:
+
+bash:
+
+$ eval `ssh-agent -s`
+tcsh:
+
+$ eval `ssh-agent -c`
+Then use ssh-add as you normally would.
+
+
+ç„¶åå†æ‰§è¡Œ ssh-add ~/.ssh/libo1
 
