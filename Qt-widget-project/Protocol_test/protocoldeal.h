@@ -1,6 +1,6 @@
 #ifndef PROTOCOLDEAL_H
 #define PROTOCOLDEAL_H
-#define FILE_DEVICE ("/dev/ttymxc1")
+#define SERIAL_DEVICE ("/dev/ttymxc1")
 #include <QObject>
 #include <QThread>
 #include <QDebug>
@@ -13,55 +13,67 @@
 #pragma pack(push, 1) //按照1字节对齐
 
 //*ID = 0的帧内容*/
-/* 数据2的数据结构 */
-typedef struct _id0_dat2_{
-    unsigned char Hund: 7;	/* 百位显示字符ASCII码表示 */
-    unsigned char Reserved: 1;
-}s_ID0DAT2_T;
-/* 数据3的数据结构 */
-typedef struct _id0_dat3_{
-    unsigned char Tend: 7;	/* 十位显示字符ASCII码表示 */
-    unsigned char Reserved: 1;
-}s_ID0DAT3_T;
-/* 数据4的数据结构 */
-typedef struct _id0_dat4_{
+/* 楼层值个位的数据结构 */
+typedef struct _id0_dat1_{
     unsigned char Unit: 7;	/* 个位显示字符ASCII码表示 */
     unsigned char Reserved: 1;
+}s_ID0DAT1_T;
+/* 楼层值十位的数据结构 */
+typedef struct _id0_dat2_{
+    unsigned char Tend: 7;	/* 十位显示字符ASCII码表示 */
+    unsigned char Reserved: 1;
+}s_ID0DAT2_T;
+/* 楼层值百位的数据结构 */
+typedef struct _id0_dat3_{
+    unsigned char Hund: 7;	/* 百位显示字符ASCII码表示 */
+    unsigned char Reserved: 1;
+}s_ID0DAT3_T;
+/* 楼层值千位的数据结构 */
+typedef struct _id0_dat4_ {
+    unsigned char Thou: 7;   /* 千位显示字符ASCII码表示 */
+    unsigned char Reserved: 1;
 }s_ID0DAT4_T;
-/* 数据5的数据结构 */
-typedef struct _id0_dat5_{
-    unsigned char ArrowUp: 1;	/*上箭头*/
-    unsigned char ArrowDn: 1;	/*下箭头*/
-    unsigned char Runing: 1;	/*运行*/
-    unsigned char Arrived: 1;	/*到站使能*/
-    unsigned char VoidEn: 1;	/*语音报站使能*/
-    unsigned char PowerDown: 1;	/*节能使能*/
-    unsigned char Reserved: 1;	/*预留*/
-    unsigned char Reserved1: 1;	/*预留*/
-}s_ID0DAT5_T;
 
+/*箭头状态（e_ARROWSTA_T类型枚举）*/
+enum {
+    ArrowHide = 0,  /*0-不显示*/
+    ArrowUp,        /*1-上箭头*/
+    ArrowDn,        /*2-下箭头*/
+    ArrowUpRoll,    /*3-上箭头滚动*/
+    ArrowDnRoll,    /*4-下箭头滚动*/
+    ArrowUpFlash,   /*5-上箭头闪烁*/
+    ArrowDnFlash,   /*6-下箭头闪烁*/
+};
+
+/* 1.电梯信息帧 (ID = 0x00) */
 typedef struct _bvt_id0_{
-    s_ID0DAT2_T Data2;	/* 数据2 */
-    s_ID0DAT3_T Data3;	/* 数据3 */
-    s_ID0DAT4_T Data4;	/* 数据4 */
-    s_ID0DAT5_T Data5;	/* 数据5 */
-    unsigned char Func[2];/*数据6/7/8*/
-    unsigned char Language1;
-    unsigned char Language2;
-    unsigned char Year;
-    unsigned char Month;
-    unsigned char Day;
-    unsigned char Week;
-    unsigned char Hour;
-    unsigned char Min;
-    unsigned char Second;
+    unsigned char ID;                 /* ID */
+    s_ID0DAT1_T Data1;                /* 个位显示字符ASCII码表示 */
+    s_ID0DAT2_T Data2;	              /* 十位显示字符ASCII码表示 */
+    s_ID0DAT3_T Data3;	              /* 百位显示字符ASCII码表示 */
+    s_ID0DAT4_T Data4;	              /* 千位显示字符ASCII码表示 */
+    unsigned char ArrowStatus;	      /* 箭头状态 */
+    unsigned char LiftSpecialStatus;  /* 电梯特殊状态 */
+    unsigned char StationClockStatus; /* 到站钟状态 */
+    unsigned char StationLightStatus; /* 到站灯状态 */
 }s_BVTID0_T;
 
-/*心跳ID帧数据*/
+/*2.控制命令帧（ID = 0x01）*/
 typedef struct _bvt_id1_{
-    unsigned char Data1;
-    unsigned char Data2;
+    unsigned char byte1;
+    unsigned char byte2;
+    unsigned char byte3;
+    unsigned char byte4;
+    unsigned char byte5;
+    unsigned char byte6;
+    unsigned char byte7;
 }s_BVTID1_T;
+
+///*心跳ID帧数据*/
+//typedef struct _bvt_id1_{
+//    unsigned char Data1;
+//    unsigned char Data2;
+//}s_BVTID1_T;
 
 
 //ID类型枚举
@@ -74,6 +86,7 @@ typedef enum _id_type_{
 
 #pragma pack(pop)
 
+// 读取串口数据的线程
 class ProducerFromBottom : public QThread
 {
     Q_OBJECT
@@ -93,6 +106,7 @@ private:
     int ProCounts;
 };
 
+// 向串口发送数据的线程
 class ConsumerFromBottom : public QThread
 {
     Q_OBJECT
@@ -108,6 +122,7 @@ private:
     int ConCounts;
 };
 
+// 协议处理的类
 class Protocoldeal: public QObject
 {
     Q_OBJECT
@@ -125,7 +140,7 @@ public:
     void QStringToChar(QString s);
     unsigned long BstBvtRecoverFrame(void *src, unsigned long srclen);      // 数据还原
     void CopyStringFromProtocol(unsigned char Id, void *str);
-
+    void PrintString(unsigned char *src, unsigned long length);
 protected:
     Protocoldeal();
     unsigned char BstBvtRecvMonitor(void);
@@ -133,7 +148,7 @@ protected:
     unsigned long BstBvtTransformFrame(void *src,unsigned long srclen,void *dst);
     unsigned char BstBvtVerify(unsigned char *data, unsigned long length); // CRC 数据校验
     void BstFifoMemCpy(unsigned char *pFrameBuf,void* dat, unsigned char DatLen);
-    unsigned char BstBvtGetFrameDatLen(e_IDTYPE_T id);
+//    unsigned char BstBvtGetFrameDatLen(e_IDTYPE_T id);
 
 signals:
 //    void AcceptDataFormBottom(QString s);

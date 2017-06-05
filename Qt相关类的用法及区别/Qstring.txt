@@ -54,3 +54,51 @@ QSerialPortInfo Protocoldeal::FindSerial()
 }
 
 
+//将串口数据拷贝到缓冲区
+void ProducerFromBottom::CopySerialDataToBuf(QByteArray arr)
+{
+    static int position = 0;      //相对于数组首地址的偏移
+    ConsumerFromBottom CFormBottom;
+    int len = arr.length();
+    // 当本次从串口获取的数据长度加上当前位置小于最大长度时，继续拷贝，否则从头拷贝
+    if (len + position < MAX_LENGTH)
+    {
+        // 完整写数据的次数超过完整读数据的次数一次时 0~4095计作完整的一次
+        if (1 == ProCounts - CFormBottom.GetConCounts())
+        {
+            // 完整写数据的次数超过完整读数据的次数一次时,
+            // 此时写数据的指针位置必须是比读指针的位置小的时候才能写入数据，否则会覆盖掉未读取的数据
+            if (totalBuf + position < CFormBottom.GetPointPosition())
+            {
+                memcpy(totalBuf + position, arr, len); // 从上一次结束的位置的下一个位置进行拷贝
+                position = position + len;             // 拷贝结束，更新position的值
+            }
+        }
+        // 完整写数据的次数等于完整读数据的次数时
+        else if (0 == ProCounts - CFormBottom.GetConCounts())
+        {
+            // 写数据的次数等于读数据的次数时
+            // 此时写数据的指针位置大于读数据的指针位置时，才可以继续写入数据
+            if (totalBuf + position > CFormBottom.GetPointPosition())
+            {
+                memcpy(totalBuf + position, arr, len); // 从上一次结束的位置的下一个位置进行拷贝
+                position = position + len;             // 拷贝结束，更新position的值
+            }
+        }
+        else
+        {
+            // 超过1次之后不能再往缓冲区写入数据
+        }
+    }
+    else
+    {
+        position = 0;
+        ProCounts ++;  // 0～4095计数一次计算完整的读写次数
+        memcpy(totalBuf + position, arr, len);
+        position = position + len;
+    }
+    ProducerFromBottom_pointer += arr.length() - 1;
+    qDebug()<<"ProducerFromBottom_pointer = "<< *ProducerFromBottom_pointer;
+    qDebug()<<"ProducerFromBottom_pointer = "<< *ProducerFromBottom_pointer;
+}
+

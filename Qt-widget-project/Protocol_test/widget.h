@@ -18,7 +18,6 @@ public:
     void DealData(char str[]);
 
 public slots:
-    void sett();
     void setstring(unsigned char s);
 
 private:

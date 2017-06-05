@@ -25,6 +25,7 @@ static char prestr[BVT_MAX_FRAME_LENTH] ;
 static char curstr[BVT_MAX_FRAME_LENTH] ;
 
 static unsigned char totalBuf[MAX_LENGTH]; // 串口读到的数据存储的数据缓冲区
+static unsigned long StringSize;
 Protocoldeal* Protocoldeal::instance = NULL;
 Protocoldeal::Protocoldeal()
 {
@@ -83,7 +84,7 @@ void Protocoldeal::BstBvtSetFrameData(e_IDTYPE_T id, void *dat)
 
     if(id >= ID_UNKNOW)/*未知ID*/
         return;
-    DatLen = BstBvtGetFrameDatLen(id);
+//    DatLen = BstBvtGetFrameDatLen(id);
     *pFrameBuf++ = BVT_STX;	/*加入帧头*/
     pStarVer = pFrameBuf;
     *pFrameBuf++ = id;	/*加入ID*/
@@ -149,7 +150,7 @@ unsigned long Protocoldeal::BstBvtRecoverFrame(void *src, unsigned long srclen)
         }
         TranLen++;
     }
-    *lDst = *lSrc;/*取出帧尾数据*/
+    *lDst = *lSrc; /*取出帧尾数据*/
     return TranLen;
 }
 
@@ -166,18 +167,18 @@ void Protocoldeal::BstFifoMemCpy(unsigned char *pFrameBuf,void* dat, unsigned ch
  * @param[out]  None
  * @retval  	帧ID对应的数据长度
  */
-unsigned char Protocoldeal::BstBvtGetFrameDatLen(e_IDTYPE_T id)
-{
-    unsigned char len = 0;
-    switch(id)
-    {
-        case ID00_BASE: len = sizeof(s_BVTID0_T);break;
-        case ID01_HEAR: len = sizeof(s_BVTID1_T);break;
-        default:
-            break;
-    }
-    return len;
-}
+//unsigned char Protocoldeal::BstBvtGetFrameDatLen(e_IDTYPE_T id)
+//{
+//    unsigned char len = 0;
+//    switch(id)
+//    {
+//        case ID00_BASE: len = sizeof(s_BVTID0_T);break;
+//        case ID01_HEAR: len = sizeof(s_BVTID1_T);break;
+//        default:
+//            break;
+//    }
+//    return len;
+//}
 
 bool Protocoldeal::JudgeChange(char str[], char str2[])
 {
@@ -199,24 +200,30 @@ QString Protocoldeal::ChartoQString(unsigned char *str)
     return qtext;  // 漏写，出现段错误
 }
 
+/*应用层调用从协议层拷贝数据到应用层的接口*/
 void Protocoldeal::CopyStringFromProtocol(unsigned char Id, void *str)
 {
     if (0x01 == Id)
     {
-        totalBuf[0] = 0x01;
-        totalBuf[1] = 'A';
-        memcpy(str, totalBuf, 2);
+        memcpy(str, totalBuf, StringSize);
         cout << "Id == " << "0x01 in if()"<< endl;
     }
     else if (0x02 == Id)
     {
-        totalBuf[0] = 0x02;
-        totalBuf[1] = 'y';
-        totalBuf[2] = 'x';
-        memcpy(str, totalBuf, 3);
+        memcpy(str, totalBuf, StringSize);
         cout << "Id == " << "0x02 in else if()"<< endl;
     }
-    printf("%X %X %c\n", Id, *(unsigned char *)str, *(unsigned char *)(str + 1));
+}
+
+void Protocoldeal::PrintString(unsigned char *src, unsigned long length)
+{
+    cout << __PRETTY_FUNCTION__<<endl;
+    unsigned long i = 0;
+    for (i = 0; i < length; i++)
+    {
+        printf("%X ", src[i]);
+    }
+    printf("\n");
 }
 
 ProducerFromBottom::ProducerFromBottom()
@@ -235,7 +242,7 @@ ProducerFromBottom::~ProducerFromBottom()
 void ProducerFromBottom::SetSerialArgument()
 {
     my_serialport = new QSerialPort;
-    my_serialport->setPortName(FILE_DEVICE);
+    my_serialport->setPortName(SERIAL_DEVICE);
     qDebug() << "Name : " << my_serialport->portName();
     if (my_serialport->open(QIODevice::ReadOnly))  //使用只读的方式打开串口
     {
@@ -288,8 +295,8 @@ void ProducerFromBottom::ReadyreadSlots()
         }
     }
     Protocoldeal *Protocol = Protocoldeal::GetInstance();
-    Protocol->BstBvtRecoverFrame(totalBuf, j);
-    unsigned char s = 0x01;
+    StringSize = Protocol->BstBvtRecoverFrame(totalBuf, j);
+    unsigned char s = 0x02;
     emit Protocol->AcceptDataFormBottom(s);
     cout << "send message"<< endl;
     for(i = 0; i < j; i++)
@@ -355,7 +362,7 @@ void ProducerFromBottom::CopySerialDataToBuf(QByteArray arr)
 void ProducerFromBottom::run()
 {
     cout << __PRETTY_FUNCTION__<<endl;
-    SetSerialArgument();
+    SetSerialArgument();  // 配置串口，连接信号，传输数据
 }
 
 // 开启线程
