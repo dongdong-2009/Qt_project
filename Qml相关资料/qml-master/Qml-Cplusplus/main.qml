@@ -112,3 +112,19 @@ Item {
         onColorChanged: colorRect.color = color
     }
 }
+/*
+main.qml 中使用 RGBGame 构造了一个对象,id 为 rgbGame ,这样就可以借助 id 来
+访问 C++类对象了 , 这里还定义了一个 changeAlgorithm 函数,参数 button 和 algorithm
+拥有动态类型。
+界面由三部分组成。顶部是一个 Text ,用来显示由 RGBGame 提供的时间,这里使用
+Connections 对 象 来 连 接 目 标 对 象 和 信 号 处 理 器 , 指 定 target 为 RGBGame , 在
+onCurrentTime 信号处理器中改变 timeLabel 的文本和颜色,颜色用到了 RGBGame 的
+timeColor 属性,该属性的读取函数是 timeColor 。
+界面中间是一个 Rectangle 对象,id 是 colorRect 。这里使用 Connections 对象,指定
+target 为 rgbGame ,在 onColorChanged 信号处理器中改变 colorRect 的颜色。
+界面底部是几个按钮,使用锚布局把它们排成一行。 start 按钮的 onClicked 信号处理
+器调用 rgbGame 的 start() 槽,启动颜色生成器。 stop 按钮的 onClicked 信号处理器调用
+rgbGame 的 stop() 槽,停止颜色生成器。而 colorAlgorithm 按钮则每点击一次就切换一个
+颜色生成算法,同时调用 changeAlgorithm() 函数,根据算法改变按钮上的文字。 quit 按钮
+点击时退出应用。
+ */
