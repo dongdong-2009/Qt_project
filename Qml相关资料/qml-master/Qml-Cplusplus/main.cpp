@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
 //    QQmlApplicationEngine engine;
 //    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     QQuickView view;
+    QObject::connect(view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
+    //不这样写，quit会直接提示没有接受者处理这个handle
     view.setSource(QUrl(QStringLiteral("qrc:/main.qml")));
     view.show();
     return app.exec();

@@ -518,7 +518,8 @@ compiler_rcc_clean:
 	-$(DEL_FILE) qrc_qml.cpp
 qrc_qml.cpp: qml.qrc \
 		MainForm.ui.qml \
-		main.qml
+		main.qml \
+		MySingleton.qml
 	/home/devin/Qt5.4.0/5.4/gcc_64/bin/rcc -name qml qml.qrc -o qrc_qml.cpp
 
 compiler_moc_header_make_all: moc_RGBGame.cpp moc_mysingleton.cpp
@@ -686,6 +687,34 @@ moc_mysingleton.cpp: /home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QObject \
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qisenum.h \
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/QQmlEngine \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlengine.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qurl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpair.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qurlquery.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qshareddata.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qhash.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringlist.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdatastream.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qiodevice.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qregexp.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmap.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdebug.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtextstream.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlocale.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvariant.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvector.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpoint.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qset.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qjsengine.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsharedpointer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qjsvalue.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qtqmlglobal.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlerror.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmldebug.h \
 		mysingleton.h
 	/home/devin/Qt5.4.0/5.4/gcc_64/bin/moc $(DEFINES) -I/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/linux-g++ -I/home/devin/Desktop/Repository/Qt_project/Qt_project/Qml相关资料/qml-master/Qml-Cplusplus -I/home/devin/Qt5.4.0/5.4/gcc_64/include -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQuick -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtWidgets -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore mysingleton.h -o moc_mysingleton.cpp
 
@@ -1012,7 +1041,8 @@ main.o: main.cpp /home/devin/Qt5.4.0/5.4/gcc_64/include/QtWidgets/QApplication \
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QHash \
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qtqmlversion.h \
 		RGBGame.h \
-		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui/QColor
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui/QColor \
+		mysingleton.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 RGBGame.o: RGBGame.cpp /home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QTimerEvent \
@@ -1180,7 +1210,35 @@ mysingleton.o: mysingleton.cpp mysingleton.h \
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qisenum.h \
-		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobject_impl.h
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/QQmlEngine \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlengine.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qurl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpair.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qurlquery.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qshareddata.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qhash.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringlist.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdatastream.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qiodevice.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qregexp.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmap.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdebug.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtextstream.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlocale.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvariant.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvector.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpoint.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qset.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qjsengine.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsharedpointer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qjsvalue.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qtqmlglobal.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlerror.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmldebug.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mysingleton.o mysingleton.cpp
 
 qrc_qml.o: qrc_qml.cpp 
