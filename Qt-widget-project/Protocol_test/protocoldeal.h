@@ -75,13 +75,18 @@ typedef struct _bvt_id1_{
 //    unsigned char Data2;
 //}s_BVTID1_T;
 
+/*各个数据帧组成的信息表*/
+typedef struct _messagetable {
+    s_BVTID0_T ID0_Message;     //电梯信息帧 (ID = 0x00)
+}messagetable;
 
 //ID类型枚举
 typedef enum _id_type_{
-    ID00_BASE = 0,	/* 基本信息ID 包含楼层，箭头、功能信息*/
-    ID01_HEAR,		/* 心跳ID */
+    ID00_BASE = 0x00,	/* 基本信息ID 包含楼层，箭头、功能信息*/
+    ID01_ORDER,
+//    ID01_HEAR,          /* 心跳ID */
 
-    ID_UNKNOW,		/* 未知ID信息 */
+    ID_UNKNOW,          /* 未知ID信息 */
 }e_IDTYPE_T;
 
 #pragma pack(pop)
@@ -134,13 +139,16 @@ public:
     void BstBvtSetFrameData(e_IDTYPE_T id,void *dat);
     void BstBvtCopyFrameData(e_IDTYPE_T id,void *dat);
     e_IDTYPE_T BstBvtPtlMonitor(void);
-    bool JudgeChange(char str[], char str2[]);
-    QString ChartoQString(unsigned char *str);
-    bool JudgeCompleteData(QString s);
-    void QStringToChar(QString s);
-    unsigned long BstBvtRecoverFrame(void *src, unsigned long srclen);      // 数据还原
+    bool JudgeChange(unsigned char ID, unsigned char str[]);
+//    QString ChartoQString(char *str);
+    unsigned char BstBvtGetFrameDatLen(unsigned char id);
+
+//    void QStringToChar(QString s);
+    unsigned long BstBvtRecoverFrame(void *des, void *src, unsigned long srclen);      // 数据还原
     void CopyStringFromProtocol(unsigned char Id, void *str);
     void PrintString(unsigned char *src, unsigned long length);
+    bool StringCompare(unsigned char *temp, unsigned char *str, unsigned long len);
+    bool AllocteMemory(void *p);
 protected:
     Protocoldeal();
     unsigned char BstBvtRecvMonitor(void);
@@ -151,11 +159,9 @@ protected:
 //    unsigned char BstBvtGetFrameDatLen(e_IDTYPE_T id);
 
 signals:
-//    void AcceptDataFormBottom(QString s);
     void AcceptDataFormBottom(unsigned char s);
     void AcceptDataFormTop();
-//public slots:
-//    void ReadyreadSlots();
+
 private:
     ProducerFromBottom *GetDataPthread;
     ConsumerFromBottom *ReadDataPthread;

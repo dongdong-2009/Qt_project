@@ -1,16 +1,21 @@
 #include <QApplication>
-#include <QQmlApplicationEngine>
+//#include <QQmlApplicationEngine>
+#include <QQuickView>
 #include <QtQml>
 #include "RGBGame.h"
+#include "mysingleton.h"
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    qmlRegisterType<RGBGame>("suntec.tools.RGBGame", 1, 0, "RGBGame");
-
-    QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-
+    qmlRegisterType<RGBGame>("lb2616.tools.RGBGame", 1, 0, "RGBGame");
+    qmlRegisterSingletonType<MySingleton>("lb2616.tools.MySingleton",
+                                          1, 0, "MySingleton", singletonProvider);
+//    QQmlApplicationEngine engine;
+//    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    QQuickView view;
+    view.setSource(QUrl(QStringLiteral("qrc:/main.qml")));
+    view.show();
     return app.exec();
 }
 

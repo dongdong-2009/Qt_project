@@ -36,7 +36,7 @@ QColor RGBGame::timeColor() const
     return QColor::fromRgb(r, g, b);
 }
 
-GenerateAlgorithm RGBGame::algorithm()
+RGBGame::GenerateAlgorithm RGBGame::algorithm() const
 {
     return m_algorithm;
 }
@@ -67,7 +67,8 @@ void RGBGame::timerEvent(QTimerEvent *e)
 {
     if (m_nColorTimer == e->timerId())
     {
-        switch (m_algorithm) {
+        switch (m_algorithm)
+        {
         case RandomRGB:
             m_currentColor.setRgb(qrand()%255, qrand()%255,qrand()%255);
             break;
@@ -87,10 +88,13 @@ void RGBGame::timerEvent(QTimerEvent *e)
             int b = m_currentColor.blue() + 10;
             m_currentColor.setRgb(r%255,g%255,b%255);
         }
-            break;
+        break;
         default:
             break;
         }
+        emit colorChanged(m_currentColor);
+        emit currentTime(
+                    QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
     }
     else
     {

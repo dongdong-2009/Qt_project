@@ -10,8 +10,8 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    ui->label_floor->setTextFormat(Qt::RichText);
-    ui->label_floor->setText("1");
+    ui->label_time->setTextFormat(Qt::RichText);
+    ui->label_time->setText("1");
     pro = Protocoldeal::GetInstance();
     connect(pro, SIGNAL(AcceptDataFormBottom(unsigned char)), this, SLOT(setstring(unsigned char)), Qt::DirectConnection);
 }
@@ -32,15 +32,16 @@ void Widget::setstring(unsigned char str)
         pro->PrintString(sstr, 19);
     }
     if ('a' == *(sstr + 1))
-        ui->label_floor->setText("a");
+        ui->label_time->setText("a");
     else
-        ui->label_floor->setText("A");
+        ui->label_time->setText("A");
     int i;
     for(i = 0; i < 19; i++)
     {
         //cout<< totalBuf[i]<< " ";
         printf("%X ", sstr[i]);
     }
+    printf("\n");
     memset(sstr, 0 , 5);
 }
 

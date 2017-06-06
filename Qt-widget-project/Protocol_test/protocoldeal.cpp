@@ -4,7 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <string.h>
 using namespace std;
+
 #define BVT_ESC 0x1B	/* 转换字符 */
 #define BVT_STX 0x80	/* 帧起始字符 */
 #define BVT_ETX 0x81	/* 帧结束字符 */
@@ -21,11 +23,13 @@ using namespace std;
 static unsigned char gBvtRecStatus ;
 static unsigned char gBvtRecCnt ;
 static unsigned char gBvtFrameBuf[BVT_MAX_FRAME_LENTH] ;
-static char prestr[BVT_MAX_FRAME_LENTH] ;
-static char curstr[BVT_MAX_FRAME_LENTH] ;
+//static char prestr[BVT_MAX_FRAME_LENTH] ;
+//static char curstr[BVT_MAX_FRAME_LENTH] ;
 
 static unsigned char totalBuf[MAX_LENGTH]; // 串口读到的数据存储的数据缓冲区
+static unsigned char tempBuf[1024];        // 去掉帧头和帧尾，并且解析好的数据的缓冲区
 static unsigned long StringSize;
+messagetable mestable;
 Protocoldeal* Protocoldeal::instance = NULL;
 Protocoldeal::Protocoldeal()
 {
@@ -123,15 +127,15 @@ unsigned char Protocoldeal::BstBvtVerify(unsigned char *data, unsigned long leng
  * @param[out]  None
  * @retval  	恢复后的帧长度
  */
-unsigned long Protocoldeal::BstBvtRecoverFrame(void *src, unsigned long srclen)
+unsigned long Protocoldeal::BstBvtRecoverFrame(void *des, void *src, unsigned long srclen)
 {
-    unsigned long Len = srclen - 2;/*去掉帧头和帧尾*/
-    unsigned long TranLen = 2;/*恢复后长度,帧头和帧尾*/
+    unsigned long Len = srclen - 2; /*去掉帧头和帧尾*/
+    unsigned long TranLen = 0;      /*数据域的数据长度*/
     unsigned long Cnt = 0;
-    unsigned char *lDst = (unsigned char*)src;
+    unsigned char *lDst = (unsigned char*)des;
     unsigned char *lSrc = (unsigned char*)src;
 
-    *lDst++ = *lSrc++;/*取出帧头数据*/
+    lSrc++; /*取出跳过帧头数据*/
     while(Cnt < Len)
     {
         if(BVT_ESC == *lSrc)                   //如果是转换字符
@@ -150,7 +154,7 @@ unsigned long Protocoldeal::BstBvtRecoverFrame(void *src, unsigned long srclen)
         }
         TranLen++;
     }
-    *lDst = *lSrc; /*取出帧尾数据*/
+    //*lDst = *lSrc; /*取出帧尾数据*/
     return TranLen;
 }
 
@@ -167,38 +171,102 @@ void Protocoldeal::BstFifoMemCpy(unsigned char *pFrameBuf,void* dat, unsigned ch
  * @param[out]  None
  * @retval  	帧ID对应的数据长度
  */
-//unsigned char Protocoldeal::BstBvtGetFrameDatLen(e_IDTYPE_T id)
-//{
-//    unsigned char len = 0;
-//    switch(id)
-//    {
-//        case ID00_BASE: len = sizeof(s_BVTID0_T);break;
-//        case ID01_HEAR: len = sizeof(s_BVTID1_T);break;
-//        default:
-//            break;
-//    }
-//    return len;
-//}
-
-bool Protocoldeal::JudgeChange(char str[], char str2[])
+unsigned char Protocoldeal::BstBvtGetFrameDatLen(unsigned char id)
 {
-    if (0 == strcmp(str, str2))
+    unsigned char len = 0;
+    switch(id)
     {
-        return false;
+        case 0x00: len = sizeof(s_BVTID0_T);break;
+        case 0x01: len = sizeof(s_BVTID1_T);break;
+        default:
+            break;
     }
-    return true;
+    return len;
 }
 
-QString Protocoldeal::ChartoQString(unsigned char *str)
+//比较unsigned char 类型的字符串是否相同
+bool Protocoldeal::StringCompare(unsigned char *temp, unsigned char *str, unsigned long len)
 {
-    QString qtext;
-    qtext.clear();qtext = " ";
+    unsigned long i = 0;
+    for (i = 0; i < len; i++)
+    {
+        if(temp[i] != str[i])
+        {
+            cout << "the different index i = " << i << endl;
+            return true;
+        }
+    }
+    cout << "the string is same as before i = " << i << endl;
+    return false;
+}
+//
+bool Protocoldeal::AllocteMemory(void *p)
+{
+    if (NULL == p)
+    {
+        printf("allcote memory is failed");
+        return true;
+    }
+    return false;
+}
+
+// 检测发送的新的数据帧的内容是否有变更
+bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
+{
+    unsigned long len;
+    unsigned char *temp;
+    bool AllocteFlag = false;
+    len = BstBvtGetFrameDatLen(ID);      // 需要拷贝的ID的数据长度
+    temp = (unsigned char *)malloc(len); // 分配内存
+    if (!AllocteMemory(temp))
+    {
+        memset(temp, 0, len);
+        switch(ID)
+        {
+        case 0x00:
+                memcpy(temp, &mestable.ID0_Message, len);// 拷贝信息表中的数据到temp中，用来和新收到的数据进行比较
+                AllocteFlag = true;
+            break;
+        case 0x01:
+            AllocteFlag = true;
+            break;
+        case 0x02:
+            AllocteFlag = true;
+            break;
+        default:
+            AllocteFlag = true;
+            break;
+        }
+        if (AllocteFlag)
+        {
+            PrintString(temp, len);
+            AllocteFlag = false;
+            if (StringCompare(temp, str, len))
+            {
+                free(temp);
+                temp = NULL;
+                return true;  // true 表示变更了
+            }
+            else
+            {
+                free(temp);
+                temp = NULL;
+                return false;
+            }
+        }
+    }
+}
+
+//QString Protocoldeal::ChartoQString(char *str)
+//{
+//    QString qtext;
+//    qtext.clear();
 //    qtext = QString("%1").arg(str);
 //    qtext = qtext.append(str);
 //    qtext += str;
-    qDebug() << "qtext = "<< qtext;
-    return qtext;  // 漏写，出现段错误
-}
+//    qDebug() << "qtext = "<< qtext;
+//    return qtext;  // 漏写，出现段错误
+//}
 
 /*应用层调用从协议层拷贝数据到应用层的接口*/
 void Protocoldeal::CopyStringFromProtocol(unsigned char Id, void *str)
@@ -272,9 +340,11 @@ void ProducerFromBottom::ReadyreadSlots()
     char str;
     unsigned long i = 0;
     unsigned long j = 0;
+    unsigned long count = 0;
     while(1)
     {
         my_serialport->read(&str, 1); // 每次读取一个字节到str中存储
+        count ++;
         printf("%X\n", str);
         if (BVT_STX == str)
         {
@@ -294,10 +364,26 @@ void ProducerFromBottom::ReadyreadSlots()
             }
         }
     }
+    printf("count = %d\n", count);
     Protocoldeal *Protocol = Protocoldeal::GetInstance();
-    StringSize = Protocol->BstBvtRecoverFrame(totalBuf, j);
-    unsigned char s = 0x02;
-    emit Protocol->AcceptDataFormBottom(s);
+    StringSize = Protocol->BstBvtRecoverFrame(tempBuf, totalBuf, j);
+    printf("%X \n", tempBuf[0]);
+    if (Protocol->JudgeChange(tempBuf[0], tempBuf))
+    {
+        emit Protocol->AcceptDataFormBottom(tempBuf[0]);
+    }
+
+    memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));
+    printf("ID0_Message.ID = %X \n", mestable.ID0_Message.ID);
+    printf("Data1 = %X \n", mestable.ID0_Message.Data1);
+    printf("Data2 = %X \n", mestable.ID0_Message.Data2);
+    printf("Data3 = %X \n", mestable.ID0_Message.Data3);
+    printf("Data4 = %X \n", mestable.ID0_Message.Data4);
+    printf("ArrowStatus = %X \n", mestable.ID0_Message.ArrowStatus);
+    printf("LiftSpecialStatus = %X \n", mestable.ID0_Message.LiftSpecialStatus);
+    printf("StationClockStatus = %X \n", mestable.ID0_Message.StationClockStatus);
+    printf("StationLightStatus = %X \n", mestable.ID0_Message.StationLightStatus);
+
     cout << "send message"<< endl;
     for(i = 0; i < j; i++)
     {

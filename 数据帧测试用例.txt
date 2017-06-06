@@ -1,0 +1,26 @@
+void Widget::setstring(unsigned char) the slots is running !
+Id == 0x02 in else if()
+end copy in setstring
+void Protocoldeal::PrintString(unsigned char*, long unsigned int)
+80 1 55 2A 7E 81 0 0 0 0 0 5 16 1 13 23 21 3 81 
+80 1 55 2A 7E 81 0 0 0 0 0 5 16 1 13 23 21 3 81 Data1 = 1 
+Data2 = 55 
+Data3 = 2A 
+Data4 = 7E 
+ArrowStatus = 81 
+LiftSpecialStatus = 0 
+StationClockStatus = 0 
+StationLightStatus = 0 
+send message
+80 1 55 2A 7E 81 
+funck !!!
+totalBuf 0x17808 
+
+i = 6 j = 6
+setting sth
+the string changes
+^C
+
+
+
+

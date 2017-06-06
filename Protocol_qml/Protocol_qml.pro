@@ -2,9 +2,7 @@ TEMPLATE = app
 
 QT += qml quick widgets
 
-SOURCES += main.cpp \
-    RGBGame.cpp \
-    mysingleton.cpp
+SOURCES += main.cpp
 
 RESOURCES += qml.qrc
 
@@ -13,7 +11,3 @@ QML_IMPORT_PATH =
 
 # Default rules for deployment.
 include(deployment.pri)
-
-HEADERS += \
-    RGBGame.h \
-    mysingleton.h

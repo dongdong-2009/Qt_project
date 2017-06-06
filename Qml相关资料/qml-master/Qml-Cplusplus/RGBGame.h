@@ -1,10 +1,11 @@
 #ifndef RGBGAME_H
 #define RGBGAME_H
 #include<QApplication>
-class RGBGame:public QObject
+#include<QColor>
+class RGBGame: public QObject
 {
     Q_OBJECT
-    Q_ENUMS(GenerateAlgorihm)
+    Q_ENUMS(GenerateAlgorithm)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
     Q_PROPERTY(QColor timeColor READ timeColor)
 public:
