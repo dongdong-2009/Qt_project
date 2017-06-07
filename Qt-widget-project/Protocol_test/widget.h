@@ -5,6 +5,7 @@
 #include <QWidget>
 #include "protocoldeal.h"
 #include <QString>
+#include <QImage>
 namespace Ui {
 class Widget;
 }
@@ -23,6 +24,7 @@ public slots:
 private:
     Ui::Widget *ui;
     Protocoldeal *pro;
+    QImage *image;
 
 };
 
