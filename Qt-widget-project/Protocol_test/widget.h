@@ -6,6 +6,7 @@
 #include "protocoldeal.h"
 #include <QString>
 #include <QImage>
+#include <QGraphicsView>
 namespace Ui {
 class Widget;
 }
@@ -17,15 +18,24 @@ public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
     void DealData(char str[]);
+protected:
+    void UiInit();
+    void ShowDate();
+    void SetWidgetBackGround(QString path);
+    void HideGraphicViewBorder();
+    void SetPicture(QString path, QGraphicsView *graphic);
+    void AnimationForPicture();
 
 public slots:
     void setstring(unsigned char s);
+    void showTime();
+    void ChangePosition();
 
 private:
     Ui::Widget *ui;
     Protocoldeal *pro;
     QImage *image;
-
+    QTimer *timer;
 };
 
 #endif // WIDGET_H
