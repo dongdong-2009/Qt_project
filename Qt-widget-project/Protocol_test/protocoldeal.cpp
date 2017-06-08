@@ -199,6 +199,7 @@ bool Protocoldeal::StringCompare(unsigned char *temp, unsigned char *str, unsign
     cout << "the string is same as before i = " << i << endl;
     return false;
 }
+
 //
 bool Protocoldeal::AllocteMemory(void *p)
 {
@@ -367,10 +368,14 @@ void ProducerFromBottom::ReadyreadSlots()
     printf("count = %d\n", count);
     Protocoldeal *Protocol = Protocoldeal::GetInstance();
     StringSize = Protocol->BstBvtRecoverFrame(tempBuf, totalBuf, j);
-    printf("%X \n", tempBuf[0]);
-    if (Protocol->JudgeChange(tempBuf[0], tempBuf))
+    if ( tempBuf[j-2] == Protocol->BstBvtVerify(tempBuf, j)) // 数据校验
     {
-        emit Protocol->AcceptDataFormBottom(tempBuf[0]);
+        printf("%X \n", tempBuf[0]);
+        cout <<" verify is true "<< endl;
+        if (Protocol->JudgeChange(tempBuf[0], tempBuf))
+        {
+            emit Protocol->AcceptDataFormBottom(tempBuf[0]);
+        }
     }
 
     memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));

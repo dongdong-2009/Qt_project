@@ -16,28 +16,28 @@ Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
 {
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
     ui->setupUi(this);
+
     timer = new QTimer(this);
     bool flagtime = connect(timer, SIGNAL(timeout()), this, SLOT(showTime()));
     timer->start(1000);
-    connect(timer, SIGNAL(timeout()), this, SLOT(ChangePosition()));
     qDebug() << "flagtiem = "<< flagtime;
 
     pro = Protocoldeal::GetInstance();
     connect(pro, SIGNAL(AcceptDataFormBottom(unsigned char)), this, SLOT(setstring(unsigned char)));
 
     UiInit();
-
-    SetPicture(":/new/prefix1/images/ArrowUp.png", ui->graphicsView_Arrow);
-    SetPicture(":/new/prefix1/images/logo.png", ui->graphicsView_logo);
-    SetPicture(":/new/prefix1/images/number2.png", ui->graphicsView_floor1);
-    SetPicture(":/new/prefix1/images/number8.png", ui->graphicsView_floor2);
-    SetPicture(":/new/prefix1/images/welcome_text.png", ui->graphicsView_scroll);
     AnimationForPicture();
+    SetTimer();
+    sstr[1] = 0x39; sstr[2] = 0x30; sstr[3] = 0x31; sstr[4] = 0x30;
+    SetFloorNumber(GainFloorNumber(sstr));
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
 Widget::~Widget()
 {
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
     delete pro;
     delete timer;
     delete ui;
@@ -46,63 +46,130 @@ Widget::~Widget()
 
 void Widget::UiInit()
 {
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
     ShowDate();
     showTime();
     SetWidgetBackGround(":/new/prefix1/images/background.png");     // 设置图片作为widget的背景
     HideGraphicViewBorder();   // 将QGraphicview控件边框设置为透明的
+    PosAnimation();
+//    SetPicture(":/new/prefix1/images/ArrowUp.png", ui->graphicsView_Arrow);
+    SetPicture(":/new/prefix1/images/logo.png", ui->graphicsView_logo);
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
 //
 void Widget::AnimationForPicture()
 {
-    QPropertyAnimation *pAnimation = new QPropertyAnimation(ui->graphicsView_scroll, "pos");
-    pAnimation->setDuration(100);
-    pAnimation->setStartValue(QRect(549, 696, 324, 36));
-    pAnimation->setEndValue(QRect(250, 250, 324, 36));
-    pAnimation->setLoopCount(-1);
-    ui->graphicsView_scroll->move(300, 696);
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
+    QPixmap image; //定义一张图片
+    image.load(":/new/prefix1/images/ArrowUp.png");//加载
+    ui->label_Arrow->clear();//清空
+    ui->label_Arrow->setPixmap(image);//加载到Label标签
+    ui->label_Arrow->show();//显示
+
+//    QLabel *mylabel = new QLabel(this);
+//    mylabel->clear();
+//    mylabel->setPixmap(image);
+    QPropertyAnimation *panimation = new QPropertyAnimation(ui->label_Arrow, "pos");
+    panimation->setDuration(10000);
+    panimation->setStartValue(QPoint(136, 250));
+    panimation->setEndValue(QPoint(136, 115));
+    panimation->setLoopCount(-1);
     qDebug() << __PRETTY_FUNCTION__;
     //pAnimation->setEasingCurve(QEasingCurve::OutBounce);  // 缓和曲线风格
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
-void Widget::ChangePosition()
+// 滚动字幕的动画设置
+void Widget::PosAnimation()
 {
-    static int x = 549;
-    if (x - 10 > 292)
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
+    QLabel *mylabel = new QLabel(this);
+    QString s = "欢迎光临上海贝思特";
+    QFont ft;                    // 设置字号
+    ft.setPointSize(20);
+    mylabel->setFont(ft);
+
+    QPalette pe;                // 设置颜色
+    pe.setColor(QPalette::WindowText, Qt::white);
+    mylabel->setPalette(pe);
+
+    mylabel->setText(s);
+    QPropertyAnimation *panimation = new QPropertyAnimation(mylabel, "pos");
+    panimation->setDuration(10000);
+    panimation->setStartValue(QPoint(290, 711));
+//    panimation->setEndValue(QPoint(this->width() - this->fontMetrics().width(s), 711));
+    panimation->setEndValue(QPoint(1024, 711));
+    panimation->setLoopCount(-1);
+    panimation->start();
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
+}
+
+void Widget::SetTimer()
+{
+    QTimer *mytime = new QTimer(this);
+    connect(mytime, SIGNAL(timeout()), this, SLOT(ChangePositionUp()));
+    mytime->start(250);
+}
+
+void Widget::ChangePositionUp()
+{
+    static int x = 250;
+    if (x - 10 > 115)
     {
         x = x - 10;
-        ui->graphicsView_scroll->move(x, 696);
+        ui->label_Arrow->move(40, x);
     }
     else
     {
-        ui->graphicsView_scroll->move(549, 696);
-        x = 549;
+        ui->label_Arrow->move(40, 250);
+        x = 250;
+    }
+}
+
+void Widget::ChangePositionDn()
+{
+    static int y = 115;
+    if (y + 10 < 250)
+    {
+        y = y + 10;
+        ui->label_Arrow->move(40, y);
+    }
+    else
+    {
+        ui->label_Arrow->move(40, 115);
+        y = 115;
     }
 }
 
 //  设置图片作为widget的背景
 void Widget::SetWidgetBackGround(QString path)
 {
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
     QPalette pal;
     QPixmap pixmap(path);
     pal.setBrush(QPalette::Window, QBrush(pixmap));
     setPalette(pal);
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
 // 将QGraphicview控件边框设置为透明的
 void Widget::HideGraphicViewBorder()
 {
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
     ui->graphicsView_Arrow->setStyleSheet("background: transparent;border:0px");
     ui->graphicsView_emergency->setStyleSheet("background: transparent;border:0px");
     ui->graphicsView_floor1->setStyleSheet("background: transparent;border:0px");
     ui->graphicsView_floor2->setStyleSheet("background: transparent;border:0px");
     ui->graphicsView_logo->setStyleSheet("background: transparent;border:0px");
     ui->graphicsView_scroll->setStyleSheet("background: transparent;border:0px");
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
 // 显示图片，将图片显示在指定的QGraphicview 的控件中
 void Widget::SetPicture(QString path, QGraphicsView *graphic)
 {
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
 //    this->image = new QImage();
     QImage image;
 //    bool flag = image->load(str);
@@ -114,11 +181,13 @@ void Widget::SetPicture(QString path, QGraphicsView *graphic)
     scene->addPixmap(QPixmap::fromImage(image));
     graphic->setScene(scene);
     graphic->show();
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
 // 显示日期
 void Widget::ShowDate()
 {
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
     QDateTime Time = QDateTime::currentDateTime();
     QString tim = Time.toString("MM-dd-yyyy");
     qDebug()<<"tim = "<< tim<<'\n';
@@ -131,6 +200,7 @@ void Widget::ShowDate()
     pe.setColor(QPalette::WindowText,Qt::white);
     ui->label_date->setPalette(pe);
     ui->label_date->setText(tim);
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
 // 显示时间，每秒刷新一次
@@ -146,6 +216,7 @@ void Widget::ShowDate()
 // 显示时间，每秒刷新一次
 void Widget::showTime()
 {
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
     QTime time = QTime::currentTime();
     QString text = time.toString("hh : mm");
     if ((time.second() % 2) == 0)
@@ -160,8 +231,89 @@ void Widget::showTime()
     ui->label_time->setPalette(pe);
     ui->label_time->setText(text);
     qDebug()<< "text = "<< text;
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
+// 解析楼层数据，返回QString的值用于显示楼层
+QString Widget::GainFloorNumber(unsigned char* str)
+{
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
+    QString s;
+    QString sstr;
+    int i;
+    s.clear();
+    sstr.clear();
+    unsigned char *p = str;
+    for (i = 4; i >= 1; i--)
+    {
+        switch (*(p + i)) {
+        case 0x30: s.append("0"); break;
+        case 0x31: s.append("1"); break;
+        case 0x32: s.append("2"); break;
+        case 0x33: s.append("3"); break;
+        case 0x34: s.append("4"); break;
+        case 0x35: s.append("5"); break;
+        case 0x36: s.append("6"); break;
+        case 0x37: s.append("7"); break;
+        case 0x38: s.append("8"); break;
+        case 0x39: s.append("9"); break;
+        case 0x41: s.append("A"); break;
+        case 0x42: s.append("B"); break;
+        default:
+            break;
+        }
+    }
+    qDebug()<<"s = "<< s;
+    if ('0' != s[0])   // 千位数为0
+    {
+        sstr = s;
+    }
+    else if ('0' == s[0] && '0' != s[1])  // 千位数为0 百位数不为0
+    {
+        for (i = 1; i < 4; i++)
+            sstr.append(s[i]);
+    }
+    else if ('0' == s[0] && '0' == s[1] && '0' != s[2])
+    {
+        for (i = 2; i < 4; i++)
+            sstr.append(s[i]);
+    }
+    else if ('0' == s[0] && '0' == s[1] && '0' == s[2])
+    {
+        for (i = 3; i < 4; i++)
+            sstr.append(s[i]);
+    }
+    qDebug()<<"sstr = "<< sstr;
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
+    return sstr;
+}
+
+//设置楼层号的槽函数
+void Widget::SetFloorNumber(QString s)
+{
+    qDebug()<<__PRETTY_FUNCTION__ << "start";
+    QFont ft;                    // 设置字号
+    if (4 == s.length())         // 有千位数时，将字体调小，否则可能显示不下
+    {
+        ft.setPointSize(70);
+    }
+    else if (3 == s.length())
+    {
+        ft.setPointSize(80);
+    }
+    else if ( 2 == s.length() || 1 == s.length())
+    {
+        ft.setPointSize(90);
+    }
+    ui->label_floor->setFont(ft);
+
+    QPalette pe;                // 设置颜色
+    pe.setColor(QPalette::WindowText, Qt::white);
+    ui->label_floor->setPalette(pe);
+
+    ui->label_floor->setText(s);
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
+}
 
 void Widget::setstring(unsigned char str)
 {
@@ -171,11 +323,15 @@ void Widget::setstring(unsigned char str)
         pro->CopyStringFromProtocol(str, sstr);
         cout << "end copy in setstring\n";
         pro->PrintString(sstr, 19);
-    }
-    if ('a' == *(sstr + 1))
-        ui->label_time->setText("a");
-    else
-        ui->label_time->setText("A");
+        switch (str) {
+        case 0x00:
+            SetFloorNumber(GainFloorNumber(sstr));
+
+            break;
+        default:
+            break;
+        }
+    }    
     int i;
     for(i = 0; i < 19; i++)
     {
@@ -183,7 +339,23 @@ void Widget::setstring(unsigned char str)
         printf("%X ", sstr[i]);
     }
     printf("\n");
-    memset(sstr, 0 , 5);
+    memset(sstr, 0 , 19);
+    qDebug()<<__PRETTY_FUNCTION__ << "end";
+}
+
+void Widget::ShowArrowStatus(unsigned char str)
+{
+    switch (str) {
+    case 0x30: ui->graphicsView_Arrow->hide(); break;
+    case 0x31: SetPicture(":/new/prefix1/images/ArrowUp.png", ui->graphicsView_Arrow); break;
+    case 0x32: SetPicture(":/new/prefix1/images/ArrowDn.png", ui->graphicsView_Arrow); break;
+    case 0x33: ; break;
+    case 0x34: ; break;
+    case 0x35: ; break;
+    case 0x36: ; break;
+    default:
+        break;
+    }
 }
 
 void Widget::DealData(char str[])

@@ -25,11 +25,17 @@ protected:
     void HideGraphicViewBorder();
     void SetPicture(QString path, QGraphicsView *graphic);
     void AnimationForPicture();
+    void PosAnimation();
+    QString GainFloorNumber(unsigned char *str);
+    void ShowArrowStatus(unsigned char str);
+    void SetTimer();
 
 public slots:
     void setstring(unsigned char s);
     void showTime();
-    void ChangePosition();
+    void ChangePositionUp();
+    void ChangePositionDn();
+    void SetFloorNumber(QString s);
 
 private:
     Ui::Widget *ui;

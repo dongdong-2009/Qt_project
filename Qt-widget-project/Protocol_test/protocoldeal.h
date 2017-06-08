@@ -149,12 +149,12 @@ public:
     void PrintString(unsigned char *src, unsigned long length);
     bool StringCompare(unsigned char *temp, unsigned char *str, unsigned long len);
     bool AllocteMemory(void *p);
+    unsigned char BstBvtVerify(unsigned char *data, unsigned long length); // CRC 数据校验
 protected:
     Protocoldeal();
     unsigned char BstBvtRecvMonitor(void);
     void BstBvtSendMonitor(void);
     unsigned long BstBvtTransformFrame(void *src,unsigned long srclen,void *dst);
-    unsigned char BstBvtVerify(unsigned char *data, unsigned long length); // CRC 数据校验
     void BstFifoMemCpy(unsigned char *pFrameBuf,void* dat, unsigned char DatLen);
 //    unsigned char BstBvtGetFrameDatLen(e_IDTYPE_T id);
 

@@ -16,6 +16,6 @@
         <file>images/welcome_text.png</file>
         <file>images/background.png</file>
         <file>images.qrc</file>
-        <file>images/num0.png</file>
+        <file>images/ArrowDn.png</file>
     </qresource>
 </RCC>

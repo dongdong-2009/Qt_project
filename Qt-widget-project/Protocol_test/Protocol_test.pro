@@ -39,7 +39,8 @@ DISTFILES += \
     images/background.png \
     images/N4.png \
     images/num0.png \
-    images/8.png
+    images/8.png \
+    images/ArrowDn.png
 
 RESOURCES += \
     images.qrc
