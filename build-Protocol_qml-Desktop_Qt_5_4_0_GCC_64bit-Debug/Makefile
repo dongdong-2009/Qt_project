@@ -12,10 +12,10 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG -DQT_QUICK_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG -DQT_QUICK_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_QML_LIB -DQT_NETWORK_LIB -DQT_SERIALPORT_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -g -Wall -W -D_REENTRANT -fPIE $(DEFINES)
-INCPATH       = -I/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/linux-g++ -I../Protocol_qml -I/home/devin/Qt5.4.0/5.4/gcc_64/include -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQuick -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtWidgets -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore -I. -I.
+INCPATH       = -I/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/linux-g++ -I../Protocol_qml -I/home/devin/Qt5.4.0/5.4/gcc_64/include -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQuick -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtWidgets -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore -I. -I.
 QMAKE         = /home/devin/Qt5.4.0/5.4/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -36,7 +36,7 @@ DISTNAME      = Protocol_qml1.0.0
 DISTDIR = /home/devin/Desktop/Repository/Qt_project/Qt_project/Protocol_qml/.tmp/Protocol_qml1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/home/devin/Qt5.4.0/5.4/gcc_64 -Wl,-rpath,/home/devin/Qt5.4.0/5.4/gcc_64/lib
-LIBS          = $(SUBLIBS) -L/home/devin/Qt5.4.0/5.4/gcc_64/lib -lQt5Quick -lQt5Widgets -lQt5Gui -lQt5Qml -lQt5Network -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -L/home/devin/Qt5.4.0/5.4/gcc_64/lib -lQt5Quick -lQt5Widgets -lQt5Gui -lQt5Qml -lQt5Network -lQt5SerialPort -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -48,10 +48,19 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ../Protocol_qml/main.cpp qrc_qml.cpp
+SOURCES       = ../Protocol_qml/main.cpp \
+		../Protocol_qml/protocoldeal.cpp qrc_qml.cpp \
+		moc_protocoldeal.cpp
 OBJECTS       = main.o \
-		qrc_qml.o
-DIST          = /home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/features/spec_pre.prf \
+		protocoldeal.o \
+		qrc_qml.o \
+		moc_protocoldeal.o
+DIST          = ../Protocol_qml/images/logo.png \
+		../Protocol_qml/images/emergency.png \
+		../Protocol_qml/images/background.png \
+		../Protocol_qml/images/ArrowUp.png \
+		../Protocol_qml/images/ArrowDn.png \
+		/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/common/shell-unix.conf \
 		/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/common/unix.conf \
 		/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/common/linux.conf \
@@ -173,7 +182,8 @@ DIST          = /home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/features/exceptions.prf \
 		/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/features/yacc.prf \
 		/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/features/lex.prf \
-		../Protocol_qml/Protocol_qml.pro  ../Protocol_qml/main.cpp
+		../Protocol_qml/Protocol_qml.pro ../Protocol_qml/protocoldeal.h ../Protocol_qml/main.cpp \
+		../Protocol_qml/protocoldeal.cpp
 QMAKE_TARGET  = Protocol_qml
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = Protocol_qml
@@ -333,7 +343,8 @@ Makefile: ../Protocol_qml/Protocol_qml.pro /home/devin/Qt5.4.0/5.4/gcc_64/mkspec
 		/home/devin/Qt5.4.0/5.4/gcc_64/lib/libQt5Core.prl \
 		/home/devin/Qt5.4.0/5.4/gcc_64/lib/libQt5Qml.prl \
 		/home/devin/Qt5.4.0/5.4/gcc_64/lib/libQt5Network.prl \
-		/home/devin/Qt5.4.0/5.4/gcc_64/lib/libQt5Widgets.prl
+		/home/devin/Qt5.4.0/5.4/gcc_64/lib/libQt5Widgets.prl \
+		/home/devin/Qt5.4.0/5.4/gcc_64/lib/libQt5SerialPort.prl
 	$(QMAKE) -spec linux-g++ CONFIG+=debug CONFIG+=declarative_debug CONFIG+=qml_debug -o Makefile ../Protocol_qml/Protocol_qml.pro
 /home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/features/spec_pre.prf:
 /home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/common/shell-unix.conf:
@@ -465,6 +476,7 @@ Makefile: ../Protocol_qml/Protocol_qml.pro /home/devin/Qt5.4.0/5.4/gcc_64/mkspec
 /home/devin/Qt5.4.0/5.4/gcc_64/lib/libQt5Qml.prl:
 /home/devin/Qt5.4.0/5.4/gcc_64/lib/libQt5Network.prl:
 /home/devin/Qt5.4.0/5.4/gcc_64/lib/libQt5Widgets.prl:
+/home/devin/Qt5.4.0/5.4/gcc_64/lib/libQt5SerialPort.prl:
 qmake: FORCE
 	@$(QMAKE) -spec linux-g++ CONFIG+=debug CONFIG+=declarative_debug CONFIG+=qml_debug -o Makefile ../Protocol_qml/Protocol_qml.pro
 
@@ -480,7 +492,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../Protocol_qml/qml.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents ../Protocol_qml/main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../Protocol_qml/protocoldeal.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../Protocol_qml/main.cpp ../Protocol_qml/protocoldeal.cpp $(DISTDIR)/
 
 
 clean:compiler_clean 
@@ -506,11 +519,98 @@ compiler_rcc_clean:
 	-$(DEL_FILE) qrc_qml.cpp
 qrc_qml.cpp: ../Protocol_qml/qml.qrc \
 		../Protocol_qml/MainForm.ui.qml \
-		../Protocol_qml/main.qml
+		../Protocol_qml/Rollingtext.qml \
+		../Protocol_qml/main.qml \
+		../Protocol_qml/images/ArrowUp.png \
+		../Protocol_qml/images/background.png \
+		../Protocol_qml/images/logo.png \
+		../Protocol_qml/images/emergency.png \
+		../Protocol_qml/images/ArrowDn.png
 	/home/devin/Qt5.4.0/5.4/gcc_64/bin/rcc -name qml ../Protocol_qml/qml.qrc -o qrc_qml.cpp
 
-compiler_moc_header_make_all:
+compiler_moc_header_make_all: moc_protocoldeal.cpp
 compiler_moc_header_clean:
+	-$(DEL_FILE) moc_protocoldeal.cpp
+moc_protocoldeal.cpp: /home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QObject \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobject.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qnamespace.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qglobal.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qconfig.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfeatures.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlogging.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qflags.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmutex.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qnumeric.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstring.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qchar.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qbytearray.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qrefcount.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qarraydata.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlist.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qiterator.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmetatype.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qisenum.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QThread \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qthread.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QDebug \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdebug.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qhash.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpair.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmap.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtextstream.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qiodevice.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlocale.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvariant.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringlist.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdatastream.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qregexp.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qshareddata.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvector.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpoint.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qset.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QString \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort/QSerialPort \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort/qserialport.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort/qserialportglobal.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort/QSerialPortInfo \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort/qserialportinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QStringList \
+		../Protocol_qml/protocoldeal.h
+	/home/devin/Qt5.4.0/5.4/gcc_64/bin/moc $(DEFINES) -I/home/devin/Qt5.4.0/5.4/gcc_64/mkspecs/linux-g++ -I/home/devin/Desktop/Repository/Qt_project/Qt_project/Protocol_qml -I/home/devin/Qt5.4.0/5.4/gcc_64/include -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQuick -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtWidgets -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort -I/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore -I. ../Protocol_qml/protocoldeal.h -o moc_protocoldeal.cpp
+
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
 compiler_uic_make_all:
@@ -521,7 +621,7 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_rcc_clean 
+compiler_clean: compiler_rcc_clean compiler_moc_header_clean 
 
 ####### Compile
 
@@ -640,11 +740,287 @@ main.o: ../Protocol_qml/main.cpp /home/devin/Qt5.4.0/5.4/gcc_64/include/QtWidget
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qjsvalue.h \
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qtqmlglobal.h \
 		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlerror.h \
-		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmldebug.h
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmldebug.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQuick/QQuickView \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQuick/qquickview.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQuick/qquickwindow.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQuick/qtquickglobal.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui/qopengl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qt_windows.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui/qopengles2ext.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui/qopenglext.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui/qwindow.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QObject \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QEvent \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QMargins \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QRect \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui/qsurface.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui/qsurfaceformat.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtGui/qicon.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqml.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlprivate.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlparserstatus.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlpropertyvaluesource.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmllist.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmetaobject.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/QtQml \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/QtQmlDepends \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QtCore \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QtCoreDepends \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qabstractanimation.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qanimationgroup.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qparallelanimationgroup.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpauseanimation.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpropertyanimation.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvariantanimation.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qeasingcurve.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsequentialanimationgroup.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtextcodec.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qendian.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlibraryinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdatetime.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qbuffer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdir.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfileinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdiriterator.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfileselector.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QStringList \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfilesystemwatcher.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlockfile.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qloggingcategory.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qprocess.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qresource.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsavefile.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsettings.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstandardpaths.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstorageinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtemporarydir.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QScopedPointer \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtemporaryfile.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qabstractproxymodel.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qidentityproxymodel.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsortfilterproxymodel.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringlistmodel.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qjsonarray.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qjsonvalue.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qjsondocument.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qjsonobject.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qabstracteventdispatcher.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qabstractnativeeventfilter.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qbasictimer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmath.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmimedata.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobjectcleanuphandler.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpointer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsharedmemory.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsignalmapper.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsocketnotifier.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsystemsemaphore.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtimer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtranslator.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qwineventnotifier.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmimedatabase.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmimetype.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfactoryinterface.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlibrary.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qplugin.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpluginloader.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/quuid.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qabstractstate.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qabstracttransition.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qeventtransition.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfinalstate.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qhistorystate.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsignaltransition.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstate.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstatemachine.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qexception.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfuture.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfutureinterface.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qrunnable.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qresultstore.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfuturesynchronizer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfuturewatcher.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qreadwritelock.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsemaphore.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qthread.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qthreadpool.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qthreadstorage.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qwaitcondition.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qarraydataops.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qarraydatapointer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qbitarray.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qbytearraymatcher.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcache.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcollator.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcommandlineoption.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcommandlineparser.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcryptographichash.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qelapsedtimer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlinkedlist.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmessageauthenticationcode.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qqueue.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qscopedvaluerollback.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstack.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtextboundaryfinder.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtimeline.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtimezone.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qxmlstream.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtcoreversion.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/QtNetwork \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/QtNetworkDepends \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qabstractnetworkcache.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworkrequest.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QSharedDataPointer \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QString \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QUrl \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QVariant \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qhttpmultipart.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QByteArray \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QIODevice \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/QNetworkRequest \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworkaccessmanager.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/QSslConfiguration \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qsslconfiguration.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qsslsocket.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qsslerror.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qsslcertificate.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qssl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QFlags \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworkcookie.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QList \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QMetaType \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworkcookiejar.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworkdiskcache.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworkreply.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/QNetworkAccessManager \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworkconfigmanager.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworkconfiguration.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworksession.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworkinterface.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qhostaddress.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qauthenticator.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qdnslookup.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qhostinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qnetworkproxy.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qlocalserver.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qlocalsocket.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qtcpserver.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qudpsocket.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qsslcertificateextension.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qsslcipher.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qsslkey.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtNetwork/qtnetworkversion.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qjsvalueiterator.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlabstracturlinterceptor.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlcomponent.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlcontext.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlexpression.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlscriptstring.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlextensioninterface.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlextensionplugin.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlfile.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlfileselector.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/QQmlEngine \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlincubator.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlnetworkaccessmanagerfactory.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlproperty.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qqmlpropertymap.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QHash \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtQml/qtqmlversion.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../Protocol_qml/main.cpp
+
+protocoldeal.o: ../Protocol_qml/protocoldeal.cpp ../Protocol_qml/protocoldeal.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QObject \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobject.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qnamespace.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qglobal.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qconfig.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qfeatures.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlogging.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qflags.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmutex.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qnumeric.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstring.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qchar.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qbytearray.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qrefcount.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qarraydata.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlist.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qiterator.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmetatype.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qisenum.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QThread \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qthread.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QDebug \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdebug.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qhash.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpair.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qmap.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qtextstream.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qiodevice.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qlocale.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvariant.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringlist.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qdatastream.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qregexp.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qshareddata.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qvector.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qpoint.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qset.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QString \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort/QSerialPort \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort/qserialport.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort/qserialportglobal.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort/QSerialPortInfo \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtSerialPort/qserialportinfo.h \
+		/home/devin/Qt5.4.0/5.4/gcc_64/include/QtCore/QStringList
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o protocoldeal.o ../Protocol_qml/protocoldeal.cpp
 
 qrc_qml.o: qrc_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_qml.o qrc_qml.cpp
+
+moc_protocoldeal.o: moc_protocoldeal.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_protocoldeal.o moc_protocoldeal.cpp
 
 ####### Install
 

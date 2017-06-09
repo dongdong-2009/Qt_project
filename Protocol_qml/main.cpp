@@ -9,8 +9,8 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     QObject * topLevel = engine.rootObjects().value(0);
-    QQuickWindow* window = qobject_cast<QQuickWindow*>(topLevel);
-    window->showFullScreen();
+//    QQuickWindow* window = qobject_cast<QQuickWindow*>(topLevel);
+//    window->showFullScreen();
 
 //    QQuickView Qengine;
 //    Qengine.setSource(QUrl(QStringLiteral("qrc:/main.qml")));

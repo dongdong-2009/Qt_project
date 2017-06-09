@@ -1,13 +1,16 @@
 import QtQuick 2.0
 
 Rectangle {
-    width: 1024
+    id: retScroll
+    width: 735
     height: 50
+    color: "transparent"
     Text {
         id:idtext
         height:parent.height
-        text:"Shanghai BST Electric Co.,ltd . Add：Da-maiwan Industrial Zone,Hangtou,Pudong New Area,Shanghai 201316,China"
+        text:"欢迎光临上海贝思特"
         color:"white"
+//        color: "red"
         font.bold: true          // 文字加粗
         font.pixelSize: 24       // 文字大小
         verticalAlignment: Text.AlignVCenter      // 水平居中
@@ -15,9 +18,9 @@ Rectangle {
         SequentialAnimation on x {
         loops: Animation.Infinite
             PropertyAnimation {
-                from:parent.width
-                to: -idtext.width
-                duration: 40000      // 滚动的文字运行的时间长度
+                from:0
+                to: retScroll.width
+                duration: 15000      // 滚动的文字运行的时间长度
             }
        }
     }

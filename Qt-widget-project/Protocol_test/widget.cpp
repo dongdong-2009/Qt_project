@@ -9,8 +9,13 @@
 #include <QFont>
 #include <QPalette>
 #include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
 using namespace std;
-static unsigned char sstr[100];
+static unsigned char sstr[1024];
+QTimer *mtime1;
+QTimer *mtime2;
+QTimer *mtime3;
+QTimer *mtime4;
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -20,18 +25,20 @@ Widget::Widget(QWidget *parent) :
     ui->setupUi(this);
 
     timer = new QTimer(this);
-    bool flagtime = connect(timer, SIGNAL(timeout()), this, SLOT(showTime()));
+    bool flagtime = connect(timer, SIGNAL(timeout()), this, SLOT(ShowTime()));
     timer->start(1000);
     qDebug() << "flagtiem = "<< flagtime;
 
     pro = Protocoldeal::GetInstance();
-    connect(pro, SIGNAL(AcceptDataFormBottom(unsigned char)), this, SLOT(setstring(unsigned char)));
+    connect(pro, SIGNAL(AcceptDataFormBottom(unsigned char)), this, SLOT(DealNewData(unsigned char)));
 
     UiInit();
-    AnimationForPicture();
-    SetTimer();
-    sstr[1] = 0x39; sstr[2] = 0x30; sstr[3] = 0x31; sstr[4] = 0x30;
-    SetFloorNumber(GainFloorNumber(sstr));
+//    AnimationForPicture();
+//    SetTimerArrowDn();
+//    ShiningArrowUp();
+//    ShiningArrowDn();
+//    sstr[1] = 0x39; sstr[2] = 0x30; sstr[3] = 0x31; sstr[4] = 0x30;
+//    SetFloorNumber(GainFloorNumber(sstr));
     qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
@@ -48,10 +55,10 @@ void Widget::UiInit()
 {
     qDebug()<<__PRETTY_FUNCTION__ << "start";
     ShowDate();
-    showTime();
+    ShowTime();
     SetWidgetBackGround(":/new/prefix1/images/background.png");     // 设置图片作为widget的背景
     HideGraphicViewBorder();   // 将QGraphicview控件边框设置为透明的
-    PosAnimation();
+    PosAnimationTextScroll();
 //    SetPicture(":/new/prefix1/images/ArrowUp.png", ui->graphicsView_Arrow);
     SetPicture(":/new/prefix1/images/logo.png", ui->graphicsView_logo);
     qDebug()<<__PRETTY_FUNCTION__ << "end";
@@ -81,7 +88,7 @@ void Widget::AnimationForPicture()
 }
 
 // 滚动字幕的动画设置
-void Widget::PosAnimation()
+void Widget::PosAnimationTextScroll()
 {
     qDebug()<<__PRETTY_FUNCTION__ << "start";
     QLabel *mylabel = new QLabel(this);
@@ -105,16 +112,39 @@ void Widget::PosAnimation()
     qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
-void Widget::SetTimer()
+void Widget::SetTimerArrowUp()
 {
+    QPixmap image; //定义一张图片
+    image.load(":/new/prefix1/images/ArrowUp.png");//加载
+    ui->label_Arrow->clear();//清空
+    ui->label_Arrow->setPixmap(image);//加载到Label标签
+    ui->label_Arrow->show();//显示
+
     QTimer *mytime = new QTimer(this);
+    mtime1 = mytime;
     connect(mytime, SIGNAL(timeout()), this, SLOT(ChangePositionUp()));
     mytime->start(250);
 }
 
+void Widget::SetTimerArrowDn()
+{
+    QPixmap image; //定义一张图片
+    image.load(":/new/prefix1/images/ArrowDn.png");//加载
+    ui->label_Arrow->clear();//清空
+    ui->label_Arrow->setPixmap(image);//加载到Label标签
+    ui->label_Arrow->show();//显示
+
+    QTimer *mytime = new QTimer(this);
+    mtime2 = mytime;
+    connect(mytime, SIGNAL(timeout()), this, SLOT(ChangePositionDn()));
+    mytime->start(1000);
+}
+
+// 上箭头移动
 void Widget::ChangePositionUp()
 {
     static int x = 250;
+    static int count = 0;
     if (x - 10 > 115)
     {
         x = x - 10;
@@ -124,12 +154,22 @@ void Widget::ChangePositionUp()
     {
         ui->label_Arrow->move(40, 250);
         x = 250;
+        count ++;
+        if (2 == count)
+        {
+            count = 0;
+            mtime1->stop();
+            qDebug() << "stop timer";
+            ui->label_Arrow->clear();
+        }
     }
 }
 
+// 下箭头移动
 void Widget::ChangePositionDn()
 {
     static int y = 115;
+    static int count = 0;
     if (y + 10 < 250)
     {
         y = y + 10;
@@ -139,6 +179,96 @@ void Widget::ChangePositionDn()
     {
         ui->label_Arrow->move(40, 115);
         y = 115;
+        count ++;
+        if (2 == count)
+        {
+            count = 0;
+            mtime2->stop();
+            qDebug() <<__PRETTY_FUNCTION__<< "stop timer";
+            ui->label_Arrow->clear();
+        }
+    }
+}
+
+// 上箭头闪烁
+void Widget::ShiningArrowUp()
+{
+    QPixmap image; //定义一张图片
+    image.load(":/new/prefix1/images/ArrowUp.png");//加载
+    ui->label_Arrow->clear();//清空
+    ui->label_Arrow->setPixmap(image);//加载到Label标签
+    ui->label_Arrow->show();//显示
+
+    QTimer *mytime = new QTimer(this);
+    mtime3 = mytime;
+    connect(mytime, SIGNAL(timeout()), this, SLOT(OnShiningArrowUp()));
+    mytime->start(200);
+}
+
+// 下箭头闪烁
+void Widget::ShiningArrowDn()
+{
+    QPixmap image; //定义一张图片
+    image.load(":/new/prefix1/images/ArrowDn.png");//加载
+    ui->label_Arrow->clear();//清空
+    ui->label_Arrow->setPixmap(image);//加载到Label标签
+    ui->label_Arrow->show();//显示
+
+    QTimer *mytime = new QTimer(this);
+    mtime4 = mytime;
+    connect(mytime, SIGNAL(timeout()), this, SLOT(OnShiningArrowDn()));
+    mytime->start(200);
+}
+
+// 上箭头闪烁的槽函数
+void Widget::OnShiningArrowUp()
+{
+    static float opacity = 0.0;
+    static int count = 0;
+    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(this);
+    effect->setOpacity(opacity);
+    if (opacity >= 1.0)
+    {
+        opacity = 0.0;
+        effect->setOpacity(opacity);
+        ui->label_Arrow->setGraphicsEffect(effect);
+    }
+    else
+    {
+        opacity = 1.0;
+        effect->setOpacity(opacity);
+        ui->label_Arrow->setGraphicsEffect(effect);
+    }
+    count ++;
+    if (3 == count)
+    {
+        mtime3->stop();
+    }
+}
+
+// 下箭头闪烁的槽函数
+void Widget::OnShiningArrowDn()
+{
+    static float opacity = 0.0;
+    static int count = 0;
+    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(this);
+    effect->setOpacity(opacity);
+    if (opacity >= 1.0)
+    {
+        opacity = 0.0;
+        effect->setOpacity(opacity);
+        ui->label_Arrow->setGraphicsEffect(effect);
+    }
+    else
+    {
+        opacity = 1.0;
+        effect->setOpacity(opacity);
+        ui->label_Arrow->setGraphicsEffect(effect);
+    }
+    count ++;
+    if (3 == count)
+    {
+        mtime4->stop();
     }
 }
 
@@ -214,7 +344,7 @@ void Widget::ShowDate()
 //}
 
 // 显示时间，每秒刷新一次
-void Widget::showTime()
+void Widget::ShowTime()
 {
     qDebug()<<__PRETTY_FUNCTION__ << "start";
     QTime time = QTime::currentTime();
@@ -315,44 +445,43 @@ void Widget::SetFloorNumber(QString s)
     qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
-void Widget::setstring(unsigned char str)
+// 处理新发过来的数据
+void Widget::DealNewData(unsigned char str)
 {
     qDebug()<<__PRETTY_FUNCTION__<< "the slots is running !";
+    int len;
     if (NULL != pro )
     {
+        printf("发过来的数据 str = %X\n", str);
+        cout << "调用拷贝字符串数据\n";
         pro->CopyStringFromProtocol(str, sstr);
-        cout << "end copy in setstring\n";
-        pro->PrintString(sstr, 19);
+        cout << "sstr字符串数据\n";
+        len = pro->GetDataLength();
+        pro->PrintString(sstr, len);
         switch (str) {
         case 0x00:
             SetFloorNumber(GainFloorNumber(sstr));
-
+            ShowArrowStatus(sstr[5]);
             break;
         default:
             break;
         }
     }    
-    int i;
-    for(i = 0; i < 19; i++)
-    {
-        //cout<< totalBuf[i]<< " ";
-        printf("%X ", sstr[i]);
-    }
-    printf("\n");
-    memset(sstr, 0 , 19);
+    memset(sstr, 0 , len);
     qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
 void Widget::ShowArrowStatus(unsigned char str)
 {
     switch (str) {
-    case 0x30: ui->graphicsView_Arrow->hide(); break;
-    case 0x31: SetPicture(":/new/prefix1/images/ArrowUp.png", ui->graphicsView_Arrow); break;
-    case 0x32: SetPicture(":/new/prefix1/images/ArrowDn.png", ui->graphicsView_Arrow); break;
-    case 0x33: ; break;
-    case 0x34: ; break;
-    case 0x35: ; break;
-    case 0x36: ; break;
+//    case 0x30: ui->graphicsView_Arrow->hide(); break;
+//    case 0x31: SetPicture(":/new/prefix1/images/ArrowUp.png", ui->graphicsView_Arrow); break;
+//    case 0x32: SetPicture(":/new/prefix1/images/ArrowDn.png", ui->graphicsView_Arrow); break;
+//    case 0x33: SetTimerArrowUp(); break;
+//    case 0x34: SetTimerArrowDn(); break;
+//    case 0x35: ShiningArrowUp(); break;
+//    case 0x36: ShiningArrowDn(); break;
+    case 0x00: ShiningArrowUp(); break;
     default:
         break;
     }

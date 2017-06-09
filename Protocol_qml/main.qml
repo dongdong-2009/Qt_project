@@ -5,22 +5,15 @@ import QtQuick.Dialogs 1.2
 
 ApplicationWindow {
     title: qsTr("Hello World")
-    width: 640
-    height: 480
+    width: 1024
+    height: 768
     visible: true
 
-    menuBar: MenuBar {
-        Menu {
-            title: qsTr("&File")
-            MenuItem {
-                text: qsTr("&Open")
-                onTriggered: messageDialog.show(qsTr("Open action triggered"));
-            }
-            MenuItem {
-                text: qsTr("E&xit")
-                onTriggered: Qt.quit();
-            }
-        }
+    Image {
+        id: background
+        fillMode: Image.TileHorizontally
+        smooth: true
+        source: 'images/background.png'
     }
 
     MainForm {
@@ -38,5 +31,10 @@ ApplicationWindow {
             messageDialog.text = caption;
             messageDialog.open();
         }
+    }
+
+    Rollingtext {
+        x: 290
+        y: 708
     }
 }

@@ -1,6 +1,5 @@
 #include "protocoldeal.h"
 #include <QThread>
-#include <fcntl.h>
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
@@ -240,6 +239,7 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
         }
         if (AllocteFlag)
         {
+            cout << "AllocteFlag = " << AllocteFlag << endl;
             PrintString(temp, len);
             AllocteFlag = false;
             if (StringCompare(temp, str, len))
@@ -258,30 +258,20 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
     }
 }
 
-//QString Protocoldeal::ChartoQString(char *str)
-//{
-//    QString qtext;
-//    qtext.clear();
-//    qtext = QString("%1").arg(str);
-//    qtext = qtext.append(str);
-//    qtext += str;
-//    qDebug() << "qtext = "<< qtext;
-//    return qtext;  // 漏写，出现段错误
-//}
-
 /*应用层调用从协议层拷贝数据到应用层的接口*/
 void Protocoldeal::CopyStringFromProtocol(unsigned char Id, void *str)
 {
-    if (0x01 == Id)
+    if (0x00 == Id)
     {
-        memcpy(str, totalBuf, StringSize);
-        cout << "Id == " << "0x01 in if()"<< endl;
+        memcpy(str, tempBuf, StringSize);
+        cout << "Id == " << "0x00 in if()"<< endl;
     }
-    else if (0x02 == Id)
+    else if (0x01 == Id)
     {
-        memcpy(str, totalBuf, StringSize);
-        cout << "Id == " << "0x02 in else if()"<< endl;
+        memcpy(str, tempBuf, StringSize);
+        cout << "Id == " << "0x01 in else if()"<< endl;
     }
+    cout << "StringSize = 拷贝string的长度"<< StringSize << endl;
 }
 
 void Protocoldeal::PrintString(unsigned char *src, unsigned long length)
@@ -304,7 +294,7 @@ ProducerFromBottom::ProducerFromBottom()
 
 ProducerFromBottom::~ProducerFromBottom()
 {
-
+    delete my_serialport;
 }
 
 //配置串口参数，连接信号和槽
@@ -365,41 +355,52 @@ void ProducerFromBottom::ReadyreadSlots()
             }
         }
     }
+
     printf("count = %d\n", count);
     Protocoldeal *Protocol = Protocoldeal::GetInstance();
     StringSize = Protocol->BstBvtRecoverFrame(tempBuf, totalBuf, j);
-    if ( tempBuf[j-2] == Protocol->BstBvtVerify(tempBuf, j)) // 数据校验
+    printf("接收到的数据为 totalBuf = ");
+    Protocol->PrintString(totalBuf, j);
+    printf("解析后的数据为 tempBuf = ");
+    Protocol->PrintString(tempBuf, StringSize);
+    if ( tempBuf[j-1] == Protocol->BstBvtVerify(tempBuf, j)) // 数据校验
     {
-        printf("%X \n", tempBuf[0]);
+        printf("tempBuf[0] = %X \n", tempBuf[0]);
         cout <<" verify is true "<< endl;
         if (Protocol->JudgeChange(tempBuf[0], tempBuf))
         {
+            printf("emit message\n");
             emit Protocol->AcceptDataFormBottom(tempBuf[0]);
         }
     }
 
-    memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));
-    printf("ID0_Message.ID = %X \n", mestable.ID0_Message.ID);
-    printf("Data1 = %X \n", mestable.ID0_Message.Data1);
-    printf("Data2 = %X \n", mestable.ID0_Message.Data2);
-    printf("Data3 = %X \n", mestable.ID0_Message.Data3);
-    printf("Data4 = %X \n", mestable.ID0_Message.Data4);
-    printf("ArrowStatus = %X \n", mestable.ID0_Message.ArrowStatus);
-    printf("LiftSpecialStatus = %X \n", mestable.ID0_Message.LiftSpecialStatus);
-    printf("StationClockStatus = %X \n", mestable.ID0_Message.StationClockStatus);
-    printf("StationLightStatus = %X \n", mestable.ID0_Message.StationLightStatus);
+//    memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));
+//    printf("ID0_Message.ID = %X \n", mestable.ID0_Message.ID);
+//    printf("Data1 = %X \n", mestable.ID0_Message.Data1);
+//    printf("Data2 = %X \n", mestable.ID0_Message.Data2);
+//    printf("Data3 = %X \n", mestable.ID0_Message.Data3);
+//    printf("Data4 = %X \n", mestable.ID0_Message.Data4);
+//    printf("ArrowStatus = %X \n", mestable.ID0_Message.ArrowStatus);
+//    printf("LiftSpecialStatus = %X \n", mestable.ID0_Message.LiftSpecialStatus);
+//    printf("StationClockStatus = %X \n", mestable.ID0_Message.StationClockStatus);
+//    printf("StationLightStatus = %X \n", mestable.ID0_Message.StationLightStatus);
 
-    cout << "send message"<< endl;
-    for(i = 0; i < j; i++)
-    {
-        //cout<< totalBuf[i]<< " ";
-        printf("%X ", totalBuf[i]);
-    }
-    printf("\n");printf("funck !!!\n");
-    qDebug() << "totalBuf"<< totalBuf <<endl;
-    cout << "i = "<< i <<" "<<"j = "<< j << endl;
-    cout << "setting sth\n";
-    cout << "the string changes"<< endl;
+//    cout << "send message"<< endl;
+//    printf("totalBuf = ");
+//    for(i = 0; i < j; i++)
+//    {
+//        printf("%X ", totalBuf[i]);
+//    }
+//    printf("\n");printf("funck !!!\n");
+//    qDebug() << "totalBuf"<< totalBuf <<endl;
+//    cout << "i = "<< i <<" "<<"j = "<< j << endl;
+//    cout << "setting sth\n";
+//    cout << "the string changes"<< endl;
+}
+
+unsigned long Protocoldeal::GetDataLength()
+{
+    return StringSize;
 }
 
 //将串口数据拷贝到缓冲区

@@ -150,6 +150,7 @@ public:
     bool StringCompare(unsigned char *temp, unsigned char *str, unsigned long len);
     bool AllocteMemory(void *p);
     unsigned char BstBvtVerify(unsigned char *data, unsigned long length); // CRC 数据校验
+    unsigned long GetDataLength();
 protected:
     Protocoldeal();
     unsigned char BstBvtRecvMonitor(void);

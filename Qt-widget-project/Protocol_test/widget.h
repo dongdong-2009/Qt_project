@@ -25,17 +25,22 @@ protected:
     void HideGraphicViewBorder();
     void SetPicture(QString path, QGraphicsView *graphic);
     void AnimationForPicture();
-    void PosAnimation();
+    void PosAnimationTextScroll();
     QString GainFloorNumber(unsigned char *str);
     void ShowArrowStatus(unsigned char str);
-    void SetTimer();
+    void SetTimerArrowUp();
+    void SetTimerArrowDn();
+    void ShiningArrowUp();
+    void ShiningArrowDn();
 
 public slots:
-    void setstring(unsigned char s);
-    void showTime();
+    void DealNewData(unsigned char s);
+    void ShowTime();
     void ChangePositionUp();
     void ChangePositionDn();
     void SetFloorNumber(QString s);
+    void OnShiningArrowUp();
+    void OnShiningArrowDn();
 
 private:
     Ui::Widget *ui;

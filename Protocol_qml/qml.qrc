@@ -2,5 +2,11 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>MainForm.ui.qml</file>
+        <file>images/logo.png</file>
+        <file>images/emergency.png</file>
+        <file>images/background.png</file>
+        <file>images/ArrowUp.png</file>
+        <file>images/ArrowDn.png</file>
+        <file>Rollingtext.qml</file>
     </qresource>
 </RCC>

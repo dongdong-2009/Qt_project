@@ -15,3 +15,10 @@ include(deployment.pri)
 
 HEADERS += \
     protocoldeal.h
+
+DISTFILES += \
+    images/logo.png \
+    images/emergency.png \
+    images/background.png \
+    images/ArrowUp.png \
+    images/ArrowDn.png

@@ -15,7 +15,7 @@ Item {
 
         Button {
             id: button1
-            text: qsTr("Press Me 1")
+            text: qsTr("push Me 1")
         }
 
         Button {

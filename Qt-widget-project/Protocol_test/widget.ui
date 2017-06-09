@@ -10,6 +10,11 @@
     <height>768</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>FZCuQian-M17S</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Widget</string>
   </property>
@@ -21,6 +26,11 @@
      <width>324</width>
      <height>36</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>FZCuQian-M17S</family>
+    </font>
    </property>
   </widget>
   <widget class="QLabel" name="label_date">
