@@ -21,3 +21,14 @@
 
 
 以上是自己开发中一点小技巧，欢迎批评指正！
+
+
+在使用Qt线程时, 在线程里跑上一个定时器。定时器时间超限时触发信号，传递给主线程做其他的事情。
+继承QThread后在实现run()函数后，m_pTimer = new QTimer(this);   new一个定时器对象,并传入this指针---注意此时的this指针是主线程的
+但每次创建线程时会出现以下提示:
+QObject: Cannot create children for a parent that is in a different thread
+
+传入this指针------相当于在子线程里为主线程建立了对象，所以出现跨线程警告
+
+另外QT中继承Qthread类后,在类中定义的对象或或对象的指针都是属于主线程的。次线程正真意义上的实体内容实在实现run()函数里。
+

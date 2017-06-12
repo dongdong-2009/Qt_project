@@ -4,6 +4,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <string.h>
+#include <QTimer>
 using namespace std;
 
 #define BVT_ESC 0x1B	/* 转换字符 */
@@ -22,7 +23,7 @@ using namespace std;
 static unsigned char gBvtRecStatus ;
 static unsigned char gBvtRecCnt ;
 static unsigned char gBvtFrameBuf[BVT_MAX_FRAME_LENTH] ;
-//static char prestr[BVT_MAX_FRAME_LENTH] ;
+static char WriteDataBuf[BVT_MAX_FRAME_LENTH] ;
 //static char curstr[BVT_MAX_FRAME_LENTH] ;
 
 static unsigned char totalBuf[MAX_LENGTH]; // 串口读到的数据存储的数据缓冲区
@@ -30,18 +31,32 @@ static unsigned char tempBuf[1024];        // 去掉帧头和帧尾，并且解�
 static unsigned long StringSize;
 messagetable mestable;
 Protocoldeal* Protocoldeal::instance = NULL;
+QTimer *timer;
+
 Protocoldeal::Protocoldeal()
 {
-    GetDataPthread = new ProducerFromBottom;
-    GetDataPthread->StartThread(GetDataPthread);
+    ReadDataPthread = new ProducerFromBottom;
+    ReadDataPthread->StartThread(ReadDataPthread);
+
+    WriteDataPthread = new WriteDataToBottom;
+    WriteDataPthread->StartThread(WriteDataPthread);
+
+    cout << __PRETTY_FUNCTION__<<"启动协议的的构造函数"<<endl;
 }
 
 Protocoldeal::~Protocoldeal()
 {
-    GetDataPthread->requestInterruption();
-    GetDataPthread->quit();
-    GetDataPthread->wait();
-    delete GetDataPthread;
+    ReadDataPthread->requestInterruption();
+    ReadDataPthread->quit();
+    ReadDataPthread->wait();
+    delete ReadDataPthread;
+
+    WriteDataPthread->requestInterruption();
+    WriteDataPthread->quit();
+    WriteDataPthread->wait();
+    delete WriteDataPthread;
+
+    cout << __PRETTY_FUNCTION__<<"启动协议的的析构函数"<<endl;
 }
 
 // 单例模式
@@ -285,16 +300,28 @@ void Protocoldeal::PrintString(unsigned char *src, unsigned long length)
     printf("\n");
 }
 
+//ProducerFromBottom * Protocoldeal::GetReadThreadPointer()
+//{
+//    return ReadDataPthread;
+//}
+
+//WriteDataToBottom * Protocoldeal::GetWriteThreadPointer()
+//{
+//    return WriteDataPthread;
+//}
+
 ProducerFromBottom::ProducerFromBottom()
 {
-    cout << __PRETTY_FUNCTION__<<endl;
+    cout << __PRETTY_FUNCTION__<<"启动读串口的线程的构造函数"<<endl;
     ProducerFromBottom_pointer = totalBuf;
     ProCounts = 0;
 }
 
 ProducerFromBottom::~ProducerFromBottom()
 {
+    CloseSerial();
     delete my_serialport;
+    cout << __PRETTY_FUNCTION__<<"启动读串口的线程的析构函数"<<endl;
 }
 
 //配置串口参数，连接信号和槽
@@ -303,9 +330,10 @@ void ProducerFromBottom::SetSerialArgument()
     my_serialport = new QSerialPort;
     my_serialport->setPortName(SERIAL_DEVICE);
     qDebug() << "Name : " << my_serialport->portName();
+    bool readflag = false;
     if (my_serialport->open(QIODevice::ReadOnly))  //使用只读的方式打开串口
     {
-        cout << "enter funtion"<<endl;
+        cout << __PRETTY_FUNCTION__<< "enter funtion"<<endl;
         //设置波特率
         my_serialport->setBaudRate(QSerialPort::Baud9600);
         //设置数据位
@@ -317,14 +345,32 @@ void ProducerFromBottom::SetSerialArgument()
         //设置停止位
         my_serialport->setStopBits(QSerialPort::OneStop);
         my_serialport->clearError();
-        my_serialport->clear();
+//        my_serialport->clear();
         cout << "before connect"<<endl;
         bool flag = connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()), Qt::BlockingQueuedConnection);
         cout << "flag = " << flag << endl;
+//        connect(Protocoldeal::GetInstance()->GetReadThreadPointer(), SIGNAL(finished()), my_serialport, SLOT(deleteLater()), Qt::BlockingQueuedConnection);
+//        connect(Protocoldeal::GetInstance()->GetReadThreadPointer(), SIGNAL(finished()), this, SLOT(CloseSerial()), Qt::BlockingQueuedConnection);
         this->exec();  // 需要在子线程中调用线程的exec的函数，使得进入消息队列
+        readflag = true;
+    }
+    if (!readflag)
+        qDebug()<<__PRETTY_FUNCTION__<< "readflag = "<< readflag << "打开串口失败!";
+    else
+        qDebug()<<__PRETTY_FUNCTION__<< "readflag = "<< readflag << "打开串口成功!";
+}
+
+// 当线程结束时，将打开的串口关闭掉
+void ProducerFromBottom::CloseSerial()
+{
+    if (NULL != my_serialport)
+    {
+        qDebug() <<__PRETTY_FUNCTION__ <<"close readserialport success!";
+        my_serialport->close(); // 关闭串口
     }
 }
 
+// 读串口数据函数
 void ProducerFromBottom::ReadyreadSlots()
 {
     static bool Isstart = false;
@@ -384,18 +430,6 @@ void ProducerFromBottom::ReadyreadSlots()
 //    printf("LiftSpecialStatus = %X \n", mestable.ID0_Message.LiftSpecialStatus);
 //    printf("StationClockStatus = %X \n", mestable.ID0_Message.StationClockStatus);
 //    printf("StationLightStatus = %X \n", mestable.ID0_Message.StationLightStatus);
-
-//    cout << "send message"<< endl;
-//    printf("totalBuf = ");
-//    for(i = 0; i < j; i++)
-//    {
-//        printf("%X ", totalBuf[i]);
-//    }
-//    printf("\n");printf("funck !!!\n");
-//    qDebug() << "totalBuf"<< totalBuf <<endl;
-//    cout << "i = "<< i <<" "<<"j = "<< j << endl;
-//    cout << "setting sth\n";
-//    cout << "the string changes"<< endl;
 }
 
 unsigned long Protocoldeal::GetDataLength()
@@ -407,7 +441,7 @@ unsigned long Protocoldeal::GetDataLength()
 void ProducerFromBottom::CopySerialDataToBuf(QByteArray arr)
 {
     static int position = 0;      //相对于数组首地址的偏移
-    ConsumerFromBottom CFormBottom;
+    WriteDataToBottom CFormBottom;
     int len = arr.length();
     // 当本次从串口获取的数据长度加上当前位置小于最大长度时，继续拷贝，否则从头拷贝
     if (len + position < MAX_LENGTH)
@@ -453,7 +487,7 @@ void ProducerFromBottom::CopySerialDataToBuf(QByteArray arr)
 
 void ProducerFromBottom::run()
 {
-    cout << __PRETTY_FUNCTION__<<endl;
+    cout << __PRETTY_FUNCTION__ << "配置串口"<<endl;
     SetSerialArgument();  // 配置串口，连接信号，传输数据
 }
 
@@ -461,40 +495,122 @@ void ProducerFromBottom::run()
 void ProducerFromBottom::StartThread(ProducerFromBottom *p)
 {
     cout << __PRETTY_FUNCTION__<<endl;
-    if (!(p->isRunning()))  // 当线程不在运行时，启动线程
+    if (NULL != p)
     {
-        p->start();
+        if (!(p->isRunning()))  // 当线程不在运行时，启动线程
+        {
+            qDebug() << "启动读取串口的线程";
+            p->start();
+        }
     }
 }
 
-ConsumerFromBottom::ConsumerFromBottom()
+WriteDataToBottom::WriteDataToBottom()
 {
-    cout << __PRETTY_FUNCTION__<<endl;
+    cout << __PRETTY_FUNCTION__<<"启动写线程的构造函数"<<endl;
     ConsumerFromBottom_pointer = totalBuf;
 }
 
-ConsumerFromBottom::~ConsumerFromBottom()
+WriteDataToBottom::~WriteDataToBottom()
 {
-
+    CloseSerial();
+    delete Write_serialport;
+    delete timer;
+    cout <<__PRETTY_FUNCTION__<<"启动写线程的析构函数"<< endl;
 }
 
-unsigned char* ConsumerFromBottom::GetPointPosition()
+unsigned char* WriteDataToBottom::GetPointPosition()
 {
     return ConsumerFromBottom_pointer;
 }
 
-int ConsumerFromBottom::GetConCounts()
+int WriteDataToBottom::GetConCounts()
 {
     qDebug()<< __PRETTY_FUNCTION__ << "ConCounts = "<< ConCounts;
     return ConCounts;
 }
 
-void ConsumerFromBottom::SetConCounts(int counts)
+void WriteDataToBottom::SetConCounts(int counts)
 {
     qDebug() << __PRETTY_FUNCTION__ <<" before ConCounts = "<< ConCounts;
     ConCounts = counts;
     qDebug() << __PRETTY_FUNCTION__ <<" after ConCounts = "<< ConCounts;
 }
 
+// 初始化串口的各个参数，设置为只读模式，用来为写串口做准备
+void WriteDataToBottom::SetSerialArgument()
+{
+    Write_serialport = new QSerialPort;
+    Write_serialport->setPortName(SERIAL_DEVICE);
+    bool writeflag = false;
+    qDebug() << "Name : " << Write_serialport->portName();
+    if (Write_serialport->open(QIODevice::WriteOnly))  //使用只写的方式打开串口
+    {
+        cout << __PRETTY_FUNCTION__<< "the serial is WriteOnly opened!"<<endl;
+        //设置波特率
+        Write_serialport->setBaudRate(QSerialPort::Baud9600);
+        //设置数据位
+        Write_serialport->setDataBits(QSerialPort::Data8);
+        //设置校验位
+        Write_serialport->setParity(QSerialPort::NoParity);
+        //设置流控制
+        Write_serialport->setFlowControl(QSerialPort::NoFlowControl);
+        //设置停止位
+        Write_serialport->setStopBits(QSerialPort::OneStop);
+        Write_serialport->clearError();
+//        connect(Protocoldeal::GetInstance()->GetWriteThreadPointer(), SIGNAL(finished()), Write_serialport, SLOT(deleteLater()), Qt::BlockingQueuedConnection);
+//        connect(Protocoldeal::GetInstance()->GetWriteThreadPointer(), SIGNAL(finished()), this, SLOT(CloseSerial()), Qt::BlockingQueuedConnection);
+        writeflag = true;
+    }
+    if (!writeflag)
+        qDebug()<< __PRETTY_FUNCTION__<< "writeflag = "<< writeflag << "打开串口失败!";
+    else
+        qDebug()<< __PRETTY_FUNCTION__<< "writeflag = "<< writeflag << "打开串口成功!";
+}
 
+void WriteDataToBottom::run()
+{
+    qDebug() <<__PRETTY_FUNCTION__ <<"Will setArgument";
+    SetSerialArgument();
+    QTimer *mytimer = new QTimer;
+    timer = mytimer;
+    connect(mytimer, SIGNAL(timeout()), this, SLOT(WriteDataSerial()), Qt::QueuedConnection);
+    mytimer->start(1500);
+    memcpy(WriteDataBuf, "8012345681", sizeof("8012345681"));
+    this->exec();
+}
 
+// 当线程结束时，将打开的串口关闭掉
+void WriteDataToBottom::CloseSerial()
+{
+    if (NULL != Write_serialport)
+    {
+        qDebug() <<__PRETTY_FUNCTION__ <<"close writeserialport success!";
+        Write_serialport->close(); // 关闭串口
+    }
+}
+
+void WriteDataToBottom::WriteDataSerial()
+{
+    if (NULL != Write_serialport)
+    {
+        qDebug() << __PRETTY_FUNCTION__ <<"write data";
+        qint64 len = Write_serialport->write(WriteDataBuf, sizeof(WriteDataBuf));
+        qDebug() << "write length = " << len;
+    }
+}
+
+// 启动线程
+void WriteDataToBottom::StartThread(WriteDataToBottom *w)
+{
+    cout << __PRETTY_FUNCTION__ <<endl;
+    // 开启线程
+    if (NULL != w)
+    {
+        if (!(w->isRunning())) // 当线程不在运行时，启动线程
+        {
+            cout <<" 启动写数据串口的线程 "<< endl;
+            w->start();
+        }
+    }
+}

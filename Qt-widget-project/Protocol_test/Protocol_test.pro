@@ -37,9 +37,6 @@ DISTFILES += \
     images/number9.png \
     images/welcome_text.png \
     images/background.png \
-    images/N4.png \
-    images/num0.png \
-    images/8.png \
     images/ArrowDn.png
 
 RESOURCES += \

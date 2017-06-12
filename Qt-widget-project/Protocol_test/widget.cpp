@@ -27,7 +27,7 @@ Widget::Widget(QWidget *parent) :
     timer = new QTimer(this);
     bool flagtime = connect(timer, SIGNAL(timeout()), this, SLOT(ShowTime()));
     timer->start(1000);
-    qDebug() << "flagtiem = "<< flagtime;
+    qDebug() << "flagtime = "<< flagtime;
 
     pro = Protocoldeal::GetInstance();
     connect(pro, SIGNAL(AcceptDataFormBottom(unsigned char)), this, SLOT(DealNewData(unsigned char)));

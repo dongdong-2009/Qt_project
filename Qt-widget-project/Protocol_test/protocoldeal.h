@@ -102,27 +102,35 @@ public:
     void SetSerialArgument();
     void CopySerialDataToBuf(QByteArray arr);
     void StartThread(ProducerFromBottom *p);
-public:
-    QSerialPort *my_serialport;
+//public:
+//    QSerialPort *my_serialport;
 public slots:
     void ReadyreadSlots();
+    void CloseSerial();
 private:
+    QSerialPort *my_serialport;
     unsigned char *ProducerFromBottom_pointer;
     int ProCounts;
 };
 
 // 向串口发送数据的线程
-class ConsumerFromBottom : public QThread
+class WriteDataToBottom : public QThread
 {
     Q_OBJECT
 public:
-    ConsumerFromBottom();
-    ~ConsumerFromBottom();
-//    void run();
+    WriteDataToBottom();
+    ~WriteDataToBottom();
+    void run();
+    void SetSerialArgument();
     unsigned char *GetPointPosition();
     int GetConCounts();
     void SetConCounts(int counts);
+    void StartThread(WriteDataToBottom *w);
+public slots:
+    void CloseSerial();
+    void WriteDataSerial();
 private:
+    QSerialPort *Write_serialport;
     unsigned char *ConsumerFromBottom_pointer;
     int ConCounts;
 };
@@ -140,10 +148,8 @@ public:
     void BstBvtCopyFrameData(e_IDTYPE_T id,void *dat);
     e_IDTYPE_T BstBvtPtlMonitor(void);
     bool JudgeChange(unsigned char ID, unsigned char str[]);
-//    QString ChartoQString(char *str);
     unsigned char BstBvtGetFrameDatLen(unsigned char id);
 
-//    void QStringToChar(QString s);
     unsigned long BstBvtRecoverFrame(void *des, void *src, unsigned long srclen);      // 数据还原
     void CopyStringFromProtocol(unsigned char Id, void *str);
     void PrintString(unsigned char *src, unsigned long length);
@@ -151,21 +157,22 @@ public:
     bool AllocteMemory(void *p);
     unsigned char BstBvtVerify(unsigned char *data, unsigned long length); // CRC 数据校验
     unsigned long GetDataLength();
+//    ProducerFromBottom * GetReadThreadPointer();
+//    WriteDataToBottom * GetWriteThreadPointer();
 protected:
     Protocoldeal();
     unsigned char BstBvtRecvMonitor(void);
     void BstBvtSendMonitor(void);
     unsigned long BstBvtTransformFrame(void *src,unsigned long srclen,void *dst);
     void BstFifoMemCpy(unsigned char *pFrameBuf,void* dat, unsigned char DatLen);
-//    unsigned char BstBvtGetFrameDatLen(e_IDTYPE_T id);
 
 signals:
     void AcceptDataFormBottom(unsigned char s);
     void AcceptDataFormTop();
 
 private:
-    ProducerFromBottom *GetDataPthread;
-    ConsumerFromBottom *ReadDataPthread;
+    ProducerFromBottom *ReadDataPthread;
+    WriteDataToBottom *WriteDataPthread;
     static Protocoldeal *instance;
 };
 
