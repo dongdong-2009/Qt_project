@@ -194,16 +194,23 @@ void Protocoldeal::BstFifoMemCpy(unsigned char *pFrameBuf,void* dat, unsigned ch
  * @param[out]  None
  * @retval  	帧ID对应的数据长度
  */
-unsigned char Protocoldeal::BstBvtGetFrameDatLen(unsigned char id)
+unsigned long Protocoldeal::BstBvtGetFrameDatLen(unsigned char id)
 {
+    qDebug()<< __PRETTY_FUNCTION__;
     unsigned char len = 0;
     switch(id)
     {
-        case 0x00: len = sizeof(s_BVTID0_T);break;
-        case 0x01: len = sizeof(s_BVTID1_T);break;
-        default:
-            break;
+    case 0x00: len = sizeof(s_BVTID0_T); break;
+    case 0x01: len = sizeof(s_BVTID1_T); break;
+    case 0x02: len = sizeof(s_BVTID2_T); break;
+    case 0x03: len = sizeof(s_BVTID3_T); break;
+    case 0x04: len = sizeof(s_BVTID4_T); break;
+    case 0x05: len = sizeof(s_BVTID5_T); break;
+    case 0x06: len = sizeof(s_BVTID6_T); break;
+    case 0x07: len = sizeof(s_BVTID7_T); break;
+    default: qDebug()<<"Id error"; break;
     }
+    qDebug("id = %x, len = %ld",id, len);
     return len;
 }
 
@@ -223,7 +230,7 @@ bool Protocoldeal::StringCompare(unsigned char *temp, unsigned char *str, unsign
     return false;
 }
 
-//
+// 分配内存是否成功
 bool Protocoldeal::AllocteMemory(void *p)
 {
     if (NULL == p)
@@ -250,8 +257,8 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
         switch(ID)
         {
         case 0x00:
-                memcpy(temp, &mestable.ID0_Message, len);// 拷贝信息表中的数据到temp中，用来和新收到的数据进行比较
-                AllocteFlag = true;
+            memcpy(temp, &mestable.ID0_Message, len);// 拷贝信息表中的数据到temp中，用来和新收到的数据进行比较
+            AllocteFlag = true;
             break;
         case 0x01:
             AllocteFlag = true;
@@ -302,6 +309,7 @@ void Protocoldeal::CopyStringFromProtocol(unsigned char Id, void *str)
     cout << "StringSize = 拷贝string的长度"<< StringSize << endl;
 }
 
+// 从UI层拷贝数据到协议层,根据Id指定拷贝的数据长度
 void Protocoldeal::CopyStringFromUi(unsigned char Id, void *str)
 {
     if (0x00 == Id)

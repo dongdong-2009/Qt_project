@@ -193,7 +193,7 @@ public:
     void BstBvtCopyFrameData(e_IDTYPE_T id,void *dat);
     e_IDTYPE_T BstBvtPtlMonitor(void);
     bool JudgeChange(unsigned char ID, unsigned char str[]);
-    unsigned char BstBvtGetFrameDatLen(unsigned char id);
+    unsigned long BstBvtGetFrameDatLen(unsigned char id);
 
     unsigned long BstBvtRecoverFrame(void *des, void *src, unsigned long srclen);      // 数据还原
     void CopyStringFromProtocol(unsigned char Id, void *str);
