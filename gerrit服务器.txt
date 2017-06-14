@@ -32,3 +32,17 @@ Gerrit代码审核权限管理 https://gerrit-review.googlesource.com/Documentat
 Gerrit修改数据库email信息 http://www.cnblogs.com/kevingrace/p/5624122.html
 
 Gerrit安装replication插件 https://gerrit-review.googlesource.com/Documentation/cmd-plugin-install.html
+
+
+
+我已经根据http://blog.csdn.net/billpig/article/details/7604828搭建好了gerrit服务器
+
+作者是用
+
+
+$ repo init -u http://github.com/CyanogenMod/android.git --mirror  -b gingerbread
+获得的repo镜像,通过这个方法我已经试过了是OK的,可以建立一个本地repo服务器镜像
+
+现在的问题是,我已经有了一个完整的Android源码,且在上面做了很多修改了
+
+我想请教,如何把我的这个手头上的Android源码,整个镜像到(或叫上传?)上面这个搭建好了gerrit服务器上

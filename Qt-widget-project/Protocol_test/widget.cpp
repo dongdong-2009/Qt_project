@@ -243,6 +243,11 @@ void Widget::OnShiningArrowUp()
     if (3 == count)
     {
         mtime3->stop();
+        count = 0;
+        qDebug()<< "delete mtime3";
+        effect->setOpacity(0.0);
+        ui->label_Arrow->setGraphicsEffect(effect);
+        delete mtime3;
     }
 }
 
@@ -269,6 +274,11 @@ void Widget::OnShiningArrowDn()
     if (3 == count)
     {
         mtime4->stop();
+        count = 0;
+        qDebug()<< "delete mtime4";
+        effect->setOpacity(0.0);
+        ui->label_Arrow->setGraphicsEffect(effect);
+        delete mtime4;
     }
 }
 
@@ -466,8 +476,8 @@ void Widget::DealNewData(unsigned char str)
         default:
             break;
         }
+        memset(sstr, 0 , len);
     }    
-    memset(sstr, 0 , len);
     qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 
@@ -481,7 +491,7 @@ void Widget::ShowArrowStatus(unsigned char str)
 //    case 0x34: SetTimerArrowDn(); break;
 //    case 0x35: ShiningArrowUp(); break;
 //    case 0x36: ShiningArrowDn(); break;
-    case 0x00: ShiningArrowUp(); break;
+    case 0x00: ShiningArrowDn(); break;
     default:
         break;
     }

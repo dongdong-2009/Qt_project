@@ -47,9 +47,9 @@ enum {
     ArrowDnFlash,   /*6-下箭头闪烁*/
 };
 
-/* 1.电梯信息帧 (ID = 0x00) */
+/* 1.电梯基本显示数据 (TAG = 0x00)*/
 typedef struct _bvt_id0_{
-    unsigned char ID;                 /* ID */
+    unsigned char ID;                 /* ID标签 */
     s_ID0DAT1_T Data1;                /* 个位显示字符ASCII码表示 */
     s_ID0DAT2_T Data2;	              /* 十位显示字符ASCII码表示 */
     s_ID0DAT3_T Data3;	              /* 百位显示字符ASCII码表示 */
@@ -60,16 +60,65 @@ typedef struct _bvt_id0_{
     unsigned char StationLightStatus; /* 到站灯状态 */
 }s_BVTID0_T;
 
-/*2.控制命令帧（ID = 0x01）*/
+/*2.电梯扩展显示数据（TAG = 0x01）*/
 typedef struct _bvt_id1_{
-    unsigned char byte1;
-    unsigned char byte2;
-    unsigned char byte3;
-    unsigned char byte4;
-    unsigned char byte5;
-    unsigned char byte6;
-    unsigned char byte7;
+    unsigned char ID;                    /* ID标签 */
+    unsigned char ShowLanguage;          /*显示语言*/
+    unsigned char CtrCanFaultInfo;       /*控制柜故障信息*/
+    unsigned char DoorMachineFaultInfo;  /*门机故障信息*/
+    unsigned char LiftSpeedInt;          /*电梯速度整数部分*/
+    unsigned char LiftSpeedFloat;        /*电梯速度小数部分*/
+    unsigned char LiftHeightLowByte;     /*电梯高度低字节*/
+    unsigned char LiftHeightHighByte;    /*电梯高度高字节*/
+    unsigned char LiftRunMileage[4];     /*电梯运行里程数 - 字节低->高*/
+    unsigned char LifeRunCounts[4];      /*电梯运行次数 - 字节高->低*/
 }s_BVTID1_T;
+
+/*3.按钮输入数据 (TAG = 0x02)*/
+typedef struct _bvt_id2_ {
+    unsigned char ID;                   /* ID标签 */
+    unsigned char ButtonType;           /* 按钮类型 */
+    unsigned char ButtonStatusLow;      /* 按钮状态低位 */
+    unsigned char ButtonStatusHigh;     /* 按钮状态高位 */
+}s_BVTID2_T;
+
+/*4.按钮输出数据 (TAG = 0x03)*/
+typedef struct _bvt_id3_ {
+    unsigned char ID;                   /* ID标签 */
+    unsigned char ButtonType;           /* 按钮类型 */
+    unsigned char ButtonStatusLow;      /* 按钮状态低位 */
+    unsigned char ButtonStatusHigh;     /* 按钮状态高位 */
+}s_BVTID3_T;
+
+/*5.MCU版本信息 (TAG = 0x04)*/
+typedef struct _bvt_id4_ {
+    unsigned char ID;                  /* ID标签 */
+    unsigned char VersionInfoInt;      /* 版本整数部分（0~9） */
+    unsigned char VersionInfoFloat;    /* 版本小数部分（00~99） */
+    unsigned char year;                /* 年（0~99） */
+    unsigned char month;               /* 月 */
+    unsigned char day;                 /* 日 */
+}s_BVTID4_T;
+
+/*6.升级请求 (TAG = 0x05)*/
+typedef struct _bvt_id5_ {
+    unsigned char ID;                  /* ID标签 */
+    unsigned char RequestStatus;       /* 请求状态 */
+    /* 0--无需升级 1--开始升级 2--升级结束 3--请求进入升级状态 */
+}s_BVTID5_T;
+
+/*7.升级请求应答 (TAG = 0x06)*/
+typedef struct _bvt_id6_ {
+    unsigned char ID;                  /* ID标签 */
+    unsigned char ResponseResult;      /* 应答结果 */
+    /* 0--正常运行 1--请求成功 2--升级数据无误，可传输下一包升级数据 3--升级数据有误，需重发 */
+}s_BVTID6_T;
+
+/*8.升级数据 (TAG = 0x07)*/
+typedef struct _bvt_id7_ {
+    unsigned char ID;                  /* ID标签 */
+    unsigned char UpdateData[64];      /* 数据(共计64字节) */
+}s_BVTID7_T;
 
 ///*心跳ID帧数据*/
 //typedef struct _bvt_id1_{
@@ -79,7 +128,14 @@ typedef struct _bvt_id1_{
 
 /*各个数据帧组成的信息表*/
 typedef struct _messagetable {
-    s_BVTID0_T ID0_Message;     //电梯信息帧 (ID = 0x00)
+    s_BVTID0_T ID0_Message;     /* 1.电梯基本显示数据 (TAG = 0x00) */
+    s_BVTID1_T ID1_Message;     /* 2.电梯扩展显示数据 (TAG = 0x01) */
+    s_BVTID2_T ID2_Message;     /* 3.按钮输入数据 (TAG = 0x02) */
+    s_BVTID3_T ID3_Message;     /* 4.按钮输出数据 (TAG = 0x03) */
+    s_BVTID4_T ID4_Message;     /* 5.MCU版本信息 (TAG = 0x04) */
+    s_BVTID5_T ID5_Message;     /* 6.升级请求 (TAG = 0x05) */
+    s_BVTID6_T ID6_Message;     /* 7.升级请求应答 (TAG = 0x06) */
+    s_BVTID7_T ID7_Message;     /* 8.升级数据 (TAG = 0x07) */
 }messagetable;
 
 //ID类型枚举
@@ -117,7 +173,9 @@ public:
     ~WriteDataToBottom();
     void run();
     void StartThread(WriteDataToBottom *w);
-
+    char GenerateDataVerifyForChar(char *str, unsigned long len);
+    void ConstructWriteData(char *wstr, char *src, unsigned long len);
+    unsigned long CountSourceStringLength(char *src);
 public slots:
     void WriteDataSerial();
 };
@@ -139,6 +197,7 @@ public:
 
     unsigned long BstBvtRecoverFrame(void *des, void *src, unsigned long srclen);      // 数据还原
     void CopyStringFromProtocol(unsigned char Id, void *str);
+    void CopyStringFromUi(unsigned char Id, void *str);
     void PrintString(unsigned char *src, unsigned long length);
     bool StringCompare(unsigned char *temp, unsigned char *str, unsigned long len);
     bool AllocteMemory(void *p);

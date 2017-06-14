@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
     //不这样写，quit会直接提示没有接受者处理这个handle
     view.setSource(QUrl(QStringLiteral("qrc:/main.qml")));
     view.show();
+//    view.showFullScreen();
     return app.exec();
 }
 

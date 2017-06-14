@@ -102,7 +102,15 @@ void RGBGame::timerEvent(QTimerEvent *e)
     }
 }
 
-
+/*
+RGBGame 类中的槽 start()、stop(),信号 colorChanged()、currentTime()都可以在
+QML 中直接调用或者与 QML 中的信号、函数连接,例子参照 main.qml。
+槽必须声明为 public。
+QML 引 擎 会 为 每 一 个 信 号 自 动 创 建 一 个 可 以 在 QML 中 使 用 的 信 号 处 理 器
+on<Signal>,Signal 首字母大写,信号中的所有参数在信号处理器中都是可用的。值得注意
+的是,如果信号的参数类型未注册到 Qt元对象系统 ,不被 QML 引擎支持,但不会出错,只
+是这个参数不能通过信号处理器来访问。
+*/
 
 
 

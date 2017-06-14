@@ -22,7 +22,8 @@ using namespace std;
 //static unsigned char gBvtRecStatus ;
 //static unsigned char gBvtRecCnt ;
 //static unsigned char gBvtFrameBuf[BVT_MAX_FRAME_LENTH] ;
-static char WriteDataBuf[BVT_MAX_FRAME_LENTH] ;
+static char WriteDataBuf[1024] ;
+static char WriteSrc[1000];
 //static char curstr[BVT_MAX_FRAME_LENTH] ;
 
 static unsigned char totalBuf[MAX_LENGTH]; // 串口读到的数据存储的数据缓冲区
@@ -120,9 +121,14 @@ void Protocoldeal::BstBvtSetFrameData(e_IDTYPE_T id, void *dat)
  */
 unsigned char Protocoldeal::BstBvtVerify(unsigned char *data, unsigned long length)
 {
+    qDebug()<< __PRETTY_FUNCTION__<<"length = "<< length;
     unsigned char result = 0;
     unsigned int i;
-
+    if (length <= 0)
+    {
+        qDebug()<< "校验失败,长度有误!";
+        return result;
+    }
     for (i = 0; i < length; i++)
     {
         result = result ^ data[i];
@@ -222,7 +228,7 @@ bool Protocoldeal::AllocteMemory(void *p)
 {
     if (NULL == p)
     {
-        printf("allcote memory is failed");
+        qDebug("allcote memory is failed");
         return true;
     }
     return false;
@@ -239,7 +245,7 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
     temp = (unsigned char *)malloc(len); // 分配内存
     if (!AllocteMemory(temp))
     {
-        qDebug()<<__PRETTY_FUNCTION__<<"allocate success!";
+        qDebug()<<__PRETTY_FUNCTION__<<"allocate success!"<< "ID = " << ID;
         memset(temp, 0, len);
         switch(ID)
         {
@@ -294,6 +300,20 @@ void Protocoldeal::CopyStringFromProtocol(unsigned char Id, void *str)
         cout << "Id == " << "0x01 in else if()"<< endl;
     }
     cout << "StringSize = 拷贝string的长度"<< StringSize << endl;
+}
+
+void Protocoldeal::CopyStringFromUi(unsigned char Id, void *str)
+{
+    if (0x00 == Id)
+    {
+        memcpy(WriteSrc, str, BstBvtGetFrameDatLen(Id));
+        cout << "Id == " << "0x00 in if()"<< endl;
+    }
+    else if (0x01 == Id)
+    {
+        memcpy(WriteSrc, str, BstBvtGetFrameDatLen(Id));
+        cout << "Id == " << "0x01 in else if()"<< endl;
+    }
 }
 
 void Protocoldeal::PrintString(unsigned char *src, unsigned long length)
@@ -381,7 +401,7 @@ void ProducerFromBottom::ReadyreadSlots()
         }
         s = (unsigned char)str;
         count ++;
-        printf("%X\n", s);
+        printf("%X ", s);
         if (BVT_STX == s)
         {
             Isstart = true;
@@ -421,7 +441,7 @@ void ProducerFromBottom::ReadyreadSlots()
         }
     }
 
-//    memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));
+    memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));
 //    printf("ID0_Message.ID = %X \n", mestable.ID0_Message.ID);
 //    printf("Data1 = %X \n", mestable.ID0_Message.Data1);
 //    printf("Data2 = %X \n", mestable.ID0_Message.Data2);
@@ -475,22 +495,49 @@ void WriteDataToBottom::run()
     QTimer *mytimer = new QTimer;
     connect(mytimer, SIGNAL(timeout()), this, SLOT(WriteDataSerial()), Qt::QueuedConnection);
     mytimer->start(3500);
-    WriteDataBuf[0] = 0x80;
-    WriteDataBuf[1] = 0x01;
-    WriteDataBuf[2] = 0x2A;
-    WriteDataBuf[3] = 0x55;
-
-    WriteDataBuf[4] = 0x7E;
-    WriteDataBuf[5] = 0x81;
     this->exec();
 }
 
+//
+unsigned long WriteDataToBottom::CountSourceStringLength(char *src)
+{
+    unsigned long len = 0;
+    while('#' != src[len])  // 约定写的数据的最后一个字符为#号,方便用来计算字符长度
+    {
+        len++;
+    }
+    qDebug()<< "要写的数据长度 len = "<< len;
+    return len;
+}
+
+// 组成一帧完整的包含帧头帧尾和校验值的数据帧
+void WriteDataToBottom::ConstructWriteData(char *wstr, char *src, unsigned long len)
+{
+    unsigned long i = 0;
+    wstr[0] = BVT_STX;
+    for (i = 0; i < len; i++)
+    {
+        wstr[i+1] = src[i];
+    }
+    wstr[++i] = GenerateDataVerifyForChar(src, len);  // 加入校验值
+    wstr[++i] = BVT_ETX;
+}
+
+// 向底层写数据
 void WriteDataToBottom::WriteDataSerial()
 {
+    WriteSrc[0] = 0x01;
+    WriteSrc[1] = 0x2A;
+    WriteSrc[2] = 0x55;
+    WriteSrc[3] = '#';
+    unsigned long length = CountSourceStringLength(WriteSrc);
+    ConstructWriteData(WriteDataBuf, WriteSrc, length);
+//    unsigned long i;
+//    for (i = 0; i)
     if (NULL != my_serialport)
     {
         qDebug() << __PRETTY_FUNCTION__ <<"write data";
-        qint64 len = my_serialport->write(WriteDataBuf, 8);
+        qint64 len = my_serialport->write(WriteDataBuf, length);
         qDebug() << "write length = " << len;
     }
 }
@@ -508,4 +555,25 @@ void WriteDataToBottom::StartThread(WriteDataToBottom *w)
             w->start();
         }
     }
+}
+
+// 生成校验值
+char WriteDataToBottom::GenerateDataVerifyForChar(char *str, unsigned long len)
+{
+    qDebug()<< __PRETTY_FUNCTION__<<"len = "<< len;
+    char result = 0;
+    unsigned long i;
+    if (len <= 0)
+    {
+        qDebug()<< "校验失败,长度有误!";
+        return result;
+    }
+
+    for (i = 0; i < len; i++)
+    {
+        result = result ^ str[i];
+    }
+    qDebug()<< __PRETTY_FUNCTION__<<"result = "<< result;
+    qDebug("result = %x\n", result);
+    return result & 0x7f;
 }

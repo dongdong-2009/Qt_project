@@ -110,6 +110,7 @@ Item {
     Connections {
         target: rgbGame
         onColorChanged: colorRect.color = color
+        // 此处的color正是对应的类的 signal void colorChanged(const QColor &color)的参数，可以在qml中使用，修改.h中的参数，则qml发生错误
     }
 }
 /*
