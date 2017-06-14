@@ -1,7 +1,7 @@
 #ifndef PROTOCOLDEAL_H
 #define PROTOCOLDEAL_H
-#define SERIAL_DEVICE ("/dev/ttymxc1")
-//#define SERIAL_DEVICE ("/dev/ttyUSB0")
+//#define SERIAL_DEVICE ("/dev/ttymxc1")
+#define SERIAL_DEVICE ("/dev/ttyUSB0")
 #include <QObject>
 #include <QThread>
 #include <QDebug>
@@ -11,7 +11,6 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QStringList>
-#include <QTimer>
 #pragma pack(push, 1) //按照1字节对齐
 
 //*ID = 0的帧内容*/
@@ -101,11 +100,18 @@ public:
     ProducerFromBottom();
     ~ProducerFromBottom();
     void run();
-    void StartThread(ProducerFromBottom *p);
     void SetSerialArgument();
-
+    void CopySerialDataToBuf(QByteArray arr);
+    void StartThread(ProducerFromBottom *p);
+//public:
+//    QSerialPort *my_serialport;
 public slots:
     void ReadyreadSlots();
+    void CloseSerial();
+private:
+//    QSerialPort *my_serialport;
+    unsigned char *ProducerFromBottom_pointer;
+    int ProCounts;
 };
 
 // 向串口发送数据的线程
@@ -116,10 +122,18 @@ public:
     WriteDataToBottom();
     ~WriteDataToBottom();
     void run();
+    void SetSerialArgument();
+    unsigned char *GetPointPosition();
+    int GetConCounts();
+    void SetConCounts(int counts);
     void StartThread(WriteDataToBottom *w);
-
 public slots:
+    void CloseSerial();
     void WriteDataSerial();
+private:
+    QSerialPort *Write_serialport;
+    unsigned char *ConsumerFromBottom_pointer;
+    int ConCounts;
 };
 
 // 协议处理的类
@@ -144,9 +158,8 @@ public:
     bool AllocteMemory(void *p);
     unsigned char BstBvtVerify(unsigned char *data, unsigned long length); // CRC 数据校验
     unsigned long GetDataLength();
-    void SetSerialArgument();
-    void CloseSerial();
-
+//    ProducerFromBottom * GetReadThreadPointer();
+//    WriteDataToBottom * GetWriteThreadPointer();
 protected:
     Protocoldeal();
     unsigned char BstBvtRecvMonitor(void);

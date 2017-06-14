@@ -487,5 +487,13 @@ void Widget::ShowArrowStatus(unsigned char str)
     }
 }
 
+void Widget::DealData(char str[])
+{
+//    if (NULL != pro)
+//    {
+//        pro->CopyStringFromProtocol(str, str);
+//    }
+}
+
 
 

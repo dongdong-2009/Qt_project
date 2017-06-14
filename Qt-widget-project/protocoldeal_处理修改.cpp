@@ -19,9 +19,9 @@ using namespace std;
 #define BVT_PTL_FRAMEID_POS 1	/* 协议帧ID地址 */
 #define BVT_PTL_DATASTART_POS 2	/* 协议帧数据地址 */
 #define MAX_LENGTH 4096         /*缓冲区大小*/
-//static unsigned char gBvtRecStatus ;
-//static unsigned char gBvtRecCnt ;
-//static unsigned char gBvtFrameBuf[BVT_MAX_FRAME_LENTH] ;
+static unsigned char gBvtRecStatus ;
+static unsigned char gBvtRecCnt ;
+static unsigned char gBvtFrameBuf[BVT_MAX_FRAME_LENTH] ;
 static char WriteDataBuf[BVT_MAX_FRAME_LENTH] ;
 //static char curstr[BVT_MAX_FRAME_LENTH] ;
 
@@ -89,12 +89,12 @@ void Protocoldeal::BstBvtPtlInit()
  */
 void Protocoldeal::BstBvtSetFrameData(e_IDTYPE_T id, void *dat)
 {
-//    unsigned char TranBuf[BVT_MAX_FRAME_LENTH] = {0};
+    unsigned char TranBuf[BVT_MAX_FRAME_LENTH] = {0};
     unsigned char FrameBuf[BVT_MAX_FRAME_LENTH] = {0};
     unsigned char *pFrameBuf = FrameBuf;
     unsigned char *pStarVer;
     unsigned char DatLen = 0;
-//    unsigned long TranLen = 0;/*转换后帧长度*/
+    unsigned long TranLen = 0;/*转换后帧长度*/
 
     if(id >= ID_UNKNOW)/*未知ID*/
         return;
@@ -152,8 +152,7 @@ unsigned long Protocoldeal::BstBvtRecoverFrame(void *des, void *src, unsigned lo
     }
     lSrc++; /*取出跳过帧头数据*/
     while(Cnt < Len)
-    {
-        qDebug()<< "enter while";
+    {qDebug()<< "enter while = ";
         if(BVT_ESC == *lSrc)                   //如果是转换字符
         {
             if(*(lSrc + 1) == BVT_STX_AF)      //转换后的帧头
@@ -169,8 +168,7 @@ unsigned long Protocoldeal::BstBvtRecoverFrame(void *des, void *src, unsigned lo
             Cnt++;
         }
         TranLen++;
-    }
-    qDebug()<< "TranLen = "<< TranLen;
+    }qDebug()<< "TranLen = "<< TranLen;
     //*lDst = *lSrc; /*取出帧尾数据*/
     return TranLen;
 }
@@ -231,7 +229,6 @@ bool Protocoldeal::AllocteMemory(void *p)
 // 检测发送的新的数据帧的内容是否有变更
 bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
 {
-    qDebug()<<__PRETTY_FUNCTION__;
     unsigned long len;
     unsigned char *temp;
     bool AllocteFlag = false;
@@ -239,7 +236,6 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
     temp = (unsigned char *)malloc(len); // 分配内存
     if (!AllocteMemory(temp))
     {
-        qDebug()<<__PRETTY_FUNCTION__<<"allocate success!";
         memset(temp, 0, len);
         switch(ID)
         {
@@ -276,8 +272,6 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
             }
         }
     }
-    qDebug()<<__PRETTY_FUNCTION__<<"allocate failure!";
-    return false;
 }
 
 /*应用层调用从协议层拷贝数据到应用层的接口*/
@@ -367,7 +361,6 @@ void ProducerFromBottom::ReadyreadSlots()
     cout << __PRETTY_FUNCTION__ << "读数据的槽函数"<<endl;
     static bool Isstart = false;
     char str;
-    unsigned char s;
     unsigned long i = 0;
     unsigned long j = 0;
     unsigned long count = 0;
@@ -379,20 +372,20 @@ void ProducerFromBottom::ReadyreadSlots()
             qDebug()<< "读不到数据退出";
             break;
         }
-        s = (unsigned char)str;
+
         count ++;
-        printf("%X\n", s);
-        if (BVT_STX == s)
+        printf("%X\n", str);
+        if (BVT_STX == str)
         {
             Isstart = true;
             i = 0;
-            totalBuf[i++] = s /*(unsigned char)str*/;
+            totalBuf[i++] = (unsigned char)str;
         }
         else if(Isstart)      // 如果遇到帧头，则将遇到帧尾之前的所有数据保存下来
         {
-            totalBuf[i++] = s /*(unsigned char)str*/;
+            totalBuf[i++] = (unsigned char)str;
 
-            if (BVT_ETX == s)
+            if (BVT_ETX == str)
             {
                 Isstart = false;
                 j = i;
@@ -403,7 +396,7 @@ void ProducerFromBottom::ReadyreadSlots()
         }
     }
 
-    printf("count = %ld\n", count);
+    printf("count = %d\n", count);
     Protocoldeal *Protocol = Protocoldeal::GetInstance();
     StringSize = Protocol->BstBvtRecoverFrame(tempBuf, totalBuf, j);
     printf("接收到的数据为 totalBuf = ");
@@ -432,6 +425,106 @@ void ProducerFromBottom::ReadyreadSlots()
 //    printf("StationClockStatus = %X \n", mestable.ID0_Message.StationClockStatus);
 //    printf("StationLightStatus = %X \n", mestable.ID0_Message.StationLightStatus);
 }
+//void ProducerFromBottom::CharToUnsignedChar(char *str, unsigned long len)
+//{
+//    if (len <= 0)
+//    {
+//        qDebug()<< "len < 0 donothing!";
+//        return;
+//    }
+//    unsigned long i = 0;
+//    for (i = 0; i < len; i++)
+//    {
+//        totalBuf[i] = (unsigned char)str[i];
+//    }
+//    qDebug()<< __PRETTY_FUNCTION__ << "len = "<< len;
+//}
+
+//int ProducerFromBottom::CheckWholeString(unsigned char *str, unsigned long len)
+//{
+//    unsigned long i = 0;
+//    bool HaveHead = false;
+//    bool HaveTail = false;
+//    qDebug()<< __PRETTY_FUNCTION__ << "len = "<< len;
+//    for (i = 0; i < len; i++)
+//    {
+//        if (BVT_STX == str[i])         // 找到帧头
+//            HaveHead = true;
+//        else if (BVT_ETX == str[i])    // 找到帧尾
+//            HaveTail = true;
+//    }
+//    if (HaveHead && HaveTail)          // 完整数据帧
+//    {
+//        position = 0;
+//        qDebug()<< __PRETTY_FUNCTION__ << "HaveHead= "<<" HaveTail= "<<" position = "
+//                <<HaveHead << HaveTail <<position;
+//        return 1;
+//    }
+//    else if (HaveHead &&(!HaveTail))   // 只有帧头，未找到帧尾
+//    {
+//        position = position + len;
+//        qDebug()<< __PRETTY_FUNCTION__ << "HaveHead= "<<" HaveTail= "<<" position = "
+//                <<HaveHead << HaveTail <<position;
+//        return 2;
+//    }
+//    else if (!HaveHead && (!HaveTail)) // 帧头帧尾都没有
+//    {
+//        position = position + len;
+//        qDebug()<< __PRETTY_FUNCTION__ << "HaveHead= "<<" HaveTail= "<<" position = "
+//                <<HaveHead << HaveTail <<position;
+//        return 3;
+//    }
+//    else if (!HaveHead && HaveTail)    // 只有帧尾
+//    {
+//        position = position + len;
+//        qDebug()<< __PRETTY_FUNCTION__ << "HaveHead= "<<" HaveTail= "<<" position = "
+//                <<HaveHead << HaveTail <<position;
+//        return 4;
+//    }
+//}
+
+// 读串口数据函数
+//void ProducerFromBottom::ReadyreadSlots()
+//{
+//    cout << __PRETTY_FUNCTION__ << "读数据的槽函数"<<endl;
+//    QByteArray arr = my_serialport->readAll();
+//    char *str = arr.data();
+//    int len = arr.length();
+//    qDebug()<< "arr.length = " << len;
+//    CharToUnsignedChar(str, len);
+//    int flag = CheckWholeString(totalBuf, len);
+//    Protocoldeal *Protocol = Protocoldeal::GetInstance();
+//    if (1 == flag)   // 一包完整的数据帧时
+//    {
+//        StringSize = Protocol->BstBvtRecoverFrame(tempBuf, totalBuf, j);
+//        printf("接收到的数据为 totalBuf = ");
+//        Protocol->PrintString(totalBuf, j);
+//        printf("解析后的数据为 tempBuf = ");
+//        Protocol->PrintString(tempBuf, StringSize);
+//        if ( tempBuf[j-1] == Protocol->BstBvtVerify(tempBuf, j)) // 数据校验
+//        {
+//            printf("tempBuf[0] = %X \n", tempBuf[0]);
+//            cout <<" verify is true "<< endl;
+//            if (Protocol->JudgeChange(tempBuf[0], tempBuf))
+//            {
+//                printf("emit message\n");
+//                emit Protocol->AcceptDataFormBottom(tempBuf[0]);
+//            }
+//        }
+//    }
+//    else if (2 == flag) // 只有帧头，未找到帧尾
+//    {
+
+//    }
+//    else if (3 == flag) // 帧头帧尾都没有
+//    {
+
+//    }
+//    else if (4 == flag) // 只有帧尾
+//    {
+
+//    }
+//}
 
 unsigned long Protocoldeal::GetDataLength()
 {
@@ -466,6 +559,8 @@ WriteDataToBottom::WriteDataToBottom()
 
 WriteDataToBottom::~WriteDataToBottom()
 {
+    mtimer->stop();
+    delete mtimer;
     cout <<__PRETTY_FUNCTION__<<"启动写线程的析构函数"<< endl;
 }
 
@@ -473,15 +568,17 @@ void WriteDataToBottom::run()
 {
     qDebug() <<__PRETTY_FUNCTION__ <<"Will setArgument";
     QTimer *mytimer = new QTimer;
+    mtimer = mytimer;
     connect(mytimer, SIGNAL(timeout()), this, SLOT(WriteDataSerial()), Qt::QueuedConnection);
-    mytimer->start(3500);
+    mytimer->start(1500);
     WriteDataBuf[0] = 0x80;
-    WriteDataBuf[1] = 0x01;
-    WriteDataBuf[2] = 0x2A;
-    WriteDataBuf[3] = 0x55;
-
-    WriteDataBuf[4] = 0x7E;
-    WriteDataBuf[5] = 0x81;
+    WriteDataBuf[1] = 0x00;
+    WriteDataBuf[2] = 0x01;
+    WriteDataBuf[3] = 0x00;
+    WriteDataBuf[4] = 0x00;
+    WriteDataBuf[5] = 0x33;
+    WriteDataBuf[6] = 0x33;
+    WriteDataBuf[7] = 0x81;
     this->exec();
 }
 

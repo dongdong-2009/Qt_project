@@ -1,5 +1,6 @@
 #ifndef WIDGET_H
 #define WIDGET_H
+#define LCD_DEVICE ("/dev/ttyUSB0")
 
 #include <QWidget>
 #include "protocoldeal.h"
@@ -16,7 +17,7 @@ class Widget : public QWidget
 public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
-
+    void DealData(char str[]);
 protected:
     void UiInit();
     void ShowDate();
