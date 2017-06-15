@@ -174,10 +174,13 @@ public:
     void run();
     void StartThread(WriteDataToBottom *w);
     char GenerateDataVerifyForChar(char *str, unsigned long len);
-    void ConstructWriteData(char *wstr, char *src, unsigned long len);
-    unsigned long CountSourceStringLength(char *src);
+
 public slots:
     void WriteDataSerial();
+    void ConstructWriteData(char *wstr, char *src);
+signals:
+    void FillDataSignal(char *wstr, char *src);
+    void WriteDataSignal();
 };
 
 // 协议处理的类

@@ -12,6 +12,7 @@
 #include <QGraphicsOpacityEffect>
 using namespace std;
 static unsigned char sstr[1024];
+static unsigned char requestBuf[1000];
 QTimer *mtime1;
 QTimer *mtime2;
 QTimer *mtime3;
@@ -29,6 +30,9 @@ Widget::Widget(QWidget *parent) :
     timer->start(1000);
     qDebug() << "flagtime = "<< flagtime;
 
+    writetimer = new QTimer(this);
+    connect(writetimer, SIGNAL(timeout()), this, SLOT(CopyData()));
+    writetimer->start(2000);
     pro = Protocoldeal::GetInstance();
     connect(pro, SIGNAL(AcceptDataFormBottom(unsigned char)), this, SLOT(DealNewData(unsigned char)));
 
@@ -46,7 +50,10 @@ Widget::~Widget()
 {
     qDebug()<<__PRETTY_FUNCTION__ << "start";
     delete pro;
+    timer->stop();
     delete timer;
+    writetimer->stop();
+    delete writetimer;
     delete ui;
     qDebug() << __PRETTY_FUNCTION__ << "delete all pointers";
 }
@@ -491,11 +498,25 @@ void Widget::ShowArrowStatus(unsigned char str)
 //    case 0x34: SetTimerArrowDn(); break;
 //    case 0x35: ShiningArrowUp(); break;
 //    case 0x36: ShiningArrowDn(); break;
-    case 0x00: ShiningArrowDn(); break;
+    case 0x00: SetTimerArrowUp(); break;
     default:
         break;
     }
 }
 
-
+void Widget::CopyData()
+{
+    requestBuf[0] = 0x01;
+    requestBuf[1] = 0x2A;
+    requestBuf[2] = 0x55;
+    requestBuf[3] = 0x30;
+    requestBuf[4] = 0x30;
+    requestBuf[5] = 0x30;
+    requestBuf[6] = 0x30;
+    qDebug()<<__PRETTY_FUNCTION__;
+    if (NULL != pro)
+    {
+        pro->CopyStringFromUi(requestBuf[0], requestBuf);
+    }
+}
 

@@ -40,12 +40,14 @@ public slots:
     void SetFloorNumber(QString s);
     void OnShiningArrowUp();
     void OnShiningArrowDn();
+    void CopyData();
 
 private:
     Ui::Widget *ui;
     Protocoldeal *pro;
     QImage *image;
     QTimer *timer;
+    QTimer *writetimer;
 };
 
 #endif // WIDGET_H

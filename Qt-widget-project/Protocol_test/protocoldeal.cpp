@@ -30,6 +30,7 @@ static unsigned char totalBuf[MAX_LENGTH]; // 串口读到的数据存储的数�
 static unsigned char tempBuf[1024];        // 去掉帧头和帧尾，并且解析好的数据的缓冲区
 static unsigned long StringSize;
 static unsigned long position;
+static unsigned long UiWriteSize;
 messagetable mestable;
 Protocoldeal* Protocoldeal::instance = NULL;
 //QTimer *timer;
@@ -151,7 +152,7 @@ unsigned long Protocoldeal::BstBvtRecoverFrame(void *des, void *src, unsigned lo
     unsigned char *lDst = (unsigned char*)des;
     unsigned char *lSrc = (unsigned char*)src;
     qDebug()<< "srclen = "<< srclen;
-    if (0 == srclen)
+    if (2 >= srclen)
     {
         qDebug()<< "buf is empty ";
         return TranLen;
@@ -197,7 +198,7 @@ void Protocoldeal::BstFifoMemCpy(unsigned char *pFrameBuf,void* dat, unsigned ch
 unsigned long Protocoldeal::BstBvtGetFrameDatLen(unsigned char id)
 {
     qDebug()<< __PRETTY_FUNCTION__;
-    unsigned char len = 0;
+    unsigned long len = 0;
     switch(id)
     {
     case 0x00: len = sizeof(s_BVTID0_T); break;
@@ -312,16 +313,12 @@ void Protocoldeal::CopyStringFromProtocol(unsigned char Id, void *str)
 // 从UI层拷贝数据到协议层,根据Id指定拷贝的数据长度
 void Protocoldeal::CopyStringFromUi(unsigned char Id, void *str)
 {
-    if (0x00 == Id)
-    {
-        memcpy(WriteSrc, str, BstBvtGetFrameDatLen(Id));
-        cout << "Id == " << "0x00 in if()"<< endl;
-    }
-    else if (0x01 == Id)
-    {
-        memcpy(WriteSrc, str, BstBvtGetFrameDatLen(Id));
-        cout << "Id == " << "0x01 in else if()"<< endl;
-    }
+    cout << __PRETTY_FUNCTION__<<" ";
+    printf("Id = %x\n",Id);
+    unsigned long strlength = BstBvtGetFrameDatLen(Id);
+    memset(WriteSrc, 0, sizeof(WriteSrc));
+    memcpy(WriteSrc, str, strlength);
+    emit WriteDataPthread->FillDataSignal(WriteDataBuf, WriteSrc);
 }
 
 void Protocoldeal::PrintString(unsigned char *src, unsigned long length)
@@ -500,52 +497,73 @@ WriteDataToBottom::~WriteDataToBottom()
 void WriteDataToBottom::run()
 {
     qDebug() <<__PRETTY_FUNCTION__ <<"Will setArgument";
-    QTimer *mytimer = new QTimer;
-    connect(mytimer, SIGNAL(timeout()), this, SLOT(WriteDataSerial()), Qt::QueuedConnection);
-    mytimer->start(3500);
+//    QTimer *mytimer = new QTimer;
+//    connect(mytimer, SIGNAL(timeout()), this, SLOT(WriteDataSerial()), Qt::QueuedConnection);
+    connect(this, SIGNAL(FillDataSignal(char*,char*)), this, SLOT(ConstructWriteData(char*,char*)),
+            Qt::QueuedConnection);
+    connect(this, SIGNAL(WriteDataSignal()), this, SLOT(WriteDataSerial()), Qt::QueuedConnection);
+//    mytimer->start(3500);
     this->exec();
 }
 
 //
-unsigned long WriteDataToBottom::CountSourceStringLength(char *src)
-{
-    unsigned long len = 0;
-    while('#' != src[len])  // 约定写的数据的最后一个字符为#号,方便用来计算字符长度
-    {
-        len++;
-    }
-    qDebug()<< "要写的数据长度 len = "<< len;
-    return len;
-}
+//unsigned long WriteDataToBottom::CountSourceStringLength(char *src)
+//{
+//    unsigned long len = 0;
+//    while('#' != src[len])  // 约定写的数据的最后一个字符为#号,方便用来计算字符长度
+//    {
+//        len++;
+//    }
+//    qDebug()<< "要写的数据长度 len = "<< len;
+//    return len;
+//}
 
 // 组成一帧完整的包含帧头帧尾和校验值的数据帧
-void WriteDataToBottom::ConstructWriteData(char *wstr, char *src, unsigned long len)
+void WriteDataToBottom::ConstructWriteData(char *wstr, char *src)
 {
+    qDebug() << __PRETTY_FUNCTION__;
     unsigned long i = 0;
-    wstr[0] = BVT_STX;
-    for (i = 0; i < len; i++)
+    unsigned long counts = 0;
+    memset(wstr, 0, 1000);
+    unsigned long len = Protocoldeal::GetInstance()->BstBvtGetFrameDatLen((unsigned char)src[0]);
+    src[len] = GenerateDataVerifyForChar(src, len); // 先在用户拷贝的数据后面加入校验值
+    wstr[counts++] = BVT_STX;  // 在需要写的数据开头加上帧头
+    for (i = 0; i < len + 1; i++) //遍历用户数据进行数据帧转换，加上帧头帧尾以及对数据中出现的帧头帧尾和转义字符替换
     {
-        wstr[i+1] = src[i];
+        if (BVT_STX == (unsigned char)src[i])
+        {
+            wstr[counts++] = BVT_ESC;
+            wstr[counts++] = BVT_STX_AF;
+        }
+        else if (BVT_ETX == (unsigned char)src[i])
+        {
+            wstr[counts++] = BVT_ESC;
+            wstr[counts++] = BVT_ETX_AF;
+        }
+        else if (BVT_ESC == (unsigned char)src[i])
+        {
+            wstr[counts++] = BVT_ESC;
+            wstr[counts++] = BVT_ESC_AF;
+        }
+        else
+        {
+            wstr[counts++] = src[i];
+        }
     }
-    wstr[++i] = GenerateDataVerifyForChar(src, len);  // 加入校验值
-    wstr[++i] = BVT_ETX;
+    wstr[counts++] = BVT_ETX;
+    UiWriteSize = counts;
+    qDebug()<<" 转换后的数据长度为 UiWriteSize =" << UiWriteSize;
+    emit WriteDataSignal();
 }
 
 // 向底层写数据
 void WriteDataToBottom::WriteDataSerial()
 {
-    WriteSrc[0] = 0x01;
-    WriteSrc[1] = 0x2A;
-    WriteSrc[2] = 0x55;
-    WriteSrc[3] = '#';
-    unsigned long length = CountSourceStringLength(WriteSrc);
-    ConstructWriteData(WriteDataBuf, WriteSrc, length);
-//    unsigned long i;
-//    for (i = 0; i)
+    cout<< __PRETTY_FUNCTION__;
     if (NULL != my_serialport)
     {
-        qDebug() << __PRETTY_FUNCTION__ <<"write data";
-        qint64 len = my_serialport->write(WriteDataBuf, length);
+        qDebug()<<"write data";
+        qint64 len = my_serialport->write(WriteDataBuf, UiWriteSize);
         qDebug() << "write length = " << len;
     }
 }
