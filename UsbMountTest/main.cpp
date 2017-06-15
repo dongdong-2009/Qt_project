@@ -1,13 +1,15 @@
 #include "widget.h"
 #include <QApplication>
-#include <QDebug>
-#include <QTextCodec>
+#include "usbmanager.h"
+#include "haldevice.h"
 int main(int argc, char *argv[])
 {
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     QApplication a(argc, argv);
+//    haldevice *hd = new haldevice;
+
+    usbmanager *um = new usbmanager;
     Widget w;
     w.show();
-//    w.showFullScreen();
+
     return a.exec();
 }

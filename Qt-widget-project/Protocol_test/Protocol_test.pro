@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui testlib
+QT       += core gui testlib dbus
 QT += serialport
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,10 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         widget.cpp \
-    protocoldeal.cpp
+    protocoldeal.cpp \
+    usbdetect.cpp
 
 HEADERS  += widget.h \
-    protocoldeal.h
+    protocoldeal.h \
+    usbdetect.h
 
 FORMS    += widget.ui
 

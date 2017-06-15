@@ -183,6 +183,14 @@ signals:
     void WriteDataSignal();
 };
 
+class UpdateData:public QObject
+{
+    Q_OBJECT
+public:
+    UpdateData();
+    ~UpdateData();
+};
+
 // 协议处理的类
 class Protocoldeal: public QObject
 {

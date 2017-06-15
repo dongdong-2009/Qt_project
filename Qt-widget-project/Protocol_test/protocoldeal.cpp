@@ -524,7 +524,7 @@ void WriteDataToBottom::ConstructWriteData(char *wstr, char *src)
     qDebug() << __PRETTY_FUNCTION__;
     unsigned long i = 0;
     unsigned long counts = 0;
-    memset(wstr, 0, 1000);
+    memset(WriteDataBuf, 0, sizeof(WriteDataBuf));  // 先清空上一次的数据
     unsigned long len = Protocoldeal::GetInstance()->BstBvtGetFrameDatLen((unsigned char)src[0]);
     src[len] = GenerateDataVerifyForChar(src, len); // 先在用户拷贝的数据后面加入校验值
     wstr[counts++] = BVT_STX;  // 在需要写的数据开头加上帧头
@@ -552,6 +552,9 @@ void WriteDataToBottom::ConstructWriteData(char *wstr, char *src)
     }
     wstr[counts++] = BVT_ETX;
     UiWriteSize = counts;
+    printf("即将要write的数据为 ");
+    for(i = 0;i < counts; i++)
+        printf("%X ", wstr[i]);
     qDebug()<<" 转换后的数据长度为 UiWriteSize =" << UiWriteSize;
     emit WriteDataSignal();
 }
@@ -602,4 +605,14 @@ char WriteDataToBottom::GenerateDataVerifyForChar(char *str, unsigned long len)
     qDebug()<< __PRETTY_FUNCTION__<<"result = "<< result;
     qDebug("result = %x\n", result);
     return result & 0x7f;
+}
+
+UpdateData::UpdateData()
+{
+
+}
+
+UpdateData::~UpdateData()
+{
+
 }

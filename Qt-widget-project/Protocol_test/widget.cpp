@@ -10,6 +10,8 @@
 #include <QPalette>
 #include <QPropertyAnimation>
 #include <QGraphicsOpacityEffect>
+#include "usbdetect.h"
+
 using namespace std;
 static unsigned char sstr[1024];
 static unsigned char requestBuf[1000];
@@ -24,7 +26,7 @@ Widget::Widget(QWidget *parent) :
 {
     qDebug()<<__PRETTY_FUNCTION__ << "start";
     ui->setupUi(this);
-
+    UsbDetect *usb = new UsbDetect;
     timer = new QTimer(this);
     bool flagtime = connect(timer, SIGNAL(timeout()), this, SLOT(ShowTime()));
     timer->start(1000);
