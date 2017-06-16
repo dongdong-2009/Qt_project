@@ -56,6 +56,6 @@ Swap:         6093        479       5614
 root@ubuntu:/home/devin# 
 
 
-
+出现这种情况是因为我将大一点的视频文件加入到qt 的 qml的资源中去了
 
 

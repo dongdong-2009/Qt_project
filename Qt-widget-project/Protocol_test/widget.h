@@ -19,7 +19,6 @@ public:
 
 protected:
     void UiInit();
-    void ShowDate();
     void SetWidgetBackGround(QString path);
     void HideGraphicViewBorder();
     void SetPicture(QString path, QGraphicsView *graphic);
@@ -35,6 +34,7 @@ protected:
 public slots:
     void DealNewData(unsigned char s);
     void ShowTime();
+    void ShowDate();
     void ChangePositionUp();
     void ChangePositionDn();
     void SetFloorNumber(QString s);
@@ -42,6 +42,8 @@ public slots:
     void OnShiningArrowDn();
     void CopyData();
 
+signals:
+    void DateChangesSignal();
 private:
     Ui::Widget *ui;
     Protocoldeal *pro;

@@ -2,6 +2,7 @@
 #define PROTOCOLDEAL_H
 #define SERIAL_DEVICE ("/dev/ttymxc1")
 //#define SERIAL_DEVICE ("/dev/ttyUSB0")
+const int OffsetHead = 2059; // 从文件的第2059的字节处拷贝5个字节，获取版本信息
 #include <QObject>
 #include <QThread>
 #include <QDebug>
@@ -12,6 +13,7 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QStringList>
 #include <QTimer>
+#include <QFile>
 #pragma pack(push, 1) //按照1字节对齐
 
 //*ID = 0的帧内容*/
@@ -147,6 +149,10 @@ typedef enum _id_type_{
     ID_UNKNOW,          /* 未知ID信息 */
 }e_IDTYPE_T;
 
+typedef struct _updateversion {
+    unsigned char ver[5];   // 升级文件的版本信息
+}UpdateVersion;
+
 #pragma pack(pop)
 
 // 读取串口数据的线程
@@ -183,12 +189,18 @@ signals:
     void WriteDataSignal();
 };
 
-class UpdateData:public QObject
+class UpdateData: public QObject
 {
     Q_OBJECT
 public:
     UpdateData();
     ~UpdateData();
+    void GetUpdateVersion(const char *filename, UpdateVersion *Uver);  // 从升级文件中获取版本号用于下一步的比较
+    bool CompareVersion(unsigned char Revversion[], unsigned char Readversion[]);   // 比较版本信息
+    void ReadUpdateFile(const char *filename);    // 读取升级文件并发送内容
+    void AppendByte(char *buf, int len);
+private:
+
 };
 
 // 协议处理的类
@@ -216,7 +228,8 @@ public:
     unsigned long GetDataLength();
     void SetSerialArgument();
     void CloseSerial();
-
+    void SetContinueFlag(unsigned char buf[]);
+    int GetContinueFlag();
 protected:
     Protocoldeal();
     unsigned char BstBvtRecvMonitor(void);
@@ -232,6 +245,7 @@ private:
     ProducerFromBottom *ReadDataPthread;
     WriteDataToBottom *WriteDataPthread;
     static Protocoldeal *instance;
+    int ContinueFlag;
 };
 
 

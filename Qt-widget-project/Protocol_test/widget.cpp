@@ -29,6 +29,7 @@ Widget::Widget(QWidget *parent) :
     UsbDetect *usb = new UsbDetect;
     timer = new QTimer(this);
     bool flagtime = connect(timer, SIGNAL(timeout()), this, SLOT(ShowTime()));
+    connect(this, SIGNAL(DateChangesSignal()), this, SLOT(ShowDate()));
     timer->start(1000);
     qDebug() << "flagtime = "<< flagtime;
 
@@ -339,7 +340,7 @@ void Widget::ShowDate()
     qDebug()<<__PRETTY_FUNCTION__ << "start";
     QDateTime Time = QDateTime::currentDateTime();
     QString tim = Time.toString("MM-dd-yyyy");
-    qDebug()<<"tim = "<< tim<<'\n';
+    qDebug()<<"tim = "<< tim;
 
     QFont ft;      // 设置字号
     ft.setPointSize(20);
@@ -370,6 +371,12 @@ void Widget::ShowTime()
     QString text = time.toString("hh : mm");
     if ((time.second() % 2) == 0)
         text[3] = ' ';
+    if ('0' == text[0] && '0' == text[1]
+           && '0' == text[5] && text[6] == '0')
+    {
+        qDebug()<< "日期变更通知";
+        emit DateChangesSignal();
+    }
 
     QFont ft;                    // 设置字号
     ft.setPointSize(20);

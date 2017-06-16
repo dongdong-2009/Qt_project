@@ -267,6 +267,21 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
         case 0x02:
             AllocteFlag = true;
             break;
+        case 0x03:
+            AllocteFlag = true;
+            break;
+        case 0x04:
+            AllocteFlag = true;
+            break;
+        case 0x05:
+            AllocteFlag = true;
+            break;
+        case 0x06:
+            AllocteFlag = true;
+            break;
+        case 0x07:
+            AllocteFlag = true;
+            break;
         default:
             AllocteFlag = true;
             break;
@@ -307,6 +322,7 @@ void Protocoldeal::CopyStringFromProtocol(unsigned char Id, void *str)
         memcpy(str, tempBuf, StringSize);
         cout << "Id == " << "0x01 in else if()"<< endl;
     }
+    memset(tempBuf, 0, sizeof(tempBuf));
     cout << "StringSize = 拷贝string的长度"<< StringSize << endl;
 }
 
@@ -381,7 +397,6 @@ ProducerFromBottom::ProducerFromBottom()
 
 ProducerFromBottom::~ProducerFromBottom()
 {
-//    CloseSerial();
     cout << __PRETTY_FUNCTION__<<"启动读串口的线程的析构函数"<<endl;
 }
 
@@ -435,6 +450,7 @@ void ProducerFromBottom::ReadyreadSlots()
     Protocol->PrintString(totalBuf, j);
     printf("解析后的数据为 tempBuf = ");
     Protocol->PrintString(tempBuf, StringSize);
+    Protocol->SetContinueFlag(tempBuf);
     if ( tempBuf[j-1] == Protocol->BstBvtVerify(tempBuf, j)) // 数据校验
     {
         printf("tempBuf[0] = %X \n", tempBuf[0]);
@@ -463,6 +479,31 @@ unsigned long Protocoldeal::GetDataLength()
     return StringSize;
 }
 
+void Protocoldeal::SetContinueFlag(unsigned char buf[])
+{
+    int ContinueFlag = -1;
+    qDebug()<< __PRETTY_FUNCTION__;
+    if (0x06 == buf[0] && 0x02 == buf[1])     // 收到升级数据包为真
+    {
+        ContinueFlag = 1;
+    }
+    else if (0x06 == buf[0] && 0x03 == buf[1])// 收到数据包有误
+    {
+        ContinueFlag = 2;
+    }
+    else                                      // 没有收到回应
+    {
+        ContinueFlag = 0;
+    }
+    qDebug()<<"ContinueFlag = "<< ContinueFlag;
+}
+
+int Protocoldeal::GetContinueFlag()
+{
+    qDebug()<< __PRETTY_FUNCTION__<<"ContinueFlag = "<< ContinueFlag;
+    return ContinueFlag;
+}
+
 void ProducerFromBottom::run()
 {
     cout << __PRETTY_FUNCTION__ << "配置串口"<<endl;
@@ -486,7 +527,6 @@ void ProducerFromBottom::StartThread(ProducerFromBottom *p)
 WriteDataToBottom::WriteDataToBottom()
 {
     cout << __PRETTY_FUNCTION__<<"启动写线程的构造函数"<<endl;
-//    ConsumerFromBottom_pointer = totalBuf;
 }
 
 WriteDataToBottom::~WriteDataToBottom()
@@ -497,26 +537,11 @@ WriteDataToBottom::~WriteDataToBottom()
 void WriteDataToBottom::run()
 {
     qDebug() <<__PRETTY_FUNCTION__ <<"Will setArgument";
-//    QTimer *mytimer = new QTimer;
-//    connect(mytimer, SIGNAL(timeout()), this, SLOT(WriteDataSerial()), Qt::QueuedConnection);
     connect(this, SIGNAL(FillDataSignal(char*,char*)), this, SLOT(ConstructWriteData(char*,char*)),
             Qt::QueuedConnection);
     connect(this, SIGNAL(WriteDataSignal()), this, SLOT(WriteDataSerial()), Qt::QueuedConnection);
-//    mytimer->start(3500);
     this->exec();
 }
-
-//
-//unsigned long WriteDataToBottom::CountSourceStringLength(char *src)
-//{
-//    unsigned long len = 0;
-//    while('#' != src[len])  // 约定写的数据的最后一个字符为#号,方便用来计算字符长度
-//    {
-//        len++;
-//    }
-//    qDebug()<< "要写的数据长度 len = "<< len;
-//    return len;
-//}
 
 // 组成一帧完整的包含帧头帧尾和校验值的数据帧
 void WriteDataToBottom::ConstructWriteData(char *wstr, char *src)
@@ -607,6 +632,7 @@ char WriteDataToBottom::GenerateDataVerifyForChar(char *str, unsigned long len)
     return result & 0x7f;
 }
 
+// 系统升级
 UpdateData::UpdateData()
 {
 
@@ -615,4 +641,99 @@ UpdateData::UpdateData()
 UpdateData::~UpdateData()
 {
 
+}
+
+// 从文件中指定的位置获取升级的版本信息
+void UpdateData::GetUpdateVersion(const char *filename, UpdateVersion *Uver)
+{
+    QFile file(filename);
+    char buf[5];
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qDebug("打开文件%s失败!", filename);
+        return;
+    }
+    file.seek(OffsetHead);
+    memset(Uver->ver, 0, sizeof(Uver->ver)); // 使用前先清为0
+    file.read(buf, 5);
+    memcpy(Uver->ver, buf, 5);
+    qDebug("verinfo = %s", Uver->ver);
+    file.close();
+}
+
+// 版本位数为定长五位数
+bool UpdateData::CompareVersion(unsigned char Revversion[], unsigned char Readversion[])
+{
+    unsigned long i;
+    for (i = 0; i < 5; i++)
+    {
+        if (Revversion[i] != Readversion[i])
+        {
+            if (Revversion[i] < Readversion[i])
+            {
+                qDebug()<< "获取到的版本比当前版本新，需升级，返回true";
+                return true;    // 需要升级，返回true
+            }
+            else
+            {
+                qDebug()<< "获取到的版本比当前版本旧，无需升级，返回false";
+                return false;   // 获取到的版本比当前版本旧，不用升级，返回false
+            }
+        }
+    }
+    qDebug()<< "版本号相同，无需升级，返回false";
+    return false;    // 版本号相同，无需升级，返回false
+}
+
+// 当读取的字符长度小于64时，对buf用0xff填充至64个字节
+void UpdateData::AppendByte(char *buf, int len)
+{
+    int i;
+    for (i = len; i < 64; i++)
+    {
+        buf[i] = 0xff;
+    }
+}
+
+void UpdateData::ReadUpdateFile(const char *filename)
+{
+    QFile file(filename);
+    char buffer[64];
+    int readlen = 0;
+    memset(buffer, 0, sizeof(buffer));
+    int ret;
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qDebug("打开文件%s失败!", filename);
+        return ;
+    }
+    while(!file.atEnd())  // 未到达文件末尾时
+    {
+        readlen = file.read(buffer, 64);
+        if (readlen < 64)
+        {
+            AppendByte(buffer, readlen);// 字符长度小于64时，对buf用0xff填充至64个字节
+        }
+        Protocoldeal::GetInstance()->CopyStringFromUi(0x07, buffer);
+
+        while( !(ret = Protocoldeal::GetInstance()->GetContinueFlag())) // 未收到校验数据时
+            ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
+        if (1 == ret)   // 数据校验正确
+        {
+            readlen = file.read(buffer, 64);
+            if (64 == readlen)  // 读取到了指定的字节数的，表明目前文件还没有结束
+            {
+
+            }
+            else if (64 > readlen) // 未读取到指定的字节数，说明已经到达文件尾部
+            {
+                break;
+            }
+        }
+        else if ( 2 == ret) // 数据校验失败,重发
+        {
+            Protocoldeal::GetInstance()->CopyStringFromUi(0x07, buffer); // 重新发送buffer的内容
+        }
+    }
+    file.close();
 }
