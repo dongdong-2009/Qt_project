@@ -485,7 +485,7 @@ void Widget::DealNewData(unsigned char str)
         len = pro->GetDataLength();
         pro->PrintString(sstr, len);
         switch (str) {
-        case 0x00:
+        case 0x00:case 0x01:
             SetFloorNumber(GainFloorNumber(sstr));
             ShowArrowStatus(sstr[5]);
             break;

@@ -451,6 +451,7 @@ void ProducerFromBottom::ReadyreadSlots()
     printf("解析后的数据为 tempBuf = ");
     Protocol->PrintString(tempBuf, StringSize);
     Protocol->SetContinueFlag(tempBuf);
+    memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));
     if ( tempBuf[j-1] == Protocol->BstBvtVerify(tempBuf, j)) // 数据校验
     {
         printf("tempBuf[0] = %X \n", tempBuf[0]);
@@ -462,7 +463,7 @@ void ProducerFromBottom::ReadyreadSlots()
         }
     }
 
-    memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));
+
 //    printf("ID0_Message.ID = %X \n", mestable.ID0_Message.ID);
 //    printf("Data1 = %X \n", mestable.ID0_Message.Data1);
 //    printf("Data2 = %X \n", mestable.ID0_Message.Data2);
@@ -496,6 +497,13 @@ void Protocoldeal::SetContinueFlag(unsigned char buf[])
         ContinueFlag = 0;
     }
     qDebug()<<"ContinueFlag = "<< ContinueFlag;
+}
+
+void Protocoldeal::SetContinueFlag(int num)
+{
+    qDebug()<< __PRETTY_FUNCTION__<< "before flag = "<< ContinueFlag;
+    ContinueFlag = num;
+    qDebug()<< __PRETTY_FUNCTION__<< "after flag = "<< ContinueFlag;
 }
 
 int Protocoldeal::GetContinueFlag()
@@ -702,6 +710,7 @@ void UpdateData::ReadUpdateFile(const char *filename)
     int readlen = 0;
     memset(buffer, 0, sizeof(buffer));
     int ret;
+    Protocoldeal *pro = Protocoldeal::GetInstance();
     if (!file.open(QIODevice::ReadOnly))
     {
         qDebug("打开文件%s失败!", filename);
@@ -714,9 +723,9 @@ void UpdateData::ReadUpdateFile(const char *filename)
         {
             AppendByte(buffer, readlen);// 字符长度小于64时，对buf用0xff填充至64个字节
         }
-        Protocoldeal::GetInstance()->CopyStringFromUi(0x07, buffer);
+        pro->CopyStringFromUi(0x07, buffer);
 
-        while( !(ret = Protocoldeal::GetInstance()->GetContinueFlag())) // 未收到校验数据时
+        while( !(ret = pro->GetContinueFlag())) // 未收到校验数据时
             ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
         if (1 == ret)   // 数据校验正确
         {
@@ -732,8 +741,9 @@ void UpdateData::ReadUpdateFile(const char *filename)
         }
         else if ( 2 == ret) // 数据校验失败,重发
         {
-            Protocoldeal::GetInstance()->CopyStringFromUi(0x07, buffer); // 重新发送buffer的内容
+            pro->CopyStringFromUi(0x07, buffer); // 重新发送buffer的内容
         }
+        pro->SetContinueFlag(0);  // 重新将标志位赋值为0
     }
     file.close();
 }

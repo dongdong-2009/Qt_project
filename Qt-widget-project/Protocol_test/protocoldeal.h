@@ -229,6 +229,7 @@ public:
     void SetSerialArgument();
     void CloseSerial();
     void SetContinueFlag(unsigned char buf[]);
+    void SetContinueFlag(int num);
     int GetContinueFlag();
 protected:
     Protocoldeal();
