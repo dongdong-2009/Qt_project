@@ -197,10 +197,15 @@ public:
     ~UpdateData();
     void GetUpdateVersion(const char *filename, UpdateVersion *Uver);  // 从升级文件中获取版本号用于下一步的比较
     bool CompareVersion(unsigned char Revversion[], unsigned char Readversion[]);   // 比较版本信息
+    void RequestUpdate(unsigned char req);
     void ReadUpdateFile(const char *filename);    // 读取升级文件并发送内容
     void AppendByte(char *buf, int len);
-private:
+    void RunNormal();
+    void ReplyRun();
+    void UpdateEnd(unsigned char req);
 
+public slots:
+    void Updating();
 };
 
 // 协议处理的类
@@ -231,6 +236,9 @@ public:
     void SetContinueFlag(unsigned char buf[]);
     void SetContinueFlag(int num);
     int GetContinueFlag();
+//    void SetRunNormal(unsigned char buf[]);
+//    void SetRunNormal(int num);
+//    int GetRunNormalFlag();
 protected:
     Protocoldeal();
     unsigned char BstBvtRecvMonitor(void);
@@ -247,6 +255,7 @@ private:
     WriteDataToBottom *WriteDataPthread;
     static Protocoldeal *instance;
     int ContinueFlag;
+    int RunNormalFlag;
 };
 
 

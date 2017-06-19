@@ -19,7 +19,7 @@ using namespace std;
 #define BVT_PTL_FRAMEID_POS 1	/* 协议帧ID地址 */
 #define BVT_PTL_DATASTART_POS 2	/* 协议帧数据地址 */
 #define MAX_LENGTH 4096         /*缓冲区大小*/
-//static unsigned char gBvtRecStatus ;
+const char *path = "/home/root/BVT607_LPC11C14.bin";
 //static unsigned char gBvtRecCnt ;
 //static unsigned char gBvtFrameBuf[BVT_MAX_FRAME_LENTH] ;
 static char WriteDataBuf[1024] ;
@@ -482,15 +482,23 @@ unsigned long Protocoldeal::GetDataLength()
 
 void Protocoldeal::SetContinueFlag(unsigned char buf[])
 {
-    int ContinueFlag = -1;
+    int ContinueFlag = 10;
     qDebug()<< __PRETTY_FUNCTION__;
-    if (0x06 == buf[0] && 0x02 == buf[1])     // 收到升级数据包为真
+    if (0x06 == buf[0] && 0x00 == buf[1])     // 正常运行
+    {
+        ContinueFlag = -1;
+    }
+    else if (0x06 == buf[0] && 0x01 == buf[1])// 请求成功
     {
         ContinueFlag = 1;
     }
-    else if (0x06 == buf[0] && 0x03 == buf[1])// 收到数据包有误
+    else if (0x06 == buf[0] && 0x02 == buf[1])// 收到升级数据包为真
     {
         ContinueFlag = 2;
+    }
+    else if (0x06 == buf[0] && 0x03 == buf[1])// 收到数据包有误
+    {
+        ContinueFlag = 3;
     }
     else                                      // 没有收到回应
     {
@@ -511,6 +519,24 @@ int Protocoldeal::GetContinueFlag()
     qDebug()<< __PRETTY_FUNCTION__<<"ContinueFlag = "<< ContinueFlag;
     return ContinueFlag;
 }
+
+//void Protocoldeal::SetRunNormal(int num)
+//{
+//    qDebug()<< __PRETTY_FUNCTION__<< "before flag = "<< RunNormalFlag;
+//    RunNormalFlag = num;
+//    qDebug()<< __PRETTY_FUNCTION__<< "after flag = "<< RunNormalFlag;
+//}
+
+//void Protocoldeal::SetRunNormal(unsigned char buf[])
+//{
+
+//}
+
+//void Protocoldeal::GetRunNormalFlag()
+//{
+//    qDebug()<< __PRETTY_FUNCTION__<<"RunNormalFlag = "<< RunNormalFlag;
+//    return RunNormalFlag;
+//}
 
 void ProducerFromBottom::run()
 {
@@ -559,7 +585,7 @@ void WriteDataToBottom::ConstructWriteData(char *wstr, char *src)
     unsigned long counts = 0;
     memset(WriteDataBuf, 0, sizeof(WriteDataBuf));  // 先清空上一次的数据
     unsigned long len = Protocoldeal::GetInstance()->BstBvtGetFrameDatLen((unsigned char)src[0]);
-    src[len] = GenerateDataVerifyForChar(src, len); // 先在用户拷贝的数据后面加入校验值
+    src[len] = GenerateDataVerifyForChar(src, len); // 先在用户拷贝的数据后面加入校验位
     wstr[counts++] = BVT_STX;  // 在需要写的数据开头加上帧头
     for (i = 0; i < len + 1; i++) //遍历用户数据进行数据帧转换，加上帧头帧尾以及对数据中出现的帧头帧尾和转义字符替换
     {
@@ -643,17 +669,18 @@ char WriteDataToBottom::GenerateDataVerifyForChar(char *str, unsigned long len)
 // 系统升级
 UpdateData::UpdateData()
 {
-
+    qDebug()<< __PRETTY_FUNCTION__;
 }
 
 UpdateData::~UpdateData()
 {
-
+    qDebug()<< __PRETTY_FUNCTION__;
 }
 
-// 从文件中指定的位置获取升级的版本信息
+// 从指定的文件中指定的位置获取升级的版本信息
 void UpdateData::GetUpdateVersion(const char *filename, UpdateVersion *Uver)
 {
+    qDebug()<< __PRETTY_FUNCTION__;
     QFile file(filename);
     char buf[5];
     if (!file.open(QIODevice::ReadOnly))
@@ -672,6 +699,7 @@ void UpdateData::GetUpdateVersion(const char *filename, UpdateVersion *Uver)
 // 版本位数为定长五位数
 bool UpdateData::CompareVersion(unsigned char Revversion[], unsigned char Readversion[])
 {
+    qDebug()<< __PRETTY_FUNCTION__;
     unsigned long i;
     for (i = 0; i < 5; i++)
     {
@@ -693,19 +721,113 @@ bool UpdateData::CompareVersion(unsigned char Revversion[], unsigned char Readve
     return false;    // 版本号相同，无需升级，返回false
 }
 
+// 单片机是否正常运行
+void UpdateData::RunNormal()
+{
+//    unsigned char req;
+    ReplyRun();
+    // emit 运行正常的通知，进行迁移画面
+}
+
+// 回复正常运行
+void UpdateData::ReplyRun()
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    unsigned char endstr[2];
+    bool first = true;
+    endstr[0] = 0x05;
+    endstr[1] = 0x00;
+    Protocoldeal *pro = Protocoldeal::GetInstance();
+    int ret;
+    while (1)
+    {
+        if (first)
+        {
+            pro->CopyStringFromUi(endstr[1], endstr);
+            first = false;
+            qDebug("只进入一次");
+        }
+        while(!(ret = pro->GetContinueFlag())) // 未收到校验正确的结果时
+            ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
+        pro->SetContinueFlag(0);  // 重新将标志位赋值为0
+
+        if (-1 == ret)   // 回复正常运行
+        {
+          //  emit  显示屏回到正常显示画面的部件
+            break;
+        }
+        else if ( 3 == ret) // 数据校验错误，需要重发
+        {
+            pro->CopyStringFromUi(endstr[1], endstr);
+        }
+    }
+    qDebug("升级结束请求成功!");
+//    emit 退出升级模式的画面;
+}
+
+// 请求进入升级模式 或 请求开始升级成功
+void UpdateData::RequestUpdate(unsigned char req)
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    unsigned char endstr[2];
+    bool first = true;
+    endstr[0] = 0x05;
+    endstr[1] = req;
+    Protocoldeal *pro = Protocoldeal::GetInstance();
+    int ret;
+    while (1)
+    {
+        if (first)
+        {
+            pro->CopyStringFromUi(endstr[1], endstr);
+            first = false;
+            qDebug("只进入一次");
+        }
+        while(!(ret = pro->GetContinueFlag())) // 未收到校验正确的结果时
+            ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
+        pro->SetContinueFlag(0);  // 重新将标志位赋值为0
+
+        if (1 == ret && 0x01 == req)   // 请求成功
+        {
+          //  emit  显示屏回到正常显示画面的部件
+            qDebug("请求进入升级状态,请求成功");
+            break;
+        }
+        else if (1 == ret && 0x03 == req) // 开始升级请求成功
+        {
+            qDebug("开始升级请求成功");
+            break;
+        }
+        else if ( 3 == ret) // 数据校验错误，需要重发
+        {
+            pro->CopyStringFromUi(endstr[1], endstr);
+        }
+    }
+    qDebug("请求进入升级模式,请求成功!");
+//    emit 退出升级模式的画面;
+}
+
 // 当读取的字符长度小于64时，对buf用0xff填充至64个字节
 void UpdateData::AppendByte(char *buf, int len)
 {
+    qDebug()<< __PRETTY_FUNCTION__;
     int i;
     for (i = len; i < 64; i++)
     {
         buf[i] = 0xff;
+        qDebug("填充0xff至字符串中");
     }
 }
 
+// 每次从文件中读64个字节的写入串口中
 void UpdateData::ReadUpdateFile(const char *filename)
 {
+    qDebug()<< __PRETTY_FUNCTION__;
+    static bool firstRead = true;
     QFile file(filename);
+    int filelength = file.size();  // 文件大小
+    static int readcount = 0;
+    float percent = 0.0;
     char buffer[64];
     int readlen = 0;
     memset(buffer, 0, sizeof(buffer));
@@ -716,34 +838,93 @@ void UpdateData::ReadUpdateFile(const char *filename)
         qDebug("打开文件%s失败!", filename);
         return ;
     }
-    while(!file.atEnd())  // 未到达文件末尾时
+    while(1)
     {
-        readlen = file.read(buffer, 64);
-        if (readlen < 64)
-        {
-            AppendByte(buffer, readlen);// 字符长度小于64时，对buf用0xff填充至64个字节
-        }
-        pro->CopyStringFromUi(0x07, buffer);
-
-        while( !(ret = pro->GetContinueFlag())) // 未收到校验数据时
-            ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
-        if (1 == ret)   // 数据校验正确
+        if (firstRead)
         {
             readlen = file.read(buffer, 64);
-            if (64 == readlen)  // 读取到了指定的字节数的，表明目前文件还没有结束
+            if (readlen < 64)
             {
-
+                AppendByte(buffer, readlen);// 字符长度小于64时，对buf用0xff填充至64个字节
             }
-            else if (64 > readlen) // 未读取到指定的字节数，说明已经到达文件尾部
-            {
-                break;
-            }
+            pro->CopyStringFromUi(0x07, buffer);
+            firstRead = false;
+            readcount++;
+            qDebug("只在第一次进入");
         }
-        else if ( 2 == ret) // 数据校验失败,重发
+        while( !(ret = pro->GetContinueFlag())) // 未收到校验正确的结果时
+            ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
+        pro->SetContinueFlag(0);  // 重新将标志位赋值为0
+
+        if ( 3 == ret) // 数据校验失败,重发
         {
+            qDebug("校验错误重发!");
             pro->CopyStringFromUi(0x07, buffer); // 重新发送buffer的内容
         }
-        pro->SetContinueFlag(0);  // 重新将标志位赋值为0
+        else if ( 2 == ret && (!file.atEnd())) // 未到达文件末尾时
+        {
+            readlen = file.read(buffer, 64);
+            if (readlen < 64)
+            {
+                AppendByte(buffer, readlen);// 字符长度小于64时，对buf用0xff填充至64个字节
+            }
+            pro->CopyStringFromUi(0x07, buffer);
+            percent = readcount*64.0/filelength;
+            readcount++;
+        }
+        else if (2 == ret && (file.atEnd())) // 校验结果为真，并且已经达到文件末尾时跳出循环
+        {
+            percent = 100.0;
+            break;
+        }
+        // emit 百分比percent
     }
     file.close();
 }
+
+// 升级结束 req
+void UpdateData::UpdateEnd(unsigned char req)
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    unsigned char endstr[2];
+    bool first = true;
+    endstr[0] = 0x05;
+    endstr[1] = req;
+    Protocoldeal *pro = Protocoldeal::GetInstance();
+    int ret;
+    while (1)
+    {
+        if (first)
+        {
+            pro->CopyStringFromUi(endstr[1], endstr);
+            first = false;
+            qDebug("只进入一次");
+        }
+        while(!(ret = pro->GetContinueFlag())) // 未收到校验正确的结果时
+            ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
+        pro->SetContinueFlag(0);  // 重新将标志位赋值为0
+
+        if (1 == ret)   // 请求成功,显示屏退出升级模式
+        {
+            break;
+        }
+        else if ( 3 == ret) // 数据校验错误，需要重发
+        {
+            pro->CopyStringFromUi(endstr[1], endstr);
+        }
+    }
+    qDebug("升级结束请求成功!");
+}
+
+// 正在升级中
+void UpdateData::Updating()
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    RequestUpdate(0x03);  // 显示屏发送请求进入升级 TAG=0x05  Byte1 = 0x03
+    RequestUpdate(0x01);  // 显示屏发送开始升级请求 TAG=0x05  Byte1 = 0x01
+    ReadUpdateFile("BVT607_LPC11C14.bin"); // 显示屏发送升级数据
+    UpdateEnd(0x02);  // 显示屏发送升级结束 TAG=0x05  Byte1 = 0x02
+    //    emit 退出升级模式的画面;
+    qDebug("退出升级模式的画面,进入正常显示电梯部件的界面");
+}
+

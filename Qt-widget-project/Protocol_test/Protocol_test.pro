@@ -15,13 +15,16 @@ TEMPLATE = app
 SOURCES += main.cpp\
         widget.cpp \
     protocoldeal.cpp \
-    usbdetect.cpp
+    usbdetect.cpp \
+    fileupdate.cpp
 
 HEADERS  += widget.h \
     protocoldeal.h \
-    usbdetect.h
+    usbdetect.h \
+    fileupdate.h
 
-FORMS    += widget.ui
+FORMS    += widget.ui \
+    fileupdate.ui
 
 DISTFILES += \
     images/ArrowUp.png \
@@ -39,7 +42,8 @@ DISTFILES += \
     images/number9.png \
     images/welcome_text.png \
     images/background.png \
-    images/ArrowDn.png
+    images/ArrowDn.png \
+    images/bground.png
 
 RESOURCES += \
     images.qrc
