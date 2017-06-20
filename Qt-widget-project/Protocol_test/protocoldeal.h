@@ -14,6 +14,9 @@ const int OffsetHead = 2059; // 从文件的第2059的字节处拷贝5个字节�
 #include <QStringList>
 #include <QTimer>
 #include <QFile>
+#include "widget.h"
+#include "fileupdate.h"
+
 #pragma pack(push, 1) //按照1字节对齐
 
 //*ID = 0的帧内容*/
@@ -150,11 +153,13 @@ typedef enum _id_type_{
 }e_IDTYPE_T;
 
 typedef struct _updateversion {
-    unsigned char ver[5];   // 升级文件的版本信息
+    unsigned char ver[2];   // 升级文件的版本信息
 }UpdateVersion;
 
 #pragma pack(pop)
 
+class Widget;
+class FileUpdate;
 // 读取串口数据的线程
 class ProducerFromBottom : public QThread
 {
@@ -195,8 +200,6 @@ class UpdateData: public QObject
 public:
     UpdateData();
     ~UpdateData();
-    void GetUpdateVersion(const char *filename, UpdateVersion *Uver);  // 从升级文件中获取版本号用于下一步的比较
-    bool CompareVersion(unsigned char Revversion[], unsigned char Readversion[]);   // 比较版本信息
     void RequestUpdate(unsigned char req);
     void ReadUpdateFile(const char *filename);    // 读取升级文件并发送内容
     void AppendByte(char *buf, int len);
@@ -236,9 +239,16 @@ public:
     void SetContinueFlag(unsigned char buf[]);
     void SetContinueFlag(int num);
     int GetContinueFlag();
-//    void SetRunNormal(unsigned char buf[]);
-//    void SetRunNormal(int num);
-//    int GetRunNormalFlag();
+    void CountString(unsigned char *des, char *src, int len);
+    void RevVersion(unsigned char buffer[], unsigned char version[]);
+    bool GetVersionFlag();
+    void SetVersionFlag(bool flag);
+
+public slots:
+    void CompareVersion(unsigned char *Revversion, unsigned char *Readversion);   // 比较版本信息
+    void GetUpdateVersion(const char *filename, UpdateVersion *Uver);  // 从升级文件中获取版本号用于下一步的比较
+    void OnUpdateSlots();
+
 protected:
     Protocoldeal();
     unsigned char BstBvtRecvMonitor(void);
@@ -249,13 +259,20 @@ protected:
 signals:
     void AcceptDataFormBottom(unsigned char s);
     void AcceptDataFormTop();
+    void SendPercent(int val);
+    void UpdateFlagSignal();
+    void StartCompareSignal(unsigned char *Revversion, unsigned char *Readversion);
 
 private:
     ProducerFromBottom *ReadDataPthread;
     WriteDataToBottom *WriteDataPthread;
+    UpdateData *upd;
     static Protocoldeal *instance;
     int ContinueFlag;
     int RunNormalFlag;
+    bool VersionComFlag;
+    Widget *w;
+    FileUpdate *f;
 };
 
 

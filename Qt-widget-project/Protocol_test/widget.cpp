@@ -26,7 +26,6 @@ Widget::Widget(QWidget *parent) :
 {
     qDebug()<<__PRETTY_FUNCTION__ << "start";
     ui->setupUi(this);
-    UsbDetect *usb = new UsbDetect;
     timer = new QTimer(this);
     bool flagtime = connect(timer, SIGNAL(timeout()), this, SLOT(ShowTime()));
     connect(this, SIGNAL(DateChangesSignal()), this, SLOT(ShowDate()));
@@ -40,12 +39,6 @@ Widget::Widget(QWidget *parent) :
     connect(pro, SIGNAL(AcceptDataFormBottom(unsigned char)), this, SLOT(DealNewData(unsigned char)));
 
     UiInit();
-//    AnimationForPicture();
-//    SetTimerArrowDn();
-//    ShiningArrowUp();
-//    ShiningArrowDn();
-//    sstr[1] = 0x39; sstr[2] = 0x30; sstr[3] = 0x31; sstr[4] = 0x30;
-//    SetFloorNumber(GainFloorNumber(sstr));
     qDebug()<<__PRETTY_FUNCTION__ << "end";
 }
 

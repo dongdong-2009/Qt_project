@@ -21,7 +21,7 @@ using namespace std;
 #define MAX_LENGTH 4096         /*缓冲区大小*/
 const char *path = "/home/root/BVT607_LPC11C14.bin";
 //static unsigned char gBvtRecCnt ;
-//static unsigned char gBvtFrameBuf[BVT_MAX_FRAME_LENTH] ;
+static unsigned char VersionInfo[5] ;
 static char WriteDataBuf[1024] ;
 static char WriteSrc[1000];
 //static char curstr[BVT_MAX_FRAME_LENTH] ;
@@ -32,11 +32,15 @@ static unsigned long StringSize;
 static unsigned long position;
 static unsigned long UiWriteSize;
 messagetable mestable;
+UpdateVersion upv;
 Protocoldeal* Protocoldeal::instance = NULL;
 //QTimer *timer;
 QSerialPort *my_serialport = NULL;
 
-Protocoldeal::Protocoldeal()
+Protocoldeal::Protocoldeal():
+    ContinueFlag(0),
+    RunNormalFlag(0),
+    VersionComFlag(false)
 {
     SetSerialArgument();     //配置串口参数，连接信号和槽
     ReadDataPthread = new ProducerFromBottom;
@@ -46,7 +50,10 @@ Protocoldeal::Protocoldeal()
     WriteDataPthread->StartThread(WriteDataPthread);
 
     connect(my_serialport, SIGNAL(readyRead()), ReadDataPthread, SLOT(ReadyreadSlots()), Qt::QueuedConnection);
+    connect(this, SIGNAL(StartCompareSignal(unsigned char*,unsigned char*)), this, SLOT(CompareVersion(unsigned char*,unsigned char*)), Qt::QueuedConnection);
+    connect(this, SIGNAL(UpdateFlagSignal()), this, SLOT(OnUpdateSlots()), Qt::QueuedConnection);
     position = 0;
+    GetUpdateVersion(path, &upv);  // 从文件中获取版本信息
     cout << __PRETTY_FUNCTION__<<"启动协议的的构造函数"<<endl;
 }
 
@@ -91,12 +98,10 @@ void Protocoldeal::BstBvtPtlInit()
  */
 void Protocoldeal::BstBvtSetFrameData(e_IDTYPE_T id, void *dat)
 {
-//    unsigned char TranBuf[BVT_MAX_FRAME_LENTH] = {0};
     unsigned char FrameBuf[BVT_MAX_FRAME_LENTH] = {0};
     unsigned char *pFrameBuf = FrameBuf;
     unsigned char *pStarVer;
     unsigned char DatLen = 0;
-//    unsigned long TranLen = 0;/*转换后帧长度*/
 
     if(id >= ID_UNKNOW)/*未知ID*/
         return;
@@ -446,11 +451,12 @@ void ProducerFromBottom::ReadyreadSlots()
     printf("count = %ld\n", count);
     Protocoldeal *Protocol = Protocoldeal::GetInstance();
     StringSize = Protocol->BstBvtRecoverFrame(tempBuf, totalBuf, j);
+    Protocol->SetContinueFlag(tempBuf);
+    Protocol->RevVersion(tempBuf, VersionInfo); //
     printf("接收到的数据为 totalBuf = ");
     Protocol->PrintString(totalBuf, j);
     printf("解析后的数据为 tempBuf = ");
-    Protocol->PrintString(tempBuf, StringSize);
-    Protocol->SetContinueFlag(tempBuf);
+    Protocol->PrintString(tempBuf, StringSize);   
     memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));
     if ( tempBuf[j-1] == Protocol->BstBvtVerify(tempBuf, j)) // 数据校验
     {
@@ -461,9 +467,12 @@ void ProducerFromBottom::ReadyreadSlots()
             printf("emit message\n");
             emit Protocol->AcceptDataFormBottom(tempBuf[0]);
         }
+        else
+        {
+            memset(tempBuf, 0, StringSize);
+            qDebug("接收的数据没有改变，清空数据");
+        }
     }
-
-
 //    printf("ID0_Message.ID = %X \n", mestable.ID0_Message.ID);
 //    printf("Data1 = %X \n", mestable.ID0_Message.Data1);
 //    printf("Data2 = %X \n", mestable.ID0_Message.Data2);
@@ -520,23 +529,120 @@ int Protocoldeal::GetContinueFlag()
     return ContinueFlag;
 }
 
-//void Protocoldeal::SetRunNormal(int num)
-//{
-//    qDebug()<< __PRETTY_FUNCTION__<< "before flag = "<< RunNormalFlag;
-//    RunNormalFlag = num;
-//    qDebug()<< __PRETTY_FUNCTION__<< "after flag = "<< RunNormalFlag;
-//}
+// 接收并保存版本信息
+void Protocoldeal::RevVersion(unsigned char buffer[], unsigned char version[])
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    if (0x04 == buffer[0])
+    {
+        qDebug("接收到版本号信息，buffer[0]= %x", buffer[0]);
+        memcpy(version, buffer+1, 2);
+        emit StartCompareSignal(version, upv.ver); // 通知开始进行版本比较
+    }
+}
 
-//void Protocoldeal::SetRunNormal(unsigned char buf[])
-//{
+// 从指定的文件中指定的位置获取升级的版本信息
+void Protocoldeal::GetUpdateVersion(const char *filename, UpdateVersion *Uver)
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    QFile file(filename);
+    char buf[5];
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qDebug("打开文件%s失败!", filename);
+        return;
+    }
+    file.seek(OffsetHead);
+    memset(Uver->ver, 0, sizeof(Uver->ver)); // 使用前先清为0
+    file.read(buf, 5);
+    CountString(Uver->ver, buf, 5);
+    qDebug("verinfo = %s", Uver->ver);
+    file.close();
+    emit UpdateFlagSignal();
+}
 
-//}
+// 将五个字节的版本信息，转化为2个字节的，方便比较版本信息
+void Protocoldeal::CountString(unsigned char *des, char *src, int len)
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    int i;
+    unsigned char interger = 0;
+    unsigned char decimal = 0;
+    for (i = 0; i < len; i ++)
+    {
+        if (i < 3)
+        {
+            interger = interger * 10 + src[i] - '0';
+        }
+        else if (i >= 3)
+        {
+            decimal = decimal * 10 + src[i] - '0';
+        }
+    }
+    des[0] = interger;  // 整数部分
+    des[1] = decimal;   // 小数部分
+    qDebug("des[0] = %d, des[1] = %d", des[0], des[1]);
+}
 
-//void Protocoldeal::GetRunNormalFlag()
-//{
-//    qDebug()<< __PRETTY_FUNCTION__<<"RunNormalFlag = "<< RunNormalFlag;
-//    return RunNormalFlag;
-//}
+// 版本在协议中为2个字节的
+void Protocoldeal::CompareVersion(unsigned char *Revversion, unsigned char *Readversion)
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    unsigned long i;
+    for (i = 0; i < 2; i++)
+    {
+        if (Revversion[i] != Readversion[i])
+        {
+            if (Revversion[i] < Readversion[i])
+            {
+                qDebug()<< "获取到的版本比当前版本新，需升级，返回true";
+                VersionComFlag = true;    // 需要升级，返回true
+                return;
+            }
+            else
+            {
+                qDebug()<< "获取到的版本比当前版本旧，无需升级，返回false";
+                VersionComFlag = false;   // 获取到的版本比当前版本旧，不用升级，返回false
+                return;
+            }
+        }
+    }
+    qDebug()<< "版本号相同，无需升级，返回false";
+    VersionComFlag = false;
+    return;    // 版本号相同，无需升级，返回false
+}
+
+bool Protocoldeal::GetVersionFlag()
+{
+    qDebug()<< __PRETTY_FUNCTION__<< "versionflag = "<< VersionComFlag;
+    return VersionComFlag;
+}
+
+void Protocoldeal::SetVersionFlag(bool flag)
+{
+    VersionComFlag = flag;
+    qDebug()<< __PRETTY_FUNCTION__<< "versionflag = "<< VersionComFlag;
+}
+
+void Protocoldeal::OnUpdateSlots()
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    upd = new UpdateData;
+    if (GetVersionFlag())
+    {
+        qDebug("显示进入升级界面");
+        f = new FileUpdate;
+        f->showFullScreen();
+        upd->Updating();
+    }
+    else
+    {
+        qDebug("显示进入电梯显示界面");
+        upd->RunNormal();
+        w = new Widget;
+        w->showFullScreen();
+    }
+}
 
 void ProducerFromBottom::run()
 {
@@ -661,8 +767,7 @@ char WriteDataToBottom::GenerateDataVerifyForChar(char *str, unsigned long len)
     {
         result = result ^ str[i];
     }
-    qDebug()<< __PRETTY_FUNCTION__<<"result = "<< result;
-    qDebug("result = %x\n", result);
+    qDebug(" %s, result = %x\n", __PRETTY_FUNCTION__, result);
     return result & 0x7f;
 }
 
@@ -675,50 +780,6 @@ UpdateData::UpdateData()
 UpdateData::~UpdateData()
 {
     qDebug()<< __PRETTY_FUNCTION__;
-}
-
-// 从指定的文件中指定的位置获取升级的版本信息
-void UpdateData::GetUpdateVersion(const char *filename, UpdateVersion *Uver)
-{
-    qDebug()<< __PRETTY_FUNCTION__;
-    QFile file(filename);
-    char buf[5];
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        qDebug("打开文件%s失败!", filename);
-        return;
-    }
-    file.seek(OffsetHead);
-    memset(Uver->ver, 0, sizeof(Uver->ver)); // 使用前先清为0
-    file.read(buf, 5);
-    memcpy(Uver->ver, buf, 5);
-    qDebug("verinfo = %s", Uver->ver);
-    file.close();
-}
-
-// 版本位数为定长五位数
-bool UpdateData::CompareVersion(unsigned char Revversion[], unsigned char Readversion[])
-{
-    qDebug()<< __PRETTY_FUNCTION__;
-    unsigned long i;
-    for (i = 0; i < 5; i++)
-    {
-        if (Revversion[i] != Readversion[i])
-        {
-            if (Revversion[i] < Readversion[i])
-            {
-                qDebug()<< "获取到的版本比当前版本新，需升级，返回true";
-                return true;    // 需要升级，返回true
-            }
-            else
-            {
-                qDebug()<< "获取到的版本比当前版本旧，无需升级，返回false";
-                return false;   // 获取到的版本比当前版本旧，不用升级，返回false
-            }
-        }
-    }
-    qDebug()<< "版本号相同，无需升级，返回false";
-    return false;    // 版本号相同，无需升级，返回false
 }
 
 // 单片机是否正常运行
@@ -827,7 +888,7 @@ void UpdateData::ReadUpdateFile(const char *filename)
     QFile file(filename);
     int filelength = file.size();  // 文件大小
     static int readcount = 0;
-    float percent = 0.0;
+    int percent = 0;
     char buffer[64];
     int readlen = 0;
     memset(buffer, 0, sizeof(buffer));
@@ -869,15 +930,15 @@ void UpdateData::ReadUpdateFile(const char *filename)
                 AppendByte(buffer, readlen);// 字符长度小于64时，对buf用0xff填充至64个字节
             }
             pro->CopyStringFromUi(0x07, buffer);
-            percent = readcount*64.0/filelength;
+            percent = readcount*64 / filelength;
             readcount++;
         }
         else if (2 == ret && (file.atEnd())) // 校验结果为真，并且已经达到文件末尾时跳出循环
         {
-            percent = 100.0;
+            percent = 100;
             break;
         }
-        // emit 百分比percent
+        emit pro->SendPercent(percent); // emit 百分比percent
     }
     file.close();
 }
@@ -923,7 +984,7 @@ void UpdateData::Updating()
     RequestUpdate(0x03);  // 显示屏发送请求进入升级 TAG=0x05  Byte1 = 0x03
     RequestUpdate(0x01);  // 显示屏发送开始升级请求 TAG=0x05  Byte1 = 0x01
     ReadUpdateFile("BVT607_LPC11C14.bin"); // 显示屏发送升级数据
-    UpdateEnd(0x02);  // 显示屏发送升级结束 TAG=0x05  Byte1 = 0x02
+    UpdateEnd(0x02);  // 显示屏发送升级结束 TAG = 0x05  Byte1 = 0x02
     //    emit 退出升级模式的画面;
     qDebug("退出升级模式的画面,进入正常显示电梯部件的界面");
 }

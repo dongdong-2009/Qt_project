@@ -17,5 +17,6 @@
         <file>images/background.png</file>
         <file>images.qrc</file>
         <file>images/ArrowDn.png</file>
+        <file>images/bground.png</file>
     </qresource>
 </RCC>

@@ -10,6 +10,8 @@ namespace Ui {
 class Widget;
 }
 
+class Protocoldeal;
+
 class Widget : public QWidget
 {
     Q_OBJECT
