@@ -195,7 +195,7 @@ signals:
     void WriteDataSignal();
 };
 
-class UpdateData: public QThread
+class UpdateData: public QObject
 {
     Q_OBJECT
 public:
@@ -244,7 +244,6 @@ public:
     void RevVersion(unsigned char buffer[], unsigned char version[]);
     bool GetVersionFlag();
     void SetVersionFlag(bool flag);
-    void NotifyCompare(unsigned char *buf);
 
 public slots:
     void CompareVersion(unsigned char *Revversion, unsigned char *Readversion);   // 比较版本信息
@@ -264,8 +263,7 @@ signals:
     void SendPercent(int val);
     void UpdateFlagSignal();
     void StartCompareSignal(unsigned char *Revversion, unsigned char *Readversion);
-    void ShowWhichScreen(int index);
-    void HideWhichScreen(int index);
+
 private:
     ProducerFromBottom *ReadDataPthread;
     WriteDataToBottom *WriteDataPthread;

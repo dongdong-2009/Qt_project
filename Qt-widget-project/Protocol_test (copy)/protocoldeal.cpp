@@ -52,11 +52,12 @@ Protocoldeal::Protocoldeal():
     Usbdetect = new QDeviceWatcher;
     Usbdetect->appendEventReceiver(this);
     connect(Usbdetect, SIGNAL(deviceAdded(QString)), this, SLOT(AddUsbSlots()), Qt::QueuedConnection);
-//    connect(my_serialport, SIGNAL(readyRead()), ReadDataPthread, SLOT(ReadyreadSlots()), Qt::QueuedConnection);
+    connect(my_serialport, SIGNAL(readyRead()), ReadDataPthread, SLOT(ReadyreadSlots()), Qt::QueuedConnection);
     connect(this, SIGNAL(StartCompareSignal(unsigned char*,unsigned char*)), this, SLOT(CompareVersion(unsigned char*,unsigned char*)), Qt::QueuedConnection);
     connect(this, SIGNAL(UpdateFlagSignal()), this, SLOT(OnUpdateSlots()), Qt::QueuedConnection);
     position = 0;
     GetUpdateVersion(path, &upv);  // 从文件中获取版本信息
+    emit UpdateFlagSignal(); //
     Usbdetect->start();
     cout << __PRETTY_FUNCTION__<<"启动协议的的构造函数"<<endl;
 }
@@ -399,7 +400,94 @@ void Protocoldeal::CloseSerial()
     }
 }
 
+ProducerFromBottom::ProducerFromBottom()
+{
+    cout << __PRETTY_FUNCTION__<<"启动读串口的线程的构造函数"<<endl;
+}
 
+ProducerFromBottom::~ProducerFromBottom()
+{
+    cout << __PRETTY_FUNCTION__<<"启动读串口的线程的析构函数"<<endl;
+}
+
+// 读串口数据函数
+
+void ProducerFromBottom::ReadyreadSlots()
+{
+    cout << __PRETTY_FUNCTION__ << "读数据的槽函数"<<endl;
+    static bool Isstart = false;
+    char str;
+    unsigned char s;
+    unsigned long i = 0;
+    unsigned long j = 0;
+    unsigned long count = 0;
+    while(1)
+    {
+        int flag = my_serialport->read(&str, 1); // 每次读取一个字节到str中存储
+        if (0 == flag)
+        {
+            qDebug()<< "读不到数据退出";
+            break;
+        }
+        s = (unsigned char)str;
+        count ++;
+        printf("%X ", s);
+        if (BVT_STX == s)
+        {
+            Isstart = true;
+            i = 0;
+            totalBuf[i++] = s /*(unsigned char)str*/;
+        }
+        else if(Isstart)      // 如果遇到帧头，则将遇到帧尾之前的所有数据保存下来
+        {
+            totalBuf[i++] = s /*(unsigned char)str*/;
+
+            if (BVT_ETX == s)
+            {
+                Isstart = false;
+                j = i;
+                i = 0;
+                qDebug()<< "遇到帧尾退出";
+                break;
+            }
+        }
+    }
+
+    printf("count = %ld\n", count);
+    Protocoldeal *Protocol = Protocoldeal::GetInstance();
+    StringSize = Protocol->BstBvtRecoverFrame(tempBuf, totalBuf, j);
+    Protocol->SetContinueFlag(tempBuf);
+    Protocol->RevVersion(tempBuf, VersionInfo); // 从单片机中获取保存版本信息
+    printf("接收到的数据为 totalBuf = ");
+    Protocol->PrintString(totalBuf, j);
+    printf("解析后的数据为 tempBuf = ");
+    Protocol->PrintString(tempBuf, StringSize);   
+    memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));
+    if ( tempBuf[j-1] == Protocol->BstBvtVerify(tempBuf, j)) // 数据校验
+    {
+        printf("tempBuf[0] = %X \n", tempBuf[0]);
+        cout <<" verify is true "<< endl;
+        if (Protocol->JudgeChange(tempBuf[0], tempBuf))
+        {
+            printf("emit message\n");
+            emit Protocol->AcceptDataFormBottom(tempBuf[0]);
+        }
+        else
+        {
+            memset(tempBuf, 0, StringSize);
+            qDebug("接收的数据没有改变，清空数据");
+        }
+    }
+//    printf("ID0_Message.ID = %X \n", mestable.ID0_Message.ID);
+//    printf("Data1 = %X \n", mestable.ID0_Message.Data1);
+//    printf("Data2 = %X \n", mestable.ID0_Message.Data2);
+//    printf("Data3 = %X \n", mestable.ID0_Message.Data3);
+//    printf("Data4 = %X \n", mestable.ID0_Message.Data4);
+//    printf("ArrowStatus = %X \n", mestable.ID0_Message.ArrowStatus);
+//    printf("LiftSpecialStatus = %X \n", mestable.ID0_Message.LiftSpecialStatus);
+//    printf("StationClockStatus = %X \n", mestable.ID0_Message.StationClockStatus);
+//    printf("StationLightStatus = %X \n", mestable.ID0_Message.StationLightStatus);
+}
 
 unsigned long Protocoldeal::GetDataLength()
 {
@@ -472,7 +560,6 @@ void Protocoldeal::GetUpdateVersion(const char *filename, UpdateVersion *Uver)
     file.seek(OffsetHead);
     memset(Uver->ver, 0, sizeof(Uver->ver)); // 使用前先清为0
     file.read(buf, 5);
-    qDebug("%x %x %x %x %x", buf[0], buf[1], buf[2], buf[3], buf[4]);
     CountString(Uver->ver, buf, 5);
     qDebug("verinfo = %s", Uver->ver);
     file.close();
@@ -545,18 +632,19 @@ void Protocoldeal::SetVersionFlag(bool flag)
 void Protocoldeal::OnUpdateSlots()
 {
     qDebug()<< __PRETTY_FUNCTION__;
-    upd = new UpdateData;
-    if (GetVersionFlag())
-    {
-        qDebug("show Fileupdate screen");
-        emit ShowWhichScreen(0);
-    }
-    else
-    {
-        qDebug("show liftscren");
-        upd->RunNormal();
-        emit ShowWhichScreen(1);
-    }
+//    upd = new UpdateData;
+//    if (GetVersionFlag())
+//    {
+//        qDebug("显示进入升级界面");
+//        fileup->showFullScreen();
+//        upd->Updating();
+//    }
+//    else
+//    {
+//        qDebug("显示进入电梯显示界面");
+//        upd->RunNormal();
+//        wid->showFullScreen();
+//    }
 }
 
 void Protocoldeal::AddUsbSlots()
@@ -567,109 +655,10 @@ void Protocoldeal::AddUsbSlots()
     //是否升级
 }
 
-void Protocoldeal::NotifyCompare(unsigned char *buf)
-{
-    qDebug()<< __PRETTY_FUNCTION__;
-    if (0x04 == buf[0])
-    {
-        emit UpdateFlagSignal();
-    }
-}
-
-ProducerFromBottom::ProducerFromBottom()
-{
-    cout << __PRETTY_FUNCTION__<<"启动读串口的线程的构造函数"<<endl;
-}
-
-ProducerFromBottom::~ProducerFromBottom()
-{
-    cout << __PRETTY_FUNCTION__<<"启动读串口的线程的析构函数"<<endl;
-}
-
-// 读串口数据函数
-
-void ProducerFromBottom::ReadyreadSlots()
-{
-    cout << __PRETTY_FUNCTION__ << "读数据的槽函数"<<endl;
-    static bool Isstart = false;
-    char str;
-    unsigned char s;
-    unsigned long i = 0;
-    unsigned long j = 0;
-    unsigned long count = 0;
-    while(1)
-    {
-        int flag = my_serialport->read(&str, 1); // 每次读取一个字节到str中存储
-        if (0 == flag)
-        {
-            qDebug()<< "读不到数据退出";
-            break;
-        }
-        s = (unsigned char)str;
-        count ++;
-        printf("%X ", s);
-        if (BVT_STX == s)
-        {
-            Isstart = true;
-            i = 0;
-            totalBuf[i++] = s /*(unsigned char)str*/;
-        }
-        else if(Isstart)      // 如果遇到帧头，则将遇到帧尾之前的所有数据保存下来
-        {
-            totalBuf[i++] = s /*(unsigned char)str*/;
-
-            if (BVT_ETX == s)
-            {
-                Isstart = false;
-                j = i;
-                i = 0;
-                qDebug()<< "遇到帧尾退出";
-                break;
-            }
-        }
-    }
-
-    printf("count = %ld\n", count);
-    Protocoldeal *Protocol = Protocoldeal::GetInstance();
-    StringSize = Protocol->BstBvtRecoverFrame(tempBuf, totalBuf, j);
-    Protocol->SetContinueFlag(tempBuf);
-    Protocol->RevVersion(tempBuf, VersionInfo); // 从单片机中获取保存版本信息
-    printf("接收到的数据为 totalBuf = ");
-    Protocol->PrintString(totalBuf, j);
-    printf("解析后的数据为 tempBuf = ");
-    Protocol->PrintString(tempBuf, StringSize);
-    Protocol->NotifyCompare(tempBuf);
-    memcpy(&mestable.ID0_Message, tempBuf, sizeof(mestable));
-    if ( tempBuf[j-1] == Protocol->BstBvtVerify(tempBuf, j)) // 数据校验
-    {
-        printf("tempBuf[0] = %X \n", tempBuf[0]);
-        cout <<" verify is true "<< endl;
-        if (Protocol->JudgeChange(tempBuf[0], tempBuf))
-        {
-            printf("emit message\n");
-            emit Protocol->AcceptDataFormBottom(tempBuf[0]);
-        }
-        else
-        {
-            memset(tempBuf, 0, StringSize);
-            qDebug("接收的数据没有改变，清空数据");
-        }
-    }
-//    printf("ID0_Message.ID = %X \n", mestable.ID0_Message.ID);
-//    printf("Data1 = %X \n", mestable.ID0_Message.Data1);
-//    printf("Data2 = %X \n", mestable.ID0_Message.Data2);
-//    printf("Data3 = %X \n", mestable.ID0_Message.Data3);
-//    printf("Data4 = %X \n", mestable.ID0_Message.Data4);
-//    printf("ArrowStatus = %X \n", mestable.ID0_Message.ArrowStatus);
-//    printf("LiftSpecialStatus = %X \n", mestable.ID0_Message.LiftSpecialStatus);
-//    printf("StationClockStatus = %X \n", mestable.ID0_Message.StationClockStatus);
-//    printf("StationLightStatus = %X \n", mestable.ID0_Message.StationLightStatus);
-}
-
 void ProducerFromBottom::run()
 {
     cout << __PRETTY_FUNCTION__ << "配置串口"<<endl;
-    ReadyreadSlots();
+//    SetSerialArgument();  // 配置串口，连接信号，传输数据
 }
 
 // 开启线程
@@ -826,12 +815,12 @@ void UpdateData::ReplyRun()
     {
         if (first)
         {
-            pro->CopyStringFromUi(endstr[0], endstr);
+            pro->CopyStringFromUi(endstr[1], endstr);
             first = false;
             qDebug("只进入一次");
         }
         while(!(ret = pro->GetContinueFlag())) // 未收到校验正确的结果时
-            msleep(50);  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
+            ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
         pro->SetContinueFlag(0);  // 重新将标志位赋值为0
 
         if (-1 == ret)   // 回复正常运行
@@ -841,7 +830,7 @@ void UpdateData::ReplyRun()
         }
         else if ( 3 == ret) // 数据校验错误，需要重发
         {
-            pro->CopyStringFromUi(endstr[0], endstr);
+            pro->CopyStringFromUi(endstr[1], endstr);
         }
     }
     qDebug("升级结束请求成功!");
@@ -867,7 +856,7 @@ void UpdateData::RequestUpdate(unsigned char req)
             qDebug("只进入一次");
         }
         while(!(ret = pro->GetContinueFlag())) // 未收到校验正确的结果时
-            msleep(50);  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
+            ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
         pro->SetContinueFlag(0);  // 重新将标志位赋值为0
 
         if (1 == ret && 0x01 == req)   // 请求成功
@@ -936,7 +925,7 @@ void UpdateData::ReadUpdateFile(const char *filename)
             qDebug("只在第一次进入");
         }
         while( !(ret = pro->GetContinueFlag())) // 未收到校验正确的结果时
-            msleep(50);  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
+            ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
         pro->SetContinueFlag(0);  // 重新将标志位赋值为0
 
         if ( 3 == ret) // 数据校验失败,重发
@@ -984,7 +973,7 @@ void UpdateData::UpdateEnd(unsigned char req)
             qDebug("只进入一次");
         }
         while(!(ret = pro->GetContinueFlag())) // 未收到校验正确的结果时
-            msleep(50);  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
+            ;  // 返回值为0时，一直在此处阻塞,一直检测返回值，直到不为0时，继续往下执行
         pro->SetContinueFlag(0);  // 重新将标志位赋值为0
 
         if (1 == ret)   // 请求成功,显示屏退出升级模式
@@ -1008,7 +997,6 @@ void UpdateData::Updating()
     ReadUpdateFile(path); // 显示屏发送升级数据
     UpdateEnd(0x02);  // 显示屏发送升级结束 TAG = 0x05  Byte1 = 0x02
     //    emit 退出升级模式的画面;
-    Protocoldeal::GetInstance()->HideWhichScreen(0);
     qDebug("退出升级模式的画面,进入正常显示电梯部件的界面");
 }
 

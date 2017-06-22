@@ -15,17 +15,17 @@ TEMPLATE = app
 SOURCES += main.cpp\
         widget.cpp \
     protocoldeal.cpp \
+    usbdetect.cpp \
     fileupdate.cpp \
     qdevicewatcher.cpp \
-    qdevicewatcher_linux.cpp \
-    showscreen.cpp
+    qdevicewatcher_linux.cpp
 
 HEADERS  += widget.h \
     protocoldeal.h \
+    usbdetect.h \
     fileupdate.h \
     qdevicewatcher.h \
-    qdevicewatcher_p.h \
-    showscreen.h
+    qdevicewatcher_p.h
 
 FORMS    += widget.ui \
     fileupdate.ui

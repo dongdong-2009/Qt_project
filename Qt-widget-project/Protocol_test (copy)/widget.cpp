@@ -10,6 +10,7 @@
 #include <QPalette>
 #include <QPropertyAnimation>
 #include <QGraphicsOpacityEffect>
+#include "usbdetect.h"
 
 using namespace std;
 static unsigned char sstr[1024];
