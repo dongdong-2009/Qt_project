@@ -399,8 +399,6 @@ void Protocoldeal::CloseSerial()
     }
 }
 
-
-
 unsigned long Protocoldeal::GetDataLength()
 {
     return StringSize;
@@ -669,7 +667,8 @@ void ProducerFromBottom::ReadyreadSlots()
 void ProducerFromBottom::run()
 {
     cout << __PRETTY_FUNCTION__ << "配置串口"<<endl;
-    ReadyreadSlots();
+    connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()), Qt::QueuedConnection);
+    this->exec();
 }
 
 // 开启线程
