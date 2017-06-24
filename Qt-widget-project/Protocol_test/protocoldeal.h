@@ -169,7 +169,7 @@ public:
     ProducerFromBottom();
     ~ProducerFromBottom();
 //    void run();
-    void StartThread(ProducerFromBottom *p);
+//    void StartThread(ProducerFromBottom *p);
     void SetSerialArgument();
 
 public slots:
@@ -177,14 +177,14 @@ public slots:
 };
 
 // 向串口发送数据的线程
-class WriteDataToBottom : public QThread
+class WriteDataToBottom : public QObject /*QThread*/
 {
     Q_OBJECT
 public:
     WriteDataToBottom();
     ~WriteDataToBottom();
-    void run();
-    void StartThread(WriteDataToBottom *w);
+//    void run();
+//    void StartThread(WriteDataToBottom *w);
     char GenerateDataVerifyForChar(char *str, unsigned long len);
 
 public slots:
@@ -252,6 +252,8 @@ public slots:
     void GetUpdateVersion(const char *filename, UpdateVersion *Uver);  // 从升级文件中获取版本号用于下一步的比较
     void OnUpdateSlots();
     void AddUsbSlots();
+    void WriteToSerialSlots(char *buf, unsigned long leng);
+
 protected:
     Protocoldeal();
     unsigned char BstBvtRecvMonitor(void);
@@ -267,9 +269,12 @@ signals:
     void StartCompareSignal(unsigned char *Revversion, unsigned char *Readversion);
     void ShowWhichScreen(int index);
     void HideWhichScreen(int index);
+    void WriteToSerialSignal(char *buf, unsigned long leng);
 private:
     ProducerFromBottom *ReadDataPthread;
     WriteDataToBottom *WriteDataPthread;
+    QThread *RThread;
+    QThread *WThread;
     UpdateData *upd;
     static Protocoldeal *instance;
     int ContinueFlag;
@@ -277,7 +282,7 @@ private:
     bool VersionComFlag;
     Widget *wid;
     FileUpdate *fileup;
-    QDeviceWatcher *Usbdetect;
+    QDeviceWatcher *UsbDetect;
 };
 
 
