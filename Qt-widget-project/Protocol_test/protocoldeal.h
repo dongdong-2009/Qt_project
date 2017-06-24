@@ -162,13 +162,13 @@ typedef struct _updateversion {
 class Widget;
 class FileUpdate;
 // 读取串口数据的线程
-class ProducerFromBottom : public QThread
+class ProducerFromBottom : public QObject /*QThread*/
 {
     Q_OBJECT
 public:
     ProducerFromBottom();
     ~ProducerFromBottom();
-    void run();
+//    void run();
     void StartThread(ProducerFromBottom *p);
     void SetSerialArgument();
 
@@ -204,6 +204,7 @@ public:
     void RequestUpdate(unsigned char req);
     void ReadUpdateFile(const char *filename);    // 读取升级文件并发送内容
     void AppendByte(char *buf, int len);
+    void run();
     void RunNormal();
     void ReplyRun();
     void UpdateEnd(unsigned char req);

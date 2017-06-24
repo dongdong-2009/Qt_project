@@ -43,14 +43,20 @@ Protocoldeal::Protocoldeal():
     VersionComFlag(false)
 {
     SetSerialArgument();     //配置串口参数，连接信号和槽
+    QThread *t = new QThread;
     ReadDataPthread = new ProducerFromBottom;
-    ReadDataPthread->StartThread(ReadDataPthread);
+//    ReadDataPthread->StartThread(ReadDataPthread);
+    ReadDataPthread->moveToThread(t);
+    connect(my_serialport, SIGNAL(readyRead()), ReadDataPthread, SLOT(ReadyreadSlots()), Qt::QueuedConnection);
+    t->start();
 
     WriteDataPthread = new WriteDataToBottom;
     WriteDataPthread->StartThread(WriteDataPthread);
 
     Usbdetect = new QDeviceWatcher;
     Usbdetect->appendEventReceiver(this);
+    upd = new UpdateData;
+qDebug()<<"主线程ID为："<<QThread::currentThreadId();
     connect(Usbdetect, SIGNAL(deviceAdded(QString)), this, SLOT(AddUsbSlots()), Qt::QueuedConnection);
 //    connect(my_serialport, SIGNAL(readyRead()), ReadDataPthread, SLOT(ReadyreadSlots()), Qt::QueuedConnection);
     connect(this, SIGNAL(StartCompareSignal(unsigned char*,unsigned char*)), this, SLOT(CompareVersion(unsigned char*,unsigned char*)), Qt::QueuedConnection);
@@ -63,9 +69,9 @@ Protocoldeal::Protocoldeal():
 
 Protocoldeal::~Protocoldeal()
 {
-    ReadDataPthread->requestInterruption();
-    ReadDataPthread->quit();
-    ReadDataPthread->wait();
+//    ReadDataPthread->requestInterruption();
+//    ReadDataPthread->quit();
+//    ReadDataPthread->wait();
     delete ReadDataPthread;
 
     WriteDataPthread->requestInterruption();
@@ -75,6 +81,7 @@ Protocoldeal::~Protocoldeal()
 
     CloseSerial();
     delete my_serialport;
+    delete upd;
     cout << __PRETTY_FUNCTION__<<"启动协议的的析构函数"<<endl;
 }
 
@@ -481,19 +488,22 @@ void Protocoldeal::GetUpdateVersion(const char *filename, UpdateVersion *Uver)
 void Protocoldeal::CountString(unsigned char *des, char *src, int len)
 {
     qDebug()<< __PRETTY_FUNCTION__;
-    int i;
+    int i = 0;
     unsigned char interger = 0;
     unsigned char decimal = 0;
-    for (i = 0; i < len; i ++)
+
+    while ('.' != src[i])
     {
-        if (i < 3)
-        {
+        if (src[i] > '0' && src[i] < '9')
             interger = interger * 10 + src[i] - '0';
-        }
-        else if (i >= 3)
-        {
+        i++;
+    }
+    i++;
+    int j ;
+    for (j = i; j < len; j ++)
+    {
+        if (src[i] > '0' && src[i] < '9')
             decimal = decimal * 10 + src[i] - '0';
-        }
     }
     des[0] = interger;  // 整数部分
     des[1] = decimal;   // 小数部分
@@ -543,18 +553,18 @@ void Protocoldeal::SetVersionFlag(bool flag)
 void Protocoldeal::OnUpdateSlots()
 {
     qDebug()<< __PRETTY_FUNCTION__;
-    upd = new UpdateData;
-    if (GetVersionFlag())
-    {
-        qDebug("show Fileupdate screen");
-        emit ShowWhichScreen(0);
-    }
-    else
-    {
-        qDebug("show liftscren");
-        upd->RunNormal();
-        emit ShowWhichScreen(1);
-    }
+    upd->start();
+//    if (GetVersionFlag())
+//    {
+//        qDebug("show Fileupdate screen");
+//        emit ShowWhichScreen(0);
+//        SetVersionFlag(false);
+//    }
+//    else
+//    {
+//        qDebug("show liftscren");
+////        emit ShowWhichScreen(1);
+//    }
 }
 
 void Protocoldeal::AddUsbSlots()
@@ -589,6 +599,7 @@ ProducerFromBottom::~ProducerFromBottom()
 void ProducerFromBottom::ReadyreadSlots()
 {
     cout << __PRETTY_FUNCTION__ << "读数据的槽函数"<<endl;
+    qDebug()<<"读线程ID为："<<QThread::currentThreadId();
     static bool Isstart = false;
     char str;
     unsigned char s;
@@ -664,25 +675,25 @@ void ProducerFromBottom::ReadyreadSlots()
 //    printf("StationLightStatus = %X \n", mestable.ID0_Message.StationLightStatus);
 }
 
-void ProducerFromBottom::run()
-{
-    cout << __PRETTY_FUNCTION__ << "配置串口"<<endl;
-    connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()), Qt::QueuedConnection);
-    this->exec();
-}
+//void ProducerFromBottom::run()
+//{
+//    cout << __PRETTY_FUNCTION__ << "配置串口"<<endl;
+//    connect(my_serialport, SIGNAL(readyRead()), this, SLOT(ReadyreadSlots()), Qt::QueuedConnection);
+//    this->exec();
+//}
 
 // 开启线程
 void ProducerFromBottom::StartThread(ProducerFromBottom *p)
 {
     cout << __PRETTY_FUNCTION__<<endl;
-    if (NULL != p)
-    {
-        if (!(p->isRunning()))  // 当线程不在运行时，启动线程
-        {
-            qDebug() << "启动读取串口的线程";
-            p->start();
-        }
-    }
+//    if (NULL != p)
+//    {
+//        if (!(p->isRunning()))  // 当线程不在运行时，启动线程
+//        {
+//            qDebug() << "启动读取串口的线程";
+//            p->start();
+//        }
+//    }
 }
 
 WriteDataToBottom::WriteDataToBottom()
@@ -814,7 +825,7 @@ void UpdateData::RunNormal()
 // 回复正常运行
 void UpdateData::ReplyRun()
 {
-    qDebug()<< __PRETTY_FUNCTION__;
+    qDebug()<< __PRETTY_FUNCTION__;qDebug()<<"Update线程ID为："<<currentThreadId();
     unsigned char endstr[2];
     bool first = true;
     endstr[0] = 0x05;
@@ -844,7 +855,28 @@ void UpdateData::ReplyRun()
         }
     }
     qDebug("升级结束请求成功!");
-//    emit 退出升级模式的画面;
+    emit Protocoldeal::GetInstance()->ShowWhichScreen(1);// 显示屏回到正常显示画面的部件
+}
+
+void UpdateData::run()
+{
+    qDebug()<< __PRETTY_FUNCTION__;qDebug()<<"Update线程ID为："<<currentThreadId();
+    Protocoldeal *pro = Protocoldeal::GetInstance();
+//    if (NULL != pro)
+//    {
+//        if (pro->GetVersionFlag())
+//        {
+//            qDebug("即将升级!");
+//            Updating();
+//        }
+//        else
+//        {
+//            qDebug("不必升级!");
+//            RunNormal();
+//        }
+//    }
+    if (!pro->GetVersionFlag())
+            RunNormal();
 }
 
 // 请求进入升级模式 或 请求开始升级成功
@@ -861,7 +893,7 @@ void UpdateData::RequestUpdate(unsigned char req)
     {
         if (first)
         {
-            pro->CopyStringFromUi(endstr[1], endstr);
+            pro->CopyStringFromUi(endstr[0], endstr);
             first = false;
             qDebug("只进入一次");
         }
@@ -882,7 +914,7 @@ void UpdateData::RequestUpdate(unsigned char req)
         }
         else if ( 3 == ret) // 数据校验错误，需要重发
         {
-            pro->CopyStringFromUi(endstr[1], endstr);
+            pro->CopyStringFromUi(endstr[0], endstr);
         }
     }
     qDebug("请求进入升级模式,请求成功!");
@@ -978,7 +1010,7 @@ void UpdateData::UpdateEnd(unsigned char req)
     {
         if (first)
         {
-            pro->CopyStringFromUi(endstr[1], endstr);
+            pro->CopyStringFromUi(endstr[0], endstr);
             first = false;
             qDebug("只进入一次");
         }
@@ -992,7 +1024,7 @@ void UpdateData::UpdateEnd(unsigned char req)
         }
         else if ( 3 == ret) // 数据校验错误，需要重发
         {
-            pro->CopyStringFromUi(endstr[1], endstr);
+            pro->CopyStringFromUi(endstr[0], endstr);
         }
     }
     qDebug("升级结束请求成功!");
@@ -1007,7 +1039,8 @@ void UpdateData::Updating()
     ReadUpdateFile(path); // 显示屏发送升级数据
     UpdateEnd(0x02);  // 显示屏发送升级结束 TAG = 0x05  Byte1 = 0x02
     //    emit 退出升级模式的画面;
-    Protocoldeal::GetInstance()->HideWhichScreen(0);
+    emit Protocoldeal::GetInstance()->HideWhichScreen(0);
+    emit Protocoldeal::GetInstance()->ShowWhichScreen(0);
     qDebug("退出升级模式的画面,进入正常显示电梯部件的界面");
 }
 

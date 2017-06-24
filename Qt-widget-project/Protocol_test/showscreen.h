@@ -5,7 +5,7 @@
 #include "widget.h"
 #include "fileupdate.h"
 #include "protocoldeal.h"
-
+#include <QThread>
 class ShowScreen : public QObject
 {
     Q_OBJECT

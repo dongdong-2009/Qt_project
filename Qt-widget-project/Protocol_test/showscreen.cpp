@@ -1,8 +1,8 @@
 #include "showscreen.h"
-
 ShowScreen::ShowScreen(QObject *parent) : QObject(parent)
 {
     qDebug()<< __PRETTY_FUNCTION__;
+    qDebug()<<"ShowScreen主线程ID为："<<QThread::currentThreadId();
     pro = Protocoldeal::GetInstance();
     connect(pro, SIGNAL(ShowWhichScreen(int)), this, SLOT(ChoiceScreen(int)));
     connect(pro, SIGNAL(HideWhichScreen(int)), this, SLOT(OnHideScreen(int)));
