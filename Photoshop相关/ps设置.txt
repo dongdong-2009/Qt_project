@@ -1,0 +1,6 @@
+http://www.jb51.net/photoshop/476877.html
+在编辑中预置->单位与标尺 设置为像素的，F8快捷键可以显示像素
+
+
+http://jingyan.baidu.com/article/08b6a591c9b4f714a80922bb.html
+设置快捷键，旋转一个图层

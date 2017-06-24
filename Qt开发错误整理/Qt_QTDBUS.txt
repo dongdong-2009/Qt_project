@@ -1,3 +1,0 @@
-usbmanager.cpp,scan,18 error message:Could not get owner of name 'org.freedesktop.Hal': no such name
-
-

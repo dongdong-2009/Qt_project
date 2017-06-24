@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/circle">
-        <file>gif/animated.gif</file>
-    </qresource>
-</RCC>
