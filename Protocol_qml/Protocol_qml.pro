@@ -3,7 +3,9 @@ TEMPLATE = app
 QT += qml quick widgets serialport
 
 SOURCES += main.cpp \
-    protocoldeal.cpp
+    protocoldeal.cpp \
+    qdevicewatcher_linux.cpp \
+    qdevicewatcher.cpp
 
 RESOURCES += qml.qrc
 
@@ -14,7 +16,9 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    protocoldeal.h
+    protocoldeal.h \
+    qdevicewatcher_p.h \
+    qdevicewatcher.h
 
 DISTFILES += \
     images/logo.png \
