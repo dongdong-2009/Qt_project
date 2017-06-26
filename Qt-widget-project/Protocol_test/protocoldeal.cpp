@@ -18,14 +18,14 @@ using namespace std;
 #define BVT_RECV_CHANNEL_SIZE 1	/* 接收通道数据类型大小 */
 #define BVT_PTL_FRAMEID_POS 1	/* 协议帧ID地址 */
 #define BVT_PTL_DATASTART_POS 2	/* 协议帧数据地址 */
-#define MAX_LENGTH 4096         /*缓冲区大小*/
+#define MAX_LENGTH 2048         /*缓冲区大小*/
 const char *path = "/home/root/BVD241.bin";
 //static unsigned char gBvtRecCnt ;
 static unsigned char VersionInfo[2] ;  // 保存单片机发送的版本信息
 //static unsigned char UsbVersion[2];    //
 static char WriteDataBuf[1024] ;
 static char WriteSrc[1000];
-
+//static int readcount;
 static unsigned char totalBuf[MAX_LENGTH]; // 串口读到的数据存储的数据缓冲区
 static unsigned char tempBuf[1024];        // 去掉帧头和帧尾，并且解析好的数据的缓冲区
 static unsigned long StringSize;
@@ -354,7 +354,16 @@ void Protocoldeal::CopyStringFromUi(unsigned char Id, void *str)
     printf("Id = %x\n",Id);
     unsigned long strlength = BstBvtGetFrameDatLen(Id);
     memset(WriteSrc, 0, sizeof(WriteSrc));
-    memcpy(WriteSrc, str, strlength);
+    if (0x07 == Id) // 读文件时需要追加Id
+    {
+        WriteSrc[0] = Id;
+        memcpy(WriteSrc+1, str, strlength - 1);
+        qDebug("读文件时需要追加Id");
+    }
+    else
+    {
+        memcpy(WriteSrc, str, strlength);
+    }
     qDebug("emit FillDataSignal(WriteDataBuf, WriteSrc)");
     emit WriteDataPthread->FillDataSignal(WriteDataBuf, WriteSrc);
 }
@@ -528,7 +537,7 @@ void Protocoldeal::CompareVersion(unsigned char *Revversion, unsigned char *Read
     {
         if (Revversion[i] != Readversion[i])
         {
-            if (Revversion[i] > Readversion[i]) // 修改代码，做测试准备
+            if (Revversion[i] < Readversion[i]) // 修改代码，做测试准备
             {
                 qDebug()<< "获取到的版本比当前版本新，需升级，返回true";
                 VersionComFlag = true;    // 需要升级，返回true
@@ -975,12 +984,15 @@ void UpdateData::ReadUpdateFile(const char *filename)
     int readlen = 0;
     memset(buffer, 0, sizeof(buffer));
     int ret;
+    qDebug("文件大小 = %d", filelength);
     Protocoldeal *pro = Protocoldeal::GetInstance();
     if (!file.open(QIODevice::ReadOnly))
     {
         qDebug("打开文件%s失败!", filename);
         return ;
     }
+    qDebug("emit Protocoldeal::GetInstance()->ShowWhichScreen(0)");
+    emit Protocoldeal::GetInstance()->ShowWhichScreen(0);
     while(1)
     {
         if (firstRead)
@@ -1012,17 +1024,21 @@ void UpdateData::ReadUpdateFile(const char *filename)
                 AppendByte(buffer, readlen);// 字符长度小于64时，对buf用0xff填充至64个字节
             }
             pro->CopyStringFromUi(0x07, buffer);
-            percent = readcount*64 / filelength;
+            percent = readcount*6400 / filelength;
+            qDebug("percent大小 = %d, readcount = %d", percent, readcount);
             readcount++;
         }
         else if (2 == ret && (file.atEnd())) // 校验结果为真，并且已经达到文件末尾时跳出循环
         {
             percent = 100;
+            readcount = 0;
+            qDebug("emit pro->SendPercent(percent)");
+            emit pro->SendPercent(percent); // emit 百分比percent
             break;
         }
         qDebug("emit pro->SendPercent(percent)");
         emit pro->SendPercent(percent); // emit 百分比percent
-    }
+    } 
     file.close();
 }
 
@@ -1066,13 +1082,14 @@ void UpdateData::Updating()
     qDebug()<< __PRETTY_FUNCTION__;
     RequestUpdate(0x03);  // 显示屏发送请求进入升级 TAG=0x05  Byte1 = 0x03
     RequestUpdate(0x01);  // 显示屏发送开始升级请求 TAG=0x05  Byte1 = 0x01
+//    readcount = 0;
     ReadUpdateFile(path); // 显示屏发送升级数据
     UpdateEnd(0x02);  // 显示屏发送升级结束 TAG = 0x05  Byte1 = 0x02
     //    emit 退出升级模式的画面;
     qDebug("emit Protocoldeal::GetInstance()->HideWhichScreen(0)");
-    qDebug("emit Protocoldeal::GetInstance()->ShowWhichScreen(0)");
+    qDebug("emit Protocoldeal::GetInstance()->ShowWhichScreen(1)");
     emit Protocoldeal::GetInstance()->HideWhichScreen(0);
-    emit Protocoldeal::GetInstance()->ShowWhichScreen(0);
+    emit Protocoldeal::GetInstance()->ShowWhichScreen(1);
     qDebug("退出升级模式的画面,进入正常显示电梯部件的界面");
 }
 

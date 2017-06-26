@@ -2,7 +2,7 @@
 #include "ui_fileupdate.h"
 #include <QPalette>
 #include <QPixmap>
-
+static int enterflag;
 FileUpdate::FileUpdate(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FileUpdate)
@@ -14,6 +14,7 @@ FileUpdate::FileUpdate(QWidget *parent) :
     SetWidgetBackGround(":/new/prefix1/images/bground.png");
     Protocoldeal *pro = Protocoldeal::GetInstance();
     connect(pro, SIGNAL(SendPercent(int)), this, SLOT(ChangeValue(int)));
+    enterflag = 0;
 }
 
 FileUpdate::~FileUpdate()
@@ -24,9 +25,14 @@ FileUpdate::~FileUpdate()
 
 void FileUpdate::ChangeValue(int val)
 {
-    qDebug()<< __PRETTY_FUNCTION__;
-    ui->progressBar->show();
-    ui->label_text->show();
+    qDebug()<< __PRETTY_FUNCTION__<<"val = "<< val;
+    if (0 == enterflag)
+    {
+        ui->progressBar->show();
+        ui->label_text->show();
+        enterflag ++;
+    }
+
     ui->progressBar->setValue(val);
 }
 
