@@ -1,4 +1,5 @@
 import QtQuick 2.0
+// 主画面坐标为： x:47; y:113
 
 Item {
     id:showarea
@@ -20,6 +21,7 @@ Item {
             }
         }
     }
+
     Flickable {
         width: showarea.width; height: showarea.height
         contentWidth: image2.width; contentHeight: image2.height

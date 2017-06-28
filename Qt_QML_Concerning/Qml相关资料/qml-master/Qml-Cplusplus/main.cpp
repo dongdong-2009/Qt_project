@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
 /*
  * main.cpp 将 RGBGame 类注册为在 QML 中可以使用的 RGBGame 类型,主版本为 1,
-次版本为 0,库的名字是 suntec.tools.RGBGame。
+次版本为 0,库的名字是 lb2616.tools.RGBGame。
 注册动作必须在 QML 上下文创建之前,否则无效。
 另外:QQuickView 为 Qt Quick UI 提供了一个窗口,可以方便地加载 QML 文件并显示
 其 界 面 。 QApplication 派 生 自 QGuiApplication , 而 QGuiApplication 又 派 生 自

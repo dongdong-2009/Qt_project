@@ -3,7 +3,8 @@ TEMPLATE = app
 QT += qml quick
 CONFIG += c++11
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    fileupdate2.cpp
 
 RESOURCES += qml.qrc
 
@@ -15,4 +16,7 @@ include(deployment.pri)
 
 DISTFILES += \
     images/ArrowUp.png
+
+HEADERS += \
+    fileupdate2.h
 

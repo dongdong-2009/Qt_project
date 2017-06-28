@@ -14,8 +14,6 @@ const int OffsetHead = 2059; // 从文件的第2059的字节处拷贝5个字节�
 #include <QStringList>
 #include <QTimer>
 #include <QFile>
-#include "widget.h"
-#include "fileupdate.h"
 #include "qdevicewatcher.h"
 #include "qdevicewatcher_p.h"
 #pragma pack(push, 1) //按照1字节对齐

@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
 ApplicationWindow{
+    property string moviename: "file:///home/root/Test1.mp4"
     id:kPlayer
     width: Screen.width /*1024*/
     height: Screen.height /*768*/
@@ -77,14 +78,16 @@ ApplicationWindow{
             MediaPlayer{
                 id:player
                 //source: "file:///home/devin/Desktop/Repository/Qt_project/Qt_project/AutoPlayer-new/videos/Test2.mp4"
-                source: "file:///home/root/ThreeKingdoms.mp4"
+//                source: "file:///home/root/ThreeKingdoms.mp4"
 //                source: "file:///home/root/Test1.mp4"
+                source: moviename
                 autoLoad: false
                 autoPlay: true    // 当AutoPlay 设置为true的时候，如果视频文件存在，就会直接播放视频
                 volume: 0.4
                 loops: MediaPlayer.Infinite
                 onStopped: {
                     console.log("the media is end!")
+                    moviename = "file:///home/root/zhuoyaoji.mp4"
                 }
             }
             VideoOutput {

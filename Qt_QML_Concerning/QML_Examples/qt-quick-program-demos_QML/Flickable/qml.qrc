@@ -12,5 +12,11 @@
         <file>images/ArrowDn.png</file>
         <file>FileUpdate.qml</file>
         <file>Test.qml</file>
+        <file>DateandTime.qml</file>
+        <file>MultiMedia.qml</file>
+        <file>BstLogo.qml</file>
+        <file>images/logo.png</file>
+        <file>FloorNumberShow.qml</file>
+        <file>ShiningTime.qml</file>
     </qresource>
 </RCC>

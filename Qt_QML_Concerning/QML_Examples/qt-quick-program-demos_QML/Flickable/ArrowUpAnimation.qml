@@ -20,6 +20,7 @@ Item {
             }
         }
     }
+
     Flickable {
         width: showarea.width; height: showarea.height
         contentWidth: image2.width; contentHeight: image2.height

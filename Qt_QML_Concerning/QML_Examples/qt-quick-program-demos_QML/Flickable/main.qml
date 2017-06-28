@@ -9,6 +9,11 @@ Window {
         id: backg
         source: "images/background.png"
     }
+    BstLogo {
+        x: 294
+        y: 39
+    }
+
 //    FlickDemo {
 //        x:47
 //        y:113
@@ -40,6 +45,13 @@ Window {
 //    Test {
 
 //    }
+    DateandTime {
+        x: 779
+        y: 27
+    }
+    FloorNumberShow {
+        x:18 ; y: 451
+    }
 }
 
 

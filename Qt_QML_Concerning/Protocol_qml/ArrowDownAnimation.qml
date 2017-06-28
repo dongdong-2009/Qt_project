@@ -1,5 +1,5 @@
 import QtQuick 2.0
-
+// 主画面坐标为： x:47; y:113
 Item {
     id: showrect
     width: 184; height: 162
