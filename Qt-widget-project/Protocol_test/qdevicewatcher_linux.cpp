@@ -62,7 +62,7 @@ bool QDeviceWatcherPrivate::start()
 
 bool QDeviceWatcherPrivate::stop()
 {
-    if (netlink_socket!=-1) {
+    if (netlink_socket != -1) {
 #if CONFIG_SOCKETNOTIFIER
         socket_notifier->setEnabled(false);
 #elif CONFIG_TCPSOCKET

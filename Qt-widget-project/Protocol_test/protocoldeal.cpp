@@ -20,12 +20,12 @@ using namespace std;
 #define BVT_PTL_DATASTART_POS 2	/* 协议帧数据地址 */
 #define MAX_LENGTH 2048         /*缓冲区大小*/
 const char *path = "/home/root/BVD241.bin";
-//static unsigned char gBvtRecCnt ;
+//const char *mount = "mount /dev/sda1 /media";
+//const char *usbpath = "/media/update/BVD241.bin_3";
 static unsigned char VersionInfo[2] ;  // 保存单片机发送的版本信息
 //static unsigned char UsbVersion[2];    //
 static char WriteDataBuf[1024] ;
 static char WriteSrc[1000];
-//static int readcount;
 static unsigned char totalBuf[MAX_LENGTH]; // 串口读到的数据存储的数据缓冲区
 static unsigned char tempBuf[1024];        // 去掉帧头和帧尾，并且解析好的数据的缓冲区
 static unsigned long StringSize;
@@ -39,12 +39,13 @@ QSerialPort *my_serialport = NULL;
 Protocoldeal::Protocoldeal():
     ContinueFlag(10),
     RunNormalFlag(0),
-    VersionComFlag(false)
+    VersionComFlag(false),
+    UsbInsertFlag(false)
 {
     SetSerialArgument();     //配置串口参数，连接信号和槽
     connect(this, SIGNAL(WriteToSerialSignal(char*,ulong)), this, SLOT(WriteToSerialSlots(char*,ulong)));
 
-    RThread = new QThread;
+    RThread = new QThread(this);
     ReadDataPthread = new ProducerFromBottom;
     ReadDataPthread->moveToThread(RThread);
     connect(my_serialport, SIGNAL(readyRead()), ReadDataPthread, SLOT(ReadyreadSlots()), Qt::QueuedConnection);
@@ -61,14 +62,14 @@ Protocoldeal::Protocoldeal():
     UsbDetect->appendEventReceiver(this);
     upd = new UpdateData;
     qDebug()<<"主线程ID为："<<QThread::currentThreadId();
-    connect(UsbDetect, SIGNAL(deviceAdded(QString)), this, SLOT(AddUsbSlots()), Qt::QueuedConnection);
+    connect(UsbDetect, SIGNAL(deviceAdded(QString)), this, SLOT(AddUsbSlots(QString)), Qt::QueuedConnection);
 //    connect(my_serialport, SIGNAL(readyRead()), ReadDataPthread, SLOT(ReadyreadSlots()), Qt::QueuedConnection);
     connect(this, SIGNAL(StartCompareSignal(unsigned char*,unsigned char*)), this, SLOT(CompareVersion(unsigned char*,unsigned char*)), Qt::QueuedConnection);
     connect(this, SIGNAL(UpdateFlagSignal()), this, SLOT(OnUpdateSlots()), Qt::QueuedConnection);
     position = 0;
     GetUpdateVersion(path, &upv);  // 从文件中获取版本信息
     UsbDetect->start();
-    cout << __PRETTY_FUNCTION__<<"启动协议的的构造函数"<<endl;
+    cout << __PRETTY_FUNCTION__<<"调用协议的的构造函数"<<endl;
 }
 
 Protocoldeal::~Protocoldeal()
@@ -87,7 +88,7 @@ Protocoldeal::~Protocoldeal()
     CloseSerial();
     delete my_serialport;
     delete upd;
-    cout << __PRETTY_FUNCTION__<<"启动协议的的析构函数"<<endl;
+    cout << __PRETTY_FUNCTION__<<"调用协议的的析构函数"<<endl;
 }
 
 // 单例模式
@@ -585,11 +586,18 @@ void Protocoldeal::OnUpdateSlots()
 //    }
 }
 
-void Protocoldeal::AddUsbSlots()
+void Protocoldeal::AddUsbSlots(QString dev)
 {
     qDebug()<< __PRETTY_FUNCTION__;
-    //从usb中获取版本
-    //对版本进行比较
+    QByteArray ba = dev.toLatin1();
+    char *mount = ba.data();
+    system(mount);      // 挂载ｕ盘到／media目录下
+    QString upath = dev + "/BVD241_3.bin";
+    QByteArray b = upath.toLatin1();
+    char *usbpath = b.data();
+    GetUpdateVersion(usbpath, &upv);   //从usb中获取版本
+    CompareVersion(VersionInfo, upv.ver); //对版本进行比较
+    OnUpdateSlots();
     //是否升级
 }
 
@@ -600,6 +608,19 @@ void Protocoldeal::NotifyCompare(unsigned char *buf)
     {
         emit UpdateFlagSignal();
     }
+}
+
+void Protocoldeal::SetUsbInsertFlag(bool flag)
+{
+    qDebug()<< __PRETTY_FUNCTION__<<"before UsbInsertFlag = "<< UsbInsertFlag;
+    UsbInsertFlag = flag;
+    qDebug()<< __PRETTY_FUNCTION__<<"after UsbInsertFlag = "<< UsbInsertFlag;
+}
+
+bool Protocoldeal::GetUsbInsertFlag()
+{
+    qDebug()<< __PRETTY_FUNCTION__<<"UsbInsertFlag = "<< UsbInsertFlag;
+    return UsbInsertFlag;
 }
 
 void Protocoldeal::WriteToSerialSlots(char *buf, unsigned long leng)
@@ -728,12 +749,12 @@ void ProducerFromBottom::ReadyreadSlots()
 
 WriteDataToBottom::WriteDataToBottom()
 {
-    cout << __PRETTY_FUNCTION__<<"启动写线程的构造函数"<<endl;
+    cout << __PRETTY_FUNCTION__<<"调用写线程的构造函数"<<endl;
 }
 
 WriteDataToBottom::~WriteDataToBottom()
 {
-    cout <<__PRETTY_FUNCTION__<<"启动写线程的析构函数"<< endl;
+    cout <<__PRETTY_FUNCTION__<<"调用写线程的析构函数"<< endl;
 }
 
 //void WriteDataToBottom::run()
@@ -789,7 +810,7 @@ void WriteDataToBottom::ConstructWriteData(char *wstr, char *src)
     emit WriteDataSignal();
 }
 
-// 向底层写数据
+// 向串口写数据
 void WriteDataToBottom::WriteDataSerial()
 {
     qDebug() << __PRETTY_FUNCTION__<< "写线程ID为："<<QThread::currentThreadId();
@@ -904,6 +925,7 @@ void UpdateData::run()
     {
         if (pro->GetVersionFlag())
         {
+            pro->SetVersionFlag(false);
             qDebug("即将升级!");
             Updating();
         }
@@ -1080,16 +1102,24 @@ void UpdateData::UpdateEnd(unsigned char req)
 void UpdateData::Updating()
 {
     qDebug()<< __PRETTY_FUNCTION__;
+    Protocoldeal *pro = Protocoldeal::GetInstance();
+    if (NULL != pro && pro->GetUsbInsertFlag())
+    {
+        qDebug("U盘插入升级，切换界面");
+        pro->SetUsbInsertFlag(false);
+        emit pro->HideWhichScreen(1);
+        emit pro->ShowWhichScreen(0);
+    }
     RequestUpdate(0x03);  // 显示屏发送请求进入升级 TAG=0x05  Byte1 = 0x03
     RequestUpdate(0x01);  // 显示屏发送开始升级请求 TAG=0x05  Byte1 = 0x01
 //    readcount = 0;
     ReadUpdateFile(path); // 显示屏发送升级数据
     UpdateEnd(0x02);  // 显示屏发送升级结束 TAG = 0x05  Byte1 = 0x02
     //    emit 退出升级模式的画面;
-    qDebug("emit Protocoldeal::GetInstance()->HideWhichScreen(0)");
-    qDebug("emit Protocoldeal::GetInstance()->ShowWhichScreen(1)");
-    emit Protocoldeal::GetInstance()->HideWhichScreen(0);
-    emit Protocoldeal::GetInstance()->ShowWhichScreen(1);
+    qDebug("emit pro->HideWhichScreen(0)");
+    qDebug("emit pro->ShowWhichScreen(1)");
+    emit pro->HideWhichScreen(0);
+    emit pro->ShowWhichScreen(1);
     qDebug("退出升级模式的画面,进入正常显示电梯部件的界面");
 }
 

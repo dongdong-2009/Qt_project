@@ -87,7 +87,7 @@ ApplicationWindow{
                 loops: MediaPlayer.Infinite
                 onStopped: {
                     console.log("the media is end!")
-                    moviename = "file:///home/root/zhuoyaoji.mp4"
+                    moviename = "file:///home/root/xialuotefannao.mp4"
                 }
             }
             VideoOutput {

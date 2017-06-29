@@ -12,8 +12,12 @@ public:
 
 signals:
     void sendPercent(int val);
+    void sendStartAniDown(bool animstardown);
+    void sendStartAniUp(bool animstarup);
 public slots:
     void ChangePercent();
+    void StartAnimDown();
+    void StartAnimUp();
 };
 
 #endif // FILEUPDATE_H

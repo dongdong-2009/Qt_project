@@ -10,9 +10,9 @@ Item {
 
         Image { id: image; source: "images/ArrowUp.png" }
         SequentialAnimation on y {
-            id: gundong
+            id: arrowup
             running: true
-            loops: Animation.Infinite
+            loops: 2/*Animation.Infinite*/
             ParallelAnimation {
                 NumberAnimation {
                     from: 0; to: -image.height; duration: 1200; easing.type: Easing.Linear
@@ -27,14 +27,20 @@ Item {
 
         Image { id: image2; source: "images/ArrowUp.png" }
         SequentialAnimation on y {
-            id: gundong2
+            id: arrowup2
             running: true
-            loops: Animation.Infinite
+            loops: 2/*Animation.Infinite*/
             ParallelAnimation {
                 NumberAnimation {
                     from: image2.height; to: 0; duration: 1200; easing.type: Easing.Linear
                 }
             }
+        }
+    }
+    Connections {
+        onSendStartAniUp: {
+            arrowup.running = animstarup;
+            arrowup2.running = animstarup;
         }
     }
 }

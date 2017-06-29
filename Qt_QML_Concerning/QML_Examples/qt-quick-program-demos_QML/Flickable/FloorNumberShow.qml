@@ -4,13 +4,13 @@ import QtQuick 2.0
 Item {
     property alias floornum: floornum
     id: floor
-    width: 261; height: 177
+    width: 291; height: 177
     Text {
         id: floornum
         font.bold: true
         font.pixelSize: 100
         color: "white"
-        text: "999"
+        text: "9"
         anchors.centerIn: floor
     }
 }

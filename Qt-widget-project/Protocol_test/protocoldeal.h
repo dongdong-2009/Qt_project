@@ -244,12 +244,13 @@ public:
     bool GetVersionFlag();
     void SetVersionFlag(bool flag);
     void NotifyCompare(unsigned char *buf);
-
+    void SetUsbInsertFlag(bool flag);
+    bool GetUsbInsertFlag();
 public slots:
     void CompareVersion(unsigned char *Revversion, unsigned char *Readversion);   // 比较版本信息
     void GetUpdateVersion(const char *filename, UpdateVersion *Uver);  // 从升级文件中获取版本号用于下一步的比较
     void OnUpdateSlots();
-    void AddUsbSlots();
+    void AddUsbSlots(QString dev);
     void WriteToSerialSlots(char *buf, unsigned long leng);
 
 protected:
@@ -278,6 +279,7 @@ private:
     int ContinueFlag;
     int RunNormalFlag;
     bool VersionComFlag;
+    bool UsbInsertFlag;
     Widget *wid;
     FileUpdate *fileup;
     QDeviceWatcher *UsbDetect;
