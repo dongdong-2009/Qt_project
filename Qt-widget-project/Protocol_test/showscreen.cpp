@@ -11,7 +11,6 @@ ShowScreen::ShowScreen(QObject *parent) : QObject(parent)
 ShowScreen::~ShowScreen()
 {
     qDebug()<< __PRETTY_FUNCTION__;
-    delete pro;
     delete fileup;
     delete wid;
 }

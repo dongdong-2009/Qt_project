@@ -21,7 +21,7 @@ using namespace std;
 #define MAX_LENGTH 2048         /*缓冲区大小*/
 const char *path = "/home/root/BVD241.bin";
 //const char *mount = "mount /dev/sda1 /media";
-//const char *usbpath = "/media/update/BVD241.bin_3";
+const char *usbpath = "/media/update/BVD241.bin_3";
 static unsigned char VersionInfo[2] ;  // 保存单片机发送的版本信息
 //static unsigned char UsbVersion[2];    //
 static char WriteDataBuf[1024] ;
@@ -88,6 +88,7 @@ Protocoldeal::~Protocoldeal()
     CloseSerial();
     delete my_serialport;
     delete upd;
+    delete instance;
     cout << __PRETTY_FUNCTION__<<"调用协议的的析构函数"<<endl;
 }
 
@@ -589,16 +590,17 @@ void Protocoldeal::OnUpdateSlots()
 void Protocoldeal::AddUsbSlots(QString dev)
 {
     qDebug()<< __PRETTY_FUNCTION__;
-    QByteArray ba = dev.toLatin1();
+    QString str;
+    str = "mount " + dev + " /media";
+    qDebug()<<"str = "<< str;
+    QByteArray ba = str.toLatin1();
     char *mount = ba.data();
+    qDebug("mount = %s", mount);
     system(mount);      // 挂载ｕ盘到／media目录下
-    QString upath = dev + "/BVD241_3.bin";
-    QByteArray b = upath.toLatin1();
-    char *usbpath = b.data();
+
     GetUpdateVersion(usbpath, &upv);   //从usb中获取版本
     CompareVersion(VersionInfo, upv.ver); //对版本进行比较
     OnUpdateSlots();
-    //是否升级
 }
 
 void Protocoldeal::NotifyCompare(unsigned char *buf)
@@ -1013,8 +1015,6 @@ void UpdateData::ReadUpdateFile(const char *filename)
         qDebug("打开文件%s失败!", filename);
         return ;
     }
-    qDebug("emit Protocoldeal::GetInstance()->ShowWhichScreen(0)");
-    emit Protocoldeal::GetInstance()->ShowWhichScreen(0);
     while(1)
     {
         if (firstRead)
@@ -1103,17 +1103,23 @@ void UpdateData::Updating()
 {
     qDebug()<< __PRETTY_FUNCTION__;
     Protocoldeal *pro = Protocoldeal::GetInstance();
-    if (NULL != pro && pro->GetUsbInsertFlag())
-    {
-        qDebug("U盘插入升级，切换界面");
-        pro->SetUsbInsertFlag(false);
-        emit pro->HideWhichScreen(1);
-        emit pro->ShowWhichScreen(0);
-    }
     RequestUpdate(0x03);  // 显示屏发送请求进入升级 TAG=0x05  Byte1 = 0x03
     RequestUpdate(0x01);  // 显示屏发送开始升级请求 TAG=0x05  Byte1 = 0x01
 //    readcount = 0;
-    ReadUpdateFile(path); // 显示屏发送升级数据
+    if (NULL != pro && pro->GetUsbInsertFlag())
+    {
+        qDebug("U盘插入升级，切换界面");
+        emit pro->HideWhichScreen(1);
+        emit pro->ShowWhichScreen(0);
+        pro->SetUsbInsertFlag(false);
+        ReadUpdateFile(usbpath); // 显示屏发送升级数据
+    }
+    else
+    {
+        qDebug("emit pro->ShowWhichScreen(0)");
+        emit pro->ShowWhichScreen(0);
+        ReadUpdateFile(path); // 显示屏发送升级数据
+    }
     UpdateEnd(0x02);  // 显示屏发送升级结束 TAG = 0x05  Byte1 = 0x02
     //    emit 退出升级模式的画面;
     qDebug("emit pro->HideWhichScreen(0)");
