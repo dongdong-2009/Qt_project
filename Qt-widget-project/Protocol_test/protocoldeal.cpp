@@ -597,7 +597,7 @@ void Protocoldeal::AddUsbSlots(QString dev)
     char *mount = ba.data();
     qDebug("mount = %s", mount);
     system(mount);      // 挂载ｕ盘到／media目录下
-
+    QThread::sleep(4);
     GetUpdateVersion(usbpath, &upv);   //从usb中获取版本
     CompareVersion(VersionInfo, upv.ver); //对版本进行比较
     OnUpdateSlots();
