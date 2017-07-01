@@ -13,6 +13,9 @@ Window {
     ArrowDownAnimation {
         x: 98; y: 131
     }
+//    TestAnimation {
+//        x: 98; y: 131
+//    }
 
 //    DateandTime {
 //        x: 884; y: 45

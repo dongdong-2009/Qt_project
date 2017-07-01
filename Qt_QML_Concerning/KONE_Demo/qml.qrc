@@ -17,5 +17,6 @@
         <file>TitleAndTime.qml</file>
         <file>Rollingtext.qml</file>
         <file>ShowWifi.qml</file>
+        <file>TestAnimation.qml</file>
     </qresource>
 </RCC>
