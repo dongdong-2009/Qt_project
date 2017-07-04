@@ -1,58 +1,113 @@
-import QtQuick 2.0
+import QtQuick 2.5
 
 Item {
-    property string coverImag: 'images/kone_arrow_up.png'
-    id: id_arrow
-    width: 156; height: 171
-    anchors.fill: parent
-    clip:true
-    Image {
-        id:arrorimage
-        width: 156
-        height: 171
-        source: coverImag
+    property string imagesource: 'images/kone_arrow_up.png'
+    property bool direction: true
+    property int i: 0
+    id: showarea
+//    width: 156; height: 191
+    clip: true
+
+    Item {
+        id: id_scrollArrow
+        Image {
+            id: imagefirstpos
+            width: showarea.width; height: showarea.height
+            source: imagesource
+        }
+        Image {
+//            id: imagesecondpos
+            width: showarea.width; height: showarea.height
+            source: imagesource
+            y: showarea.height
+        }
     }
-    Image {
-        width: 156
-        height: 171
-        source: coverImag
-        y:171
+    FloorNumberShow {
+        id: floor
+        visible: false
+        onFloorChanged: {
+            showarea.changepic(fnum, upflag);
+        }
+    }
+
+    function animationCtrl(){
+        if(direction){
+            animaDw.stop();
+            animaUp.start();
+        }else{
+            animaUp.stop();
+            animaDw.start();
+        }
+        console.log("go....");
     }
     NumberAnimation {
-        id:animatUp
-        target:id_scrollArrow
+        id: animaUp
+        target: id_scrollArrow
         property: "y"
-        from:0; to:-id_arrow.height ;
+        from:0; to:-showarea.height ;
         alwaysRunToEnd: true
-        duration: 1000 //l_speedLeve;
+        duration: 1000
         loops: Animation.Infinite
     }
 
     NumberAnimation {
-        id:animatDown
-        target:id_scrollArrow
+        id: animaDw
+        target: id_scrollArrow
         property: "y"
-        alwaysRunToEnd: true
-        from: -id_arrow.height; to: 0;
-        duration: 1000 //l_speedLeve;
+        from: -showarea.height; to: 0;
+        duration: 1000
         loops: Animation.Infinite
     }
-//    onFloorChanged: {
-//        if (fnum == 9)
-//        {
-//            coverImag = 'kone_arrow_down.png'
-//            arrorimage.source = coverImag
+
+//    Timer {
+//        interval: 10000; running: true; repeat: true
+//        onTriggered: {
+//            changepic();
 //        }
 //    }
 
-    function animationCtrl(){
-        if(orienteRun){
-            animatDown.stop();
-            animatUp.start();
-        }else{
-            animatUp.stop();
-            animatDown.start();
+//    function changepic()
+//    {
+//        if (0 == i%2 )
+//        {
+//            direction = false;
+//            imagesource = 'images/kone_arrow_down.png';
+//            imagefirstpos.source = imagesource
+//            animationCtrl();
+//        }
+//        else if (1 == i%2)
+//        {
+//            direction = true;
+//            imagesource = 'images/kone_arrow_up.png';
+//            imagefirstpos.source = imagesource
+//            animationCtrl();
+//        }
+//        i++;
+//        if (i >= 2)
+//            i = 0;
+//    }
+    function changepic(fnum, upflag)
+    {
+        if (fnum === 1 && upflag === false)
+        {
+            // 箭头向下
+            direction = false;
+            imagesource = 'images/kone_arrow_down.png';
+            imagefirstpos.source = imagesource;
+            animationCtrl();
+            console.log("fnum = ","upflag = " ,fnum, upflag);
+        }
+        else if (fnum === 9 && upflag === true)
+        {
+            //箭头向上
+            direction = true;
+            imagesource = 'images/kone_arrow_up.png';
+            imagefirstpos.source = imagesource
+            animationCtrl();
+            console.log("fnum = ","upflag = " ,fnum, upflag);
         }
     }
+
+    Component.onCompleted: animationCtrl()
 }
 

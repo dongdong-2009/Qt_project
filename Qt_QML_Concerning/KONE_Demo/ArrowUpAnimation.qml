@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import lb2616.tools.ShowFloor 1.0
+//import lb2616.tools.ShowFloor 1.0
 Item {
     id:showarea
     width: 156; height: 171

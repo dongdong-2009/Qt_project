@@ -1,11 +1,14 @@
 TEMPLATE = app
 
-QT += qml quick
+QT += qml quick serialport core
 CONFIG += c++11
 
 SOURCES += main.cpp \
     showfloor.cpp \
-    findqmlcomponent.cpp
+    findqmlcomponent.cpp \
+    protocoldeal.cpp \
+    qdevicewatcher.cpp \
+    qdevicewatcher_linux.cpp
 
 RESOURCES += qml.qrc
 
@@ -25,5 +28,8 @@ DISTFILES += \
 
 HEADERS += \
     showfloor.h \
-    findqmlcomponent.h
+    findqmlcomponent.h \
+    protocoldeal.h \
+    qdevicewatcher.h \
+    qdevicewatcher_p.h
 

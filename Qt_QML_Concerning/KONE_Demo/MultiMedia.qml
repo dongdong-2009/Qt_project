@@ -3,11 +3,11 @@ import QtMultimedia 5.5
 // 主画面坐标为： x: 350; y: 128
 
 /*Item*/
-Item {
+Rectangle {
 //    property alias screen:screen
     id:screen
     width: 657; height: 511
-//    color: "lightblue"
+    color: "lightblue"
     MediaPlayer{
         id:player
         //source: "file:///home/devin/Desktop/Repository/Qt_project/Qt_project/AutoPlayer-new/videos/Test2.mp4"
@@ -23,9 +23,10 @@ Item {
         }
     }
     VideoOutput {
-        width: 657; height: 511
+//        width: 657; height: 511
         anchors.fill: parent
         source: player
+        fillMode:VideoOutput.Stretch
     }
 }
 
