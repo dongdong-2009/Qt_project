@@ -52,6 +52,11 @@ Window {
     FloorNumberShow {
         x:18 ; y: 451
     }
+    MultiMedia {
+        x: 350; y: 128
+        width:675
+        height: 511
+    }
 }
 
 

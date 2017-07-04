@@ -226,8 +226,8 @@ public slots:
 class Protocoldeal: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString dat READ dat NOTIFY sendDateChanged)
-    Q_PROPERTY(QString tim READ tim NOTIFY sendTimerChanged)
+//    Q_PROPERTY(QString dat READ dat NOTIFY sendDateChanged)
+//    Q_PROPERTY(QString tim READ tim NOTIFY sendTimerChanged)
 public:
     ~Protocoldeal();
     static Protocoldeal *GetInstance();
@@ -261,8 +261,8 @@ public:
     void FreshTimer(unsigned char *time);
     QString Year(unsigned char *year);
     QString Time(unsigned char *time);
-    QString tim();
-    QString dat();
+//    QString tim();
+//    QString dat();
 public slots:
     void CompareVersion(unsigned char *Revversion, unsigned char *Readversion);   // 比较版本信息
     void GetUpdateVersion(const char *filename, UpdateVersion *Uver);  // 从升级文件中获取版本号用于下一步的比较

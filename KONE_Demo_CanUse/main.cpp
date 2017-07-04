@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 //    qmlRegisterType<Protocoldeal>("lb2616.tools.Protocoldeal", 1, 0, "Protocoldeal");
     QQmlApplicationEngine engine;
     Protocoldeal *pro = Protocoldeal::GetInstance();
-    engine.rootContext()->setContextProperty("Mypro",pro);
+    engine.rootContext()->setContextProperty("Mypro", pro);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     QObject * topLevel = engine.rootObjects().value(0);
     QQuickWindow* window = qobject_cast<QQuickWindow*>(topLevel);

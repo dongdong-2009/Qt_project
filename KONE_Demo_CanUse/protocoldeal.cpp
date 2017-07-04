@@ -88,7 +88,7 @@ Protocoldeal::~Protocoldeal()
     CloseSerial();
     delete my_serialport;
     delete upd;
-//    delete instance;
+    delete instance;
     cout << __PRETTY_FUNCTION__<<"调用协议的的析构函数"<<endl;
 }
 
@@ -661,7 +661,7 @@ QString Protocoldeal::Year(unsigned char *year)
     for (i = 4; i < 6; i++)  // 日，月，年
     {
         j = year[i] - 0x00;
-        if (j < 9 && i == 4)
+        if (j <= 9 && i == 4)
         {
             qyear.append("0");
             qyear.append(QString::number(j));
@@ -688,7 +688,7 @@ QString Protocoldeal::Time(unsigned char *time)
     for (i = 3; i >= 2; i--)  // 日，月，年
     {
         j = time[i] - 0x00;
-        if (j < 9)
+        if (j <= 9)
         {
             qtime.append("0");
             qtime.append(QString::number(j));
@@ -706,17 +706,17 @@ QString Protocoldeal::Time(unsigned char *time)
     return qtime;
 }
 
-QString Protocoldeal::tim()
-{
-    QString ti;
-    return ti;
-}
+//QString Protocoldeal::tim()
+//{
+//    QString ti;
+//    return ti;
+//}
 
-QString Protocoldeal::dat()
-{
-    QString da;
-    return da;
-}
+//QString Protocoldeal::dat()
+//{
+//    QString da;
+//    return da;
+//}
 
 void Protocoldeal::WriteToSerialSlots(char *buf, unsigned long leng)
 {

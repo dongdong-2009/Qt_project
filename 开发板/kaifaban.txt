@@ -62,3 +62,19 @@ Using Wayland-EGL
 
 
 
+
+
+Available platform plugins are: eglfs, minimal, minimalegl, offscreen, wayland-egl, wayland.
+
+Reinstalling the application may fix this problem.
+Aborted
+root@imx6qsabresd:~# ./KONE_Demo -platform elfs 
+This application failed to start because it could not find or load the Qt platform plugin "elfs".
+
+Available platform plugins are: eglfs, minimal, minimalegl, offscreen, wayland-egl, wayland.
+
+Reinstalling the application may fix this problem.
+Aborted
+root@imx6qsabresd:~# ./KONE_Demo -platform eglfs&
+eglfs 是指不含有图形界面的参数 wayland是包含图形界面的参数
+

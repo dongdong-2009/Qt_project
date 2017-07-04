@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import lb2616.tools.FileUpdate2 1.0
 Item {
-    objectName: arrowdownpicture
+    objectName: "arrowdownpicture"
     id: showrect
     width: 184; height: 162
     clip: true
