@@ -32,7 +32,7 @@ Item {
 //        }
 //    }
     Timer {
-        interval: 100; running: true; repeat: true
+        interval: 1500; running: true; repeat: true
         onTriggered: {
             changeFloornum();
         }

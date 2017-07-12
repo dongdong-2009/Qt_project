@@ -18,7 +18,7 @@ Item {
             PropertyAnimation {
                 from:0
                 to: retScroll.width
-                duration: 1000      // 滚动的文字运行的时间长度
+                duration: 12000      // 滚动的文字运行的时间长度
             }
        }
     }

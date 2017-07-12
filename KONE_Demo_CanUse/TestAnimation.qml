@@ -46,7 +46,7 @@ Item {
         property: "y"
         from:0; to:-showarea.height ;
         alwaysRunToEnd: true
-        duration: 100
+        duration: 1500
         loops: Animation.Infinite
     }
 
@@ -55,7 +55,7 @@ Item {
         target: id_scrollArrow
         property: "y"
         from: -showarea.height; to: 0;
-        duration: 100
+        duration: 1500
         loops: Animation.Infinite
     }
 
