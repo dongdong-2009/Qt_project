@@ -3,8 +3,8 @@
 #include "findqmlcomponent.h"
 #include <QObject>
 #include "protocoldeal.h"
-//#include <QQuickView>
-
+#include <QQuickView>
+#include <QQmlContext>
 //#include <QDeclarativeComponent>
 //#include <QDeclarativeEngine>
 //#include <QDeclarativeContext>

@@ -6,8 +6,6 @@ import QtMultimedia 5.5
 Rectangle {
 //    property alias screen:screen
     id:screen
-//    width: 657; height: 511
-//    color: "lightblue"
     color: "transparent"
     MediaPlayer{
         id:player

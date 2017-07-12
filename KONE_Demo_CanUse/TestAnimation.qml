@@ -1,4 +1,4 @@
-import QtQuick 2.5
+import QtQuick 2.0
 
 Item {
     property string imagesource: 'images/kone_arrow_up.png'
@@ -46,7 +46,7 @@ Item {
         property: "y"
         from:0; to:-showarea.height ;
         alwaysRunToEnd: true
-        duration: 1500
+        duration: 100
         loops: Animation.Infinite
     }
 
@@ -55,7 +55,7 @@ Item {
         target: id_scrollArrow
         property: "y"
         from: -showarea.height; to: 0;
-        duration: 1500
+        duration: 100
         loops: Animation.Infinite
     }
 

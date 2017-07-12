@@ -24,7 +24,7 @@ Window {
     FloorNumberShow {
         x: 0; y: 363
         width: 351; height: 173
-        text: "2"
+//        text: "2"
     }
     TitleAndTime {
         x: 884; y: 15
