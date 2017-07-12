@@ -98,7 +98,9 @@ Protocoldeal* Protocoldeal::GetInstance()
     if (NULL == instance)
     {
         instance = new Protocoldeal();
+        qDebug("%s just enter first", __PRETTY_FUNCTION__);
     }
+    qDebug("%s enter when call on", __PRETTY_FUNCTION__);
     return instance;
 }
 
@@ -270,10 +272,11 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
 {
     qDebug()<<__PRETTY_FUNCTION__;
     unsigned long len;
-    unsigned char *temp;
+//    unsigned char *temp;
     bool AllocteFlag = false;
     len = BstBvtGetFrameDatLen(ID);      // 需要拷贝的ID的数据长度
-    temp = (unsigned char *)malloc(len); // 分配内存
+//    temp = (unsigned char *)malloc(len); // 分配内存
+    static unsigned char temp[200];
     if (!AllocteMemory(temp))
     {
         qDebug()<<__PRETTY_FUNCTION__<<"allocate success!"<< "ID = " << ID;
@@ -285,6 +288,7 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
             AllocteFlag = true;
             break;
         case 0x01:
+            memcpy(temp, &mestable.ID1_Message, len);
             AllocteFlag = true;
             break;
         case 0x02:
@@ -316,14 +320,21 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
             AllocteFlag = false;
             if (StringCompare(temp, str, len))
             {
-                free(temp);
-                temp = NULL;
+                qDebug()<< "before free";
+//                free(temp);
+                qDebug()<< "after free";
+//                temp = NULL;
+                qDebug()<< "set NULL";
                 return true;  // true 表示变更了
             }
             else
             {
-                free(temp);
-                temp = NULL;
+                qDebug()<< "can not changes";
+                qDebug()<< "before free";
+//                free(temp);
+                qDebug()<< "after free";
+//                temp = NULL;
+                qDebug()<< "set NULL";
                 return false;
             }
         }
