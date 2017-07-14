@@ -77,13 +77,22 @@ Protocoldeal::~Protocoldeal()
 //    ReadDataPthread->requestInterruption();
 //    ReadDataPthread->quit();
 //    ReadDataPthread->wait();
+
+    RThread->requestInterruption();
+    RThread->quit();
+    RThread->wait();
     delete ReadDataPthread;
     delete RThread;
 //    WriteDataPthread->requestInterruption();
 //    WriteDataPthread->quit();
 //    WriteDataPthread->wait();
+
+    WThread->requestInterruption();
+    WThread->quit();
+    WThread->wait();
     delete WriteDataPthread;
     delete WThread;
+
     delete UsbDetect;
     CloseSerial();
     delete my_serialport;

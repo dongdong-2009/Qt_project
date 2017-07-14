@@ -78,17 +78,24 @@ Protocoldeal::~Protocoldeal()
 //    ReadDataPthread->quit();
 //    ReadDataPthread->wait();
     delete ReadDataPthread;
+    RThread->requestInterruption();
+    RThread->quit();
+    RThread->wait();
     delete RThread;
 //    WriteDataPthread->requestInterruption();
 //    WriteDataPthread->quit();
 //    WriteDataPthread->wait();
     delete WriteDataPthread;
+    WThread->requestInterruption();
+    WThread->quit();
+    WThread->wait();
     delete WThread;
+
     delete UsbDetect;
     CloseSerial();
     delete my_serialport;
     delete upd;
-//    delete instance;
+    delete instance;
     cout << __PRETTY_FUNCTION__<<"调用协议的的析构函数"<<endl;
 }
 
@@ -98,7 +105,9 @@ Protocoldeal* Protocoldeal::GetInstance()
     if (NULL == instance)
     {
         instance = new Protocoldeal();
+        qDebug("%s just enter first", __PRETTY_FUNCTION__);
     }
+    qDebug("%s enter when call on", __PRETTY_FUNCTION__);
     return instance;
 }
 
@@ -270,10 +279,11 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
 {
     qDebug()<<__PRETTY_FUNCTION__;
     unsigned long len;
-    unsigned char *temp;
+//    unsigned char *temp;
     bool AllocteFlag = false;
     len = BstBvtGetFrameDatLen(ID);      // 需要拷贝的ID的数据长度
-    temp = (unsigned char *)malloc(len); // 分配内存
+//    temp = (unsigned char *)malloc(len); // 分配内存
+    static unsigned char temp[200];
     if (!AllocteMemory(temp))
     {
         qDebug()<<__PRETTY_FUNCTION__<<"allocate success!"<< "ID = " << ID;
@@ -318,9 +328,9 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
             if (StringCompare(temp, str, len))
             {
                 qDebug()<< "before free";
-                free(temp);
+//                free(temp);
                 qDebug()<< "after free";
-                temp = NULL;
+//                temp = NULL;
                 qDebug()<< "set NULL";
                 return true;  // true 表示变更了
             }
@@ -328,9 +338,9 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
             {
                 qDebug()<< "can not changes";
                 qDebug()<< "before free";
-                free(temp);
+//                free(temp);
                 qDebug()<< "after free";
-                temp = NULL;
+//                temp = NULL;
                 qDebug()<< "set NULL";
                 return false;
             }
