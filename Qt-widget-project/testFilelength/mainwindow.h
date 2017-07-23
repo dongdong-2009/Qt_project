@@ -4,10 +4,13 @@
 #include <QMainWindow>
 #include <QFile>
 #include <QDebug>
-#define FILENAME  "/home/devin/Desktop/BVT607_LPC11C14.bin"
+#define FILENAME  "/home/libo/Desktop/a.txt"
 namespace Ui {
 class MainWindow;
 }
+typedef struct quanzhi {
+    int quan;
+}Quanzhi;
 
 class MainWindow : public QMainWindow
 {
@@ -18,8 +21,12 @@ public:
     ~MainWindow();
     void CountFileSize(const char* filename, unsigned char *str, int count);
     void IntToUnsignedChar(int length, int count, unsigned char *str);
+    int GetNewLength(int *i, int length, int array[], unsigned char *str, int *pos);
+    int SplitNumber(int length, int array[], int *i);
+    int Micifang(int zhishu, int dishu);
 private:
     Ui::MainWindow *ui;
+    bool ConvertFlag;
 };
 
 #endif // MAINWINDOW_H
