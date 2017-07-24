@@ -30,3 +30,8 @@ HEADERS  += widget.h \
     copyfilethread.h
 
 FORMS    += widget.ui
+
+DISTFILES +=
+
+RESOURCES += \
+    icon.qrc

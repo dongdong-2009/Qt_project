@@ -22,8 +22,18 @@ ThreadDlg::ThreadDlg(QWidget *parent)
 
 ThreadDlg::~ThreadDlg()
 {
-//    qDebug()<<"is xigou function";
-//    delete []workThread;
+    qDebug()<<"is xigou function";
+    for(int i = 0; i < MAXSIZE; i++)
+    {
+        workThread[i]->id = i;
+        qDebug()<<"id = "<<workThread[i]->id<<"will delete OK!";
+//        workThread[i]->requestInterruption();
+//        workThread[i]->wait();
+        workThread[i]->terminate();
+        workThread[i]->wait();
+//        workThread[i]->quit();
+        delete workThread[i];
+    }
 }
 
 void ThreadDlg::slotStart()

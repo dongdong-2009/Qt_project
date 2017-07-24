@@ -1,12 +1,12 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
-#include <QWidget>
-#include <windows.h>
+#include <QWidget>/*
+//#include <windows.h>
 
-#include <winbase.h>
-#include <winnls.h>
-#include <dbt.h>
+//#include <winbase.h>
+//#include <winnls.h>
+//#include <dbt.h>*/
 #include <QCoreApplication>
 #include <QDebug>
 #include <QString>
@@ -22,10 +22,12 @@
 #include <QSpinBox>
 #include <QProgressDialog>
 #include <QTimer>
+#include "copyfilethread.h"
+#include <QDateTime>
+class CopyfileThread;
 namespace Ui {
 class Widget;
 }
-
 
 typedef struct USB_DISK_INFO
 {
@@ -60,6 +62,12 @@ public:
     void formatUdisk(QString diskDir);
     bool isValideDriver(QString diskDir);
     void windowFeature();
+
+    bool GetvideoClicked();
+    bool GetpictureClicked();
+    QString getVideoList();
+    QStringList GetPictureList();
+
 private slots:
     void on_comboBox_USB_currentIndexChanged(QString );
     void OpenfileDaliog();
@@ -74,7 +82,7 @@ private slots:
     void SetspinBoxbright_1();
     void SethorizontalSliderbright_2();
     void SetspinBoxbright_2();
-//    void Showcopyprogress();
+
     bool Filecopy(QString sourcefile, QString tofile);
     void Createxml();
     QString GetLineEdit_text(QLineEdit *line);
@@ -82,20 +90,33 @@ private slots:
     QString GetTextEdit_text();
     QString GetspinBox_text(QSpinBox *box);
     bool IsChecked_CheckBox(QCheckBox *Cbox);
-    bool GetvideoClicked();
-    bool GetpictureClicked();
-    QStringList GetPictureList();
-    QString getVideoList();
+
+    void copyStation(int flag, QString qsText);
+    void on_copyBtnclicked();
+    void CloseProgress();
+    QString GetCurTime();
+    void SetTimeformatclicked_twelve();
+    void SetTimeformatclicked_twentyfour();
+    void Setyearmouthday();
+    void Setmouthdayyear();
+    bool JudgeCreateXml();
 
 private:
     Ui::Widget *ui;
     QVector<USB_DISK_INFO> usb_disk_info;
     USB_DISK_INFO CurrentUseDisk;
-    bool VideoBtnClickedFlag = false;
-    bool PictureBtnClickedFlag = false;
+    bool VideoBtnClickedFlag;
+    bool PictureBtnClickedFlag;
+    bool RadioBoxFlag_Twelveformat;
+    bool RadioBoxFlag_Twentyfourformat;
+    bool yearmouthday;
+    bool mouthdayyear;
+    bool Istrue;
     QStringList m_listview;
     QString m_videoname;
     int currentValue;
+    CopyfileThread *cfilethread;
+    QProgressDialog *progDlg;
 };
 
 #endif // WIDGET_H

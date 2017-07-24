@@ -242,7 +242,8 @@ unsigned long Protocoldeal::BstBvtGetFrameDatLen(unsigned char id)
     case 0x04: len = sizeof(s_BVTID4_T); break;
     case 0x05: len = sizeof(s_BVTID5_T); break;
     case 0x06: len = sizeof(s_BVTID6_T); break;
-    case 0x07: len = sizeof(s_BVTID7_T); break;
+//    case 0x07: len = sizeof(s_BVTID7_T); break;
+    case ID07_UPDATEDATA: len = sizeof(s_BVTID7_T);break;
     default: qDebug()<<"Id error"; break;
     }
     qDebug("id = %x, len = %ld",id, len);
@@ -315,7 +316,7 @@ bool Protocoldeal::JudgeChange(unsigned char ID, unsigned char str[])
         case 0x06:
             AllocteFlag = true;
             break;
-        case 0x07:
+        case ID07_UPDATEDATA:
             AllocteFlag = true;
             break;
         default:
@@ -961,14 +962,123 @@ void UpdateData::run()
 //            RunNormal();
 }
 
+// 将文件大小转换成四个字节的字符串
+void UpdateData::ConvertFileSize(const char *filename, unsigned char *str, int Cpcount)
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    QFile file(filename);
+    int length = file.size();
+    qDebug("filelength = %d", length);
+    IntToUnsignedChar(length, str, Cpcount);
+}
+
+void UpdateData::IntToUnsignedChar(int length, unsigned char *str, int Cpcount)
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    unsigned char temp[10];
+    int ar[16];
+    int i = 0;
+    int j = 0;
+    int index = 0;
+    int addcount = 0;
+    int num = 0;
+    bool flag = true;
+    SplitNumber(length, ar, i); // 将int类型的值拆分到数组中
+    qDebug("i = %d", i);
+    for (j = 0; j < i; j++)
+    {
+        if (i < 8 && flag)
+        {
+            temp[index++] = 0x00;
+            qDebug("i = %d 小于8,最高位置为0x00", i);
+            flag = false; // 保证i < 8的判断只进行一次操作
+        }
+        addcount++;
+        num = num*10 + ar[j];
+        if (0 == addcount % 2)
+        {
+            temp[index++] = num + 0x00; // 赋值操作
+            num = 0;
+        }
+    }
+    memcpy(str, temp, Cpcount);
+    return;
+}
+
+// 将int类型的值拆分到数组中
+void UpdateData::SplitNumber(int length, int array[], int &i)
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    while(length)
+    {
+        array[i] = length % 10;
+        length = length / 10;
+        qDebug("array[%d] = %d", i, array[i]);
+        i++;
+    }
+    int j = 0;
+    int k = i - 1; // 指向最后一个值的下标
+    int temp;
+    for (j = 0; j < i/2; j++, k--) // 将数组倒置一下
+    {
+        temp = array[j];
+        array[j] = array[k];
+        array[k] = temp;
+    }
+    for(j = 0; j < i; j++)
+    {
+        qDebug("ar[%d] = %d", j, array[j]);
+    }
+}
+
+void UpdateData::WholeFileVerify(const char*filename, unsigned char *str, int Cpcount)
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    QFile file(filename);
+    char ch;
+    unsigned char prech = 0x00;
+    unsigned char curch;
+    unsigned char result[10];
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qDebug("打开文件%s失败!", filename);
+        return ;
+    }
+    while(!file.atEnd())
+    {
+        file.read(&ch, 1);
+        curch = (unsigned char)ch;
+        prech = curch ^ prech;
+    }
+    curch = prech & 0x7f;
+    result[0] = 0x00;
+    result[1] = curch;
+    memcpy(str, result, Cpcount);
+}
+
 // 请求进入升级模式 或 请求开始升级成功
 void UpdateData::RequestUpdate(unsigned char req)
 {
     qDebug()<< __PRETTY_FUNCTION__;
-    unsigned char endstr[2];
+    unsigned char endstr[8];
     bool first = true;
-    endstr[0] = 0x05;
+//    endstr[0] = 0x05;
+    endstr[0] = ID05_UPDATEREQ;
     endstr[1] = req;
+    if (0x01 == req)
+    {
+        ConvertFileSize(path, &endstr[2], 4);
+        WholeFileVerify(path, &endstr[6], 2);
+    }
+    else
+    {
+        int i;
+        for(i = 2; i < 8; i++)
+        {
+            endstr[i] = 0x00;
+        }
+    }
+
     Protocoldeal *pro = Protocoldeal::GetInstance();
     int ret;
     while (1)
