@@ -5,22 +5,34 @@
 #include <QtXml/QDomElement>
 #include <QtXml/QDomDocument>
 #include <QStringListModel>
+//#include "copyfilethread.h"
 #define MAX_DIR_NUMBER 20
 //最大的盘符数量
 #define RELEASE_VERSION ("1.0.0")
 
-
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Widget)
+    ui(new Ui::Widget),
+    VideoBtnClickedFlag(true),
+    PictureBtnClickedFlag(false),
+    RadioBoxFlag_Twelveformat(true),
+    RadioBoxFlag_Twentyfourformat(false),
+    yearmouthday(true),
+    mouthdayyear(false),
+    Istrue(false)
 {
     ui->setupUi(this);
     windowFeature();
+    cfilethread = new CopyfileThread;
+    connect(cfilethread, SIGNAL(copyStationSig(int,QString)),this, SLOT(copyStation(int,QString)));
+
     this->Init();
 }
 
 Widget::~Widget()
 {
+    cfilethread->copyStop();
+    cfilethread->wait();
     delete ui;
 }
 
@@ -30,16 +42,15 @@ void Widget::windowFeature()
     QString version = QString("MedieaScreenHelper v%1").arg(RELEASE_VERSION);
     this->setWindowTitle(version);
     this->setWindowFlags(windowFlags()& ~Qt::WindowMaximizeButtonHint);
-    setFixedSize(800,400);
+    setFixedSize(873, 462);
 }
 
 void Widget::Init()
 {
-    this->ui->lineEdit_2->hide();
-    this->ui->pushButton_selectvideo->hide();
     this->ui->listView->hide();
     this->ui->pushbutton_selectpicture->hide();
     this->ui->plainTextEdit->hide();
+    this->ui->label_prompt->hide();
     connect(this->ui->pushButton_makeudisk,&QPushButton::clicked,this,&Widget::formatDir);
 
     connect(this->ui->pushButton_selectvideo, &QPushButton::clicked, this, &Widget::OpenfileDaliog);
@@ -47,6 +58,10 @@ void Widget::Init()
 
     connect(this->ui->radioButton_video,&QRadioButton::clicked, this, &Widget::Justselectvideo);
     connect(this->ui->radioButton_picture,&QRadioButton::clicked, this, &Widget::Justselectpicture);
+    connect(this->ui->radioButton_12,&QRadioButton::clicked, this, &Widget::SetTimeformatclicked_twelve);
+    connect(this->ui->radioButton_24,&QRadioButton::clicked, this, &Widget::SetTimeformatclicked_twentyfour);
+    connect(this->ui->radioButton_year,&QRadioButton::clicked, this, &Widget::Setyearmouthday);
+    connect(this->ui->radioButton_mouth,&QRadioButton::clicked, this, &Widget::Setmouthdayyear);
 
     connect(this->ui->horizontalSlider_volume,SIGNAL(valueChanged(int)),this,SLOT(SetspinBoxvolume()));
     connect(this->ui->spinBox_volume,SIGNAL(valueChanged(int)),this,SLOT(SethorizontalSlidervolume()));
@@ -57,6 +72,8 @@ void Widget::Init()
     connect(this->ui->spinBox_1_bright,SIGNAL(valueChanged(int)),this,SLOT(SethorizontalSliderbright_1()));
     connect(this->ui->horizontalSlider_2_bright,SIGNAL(valueChanged(int)),this,SLOT(SetspinBoxbright_2()));
     connect(this->ui->spinBox_2_bright,SIGNAL(valueChanged(int)),this,SLOT(SethorizontalSliderbright_2()));
+    connect(this->ui->pushButton_copy,SIGNAL(clicked(bool)),this,SLOT(on_copyBtnclicked()));
+
     //ui->comboBox_USB->clear();
     //this->usb_disk_info.clear();
     this->ScanHD();
@@ -299,66 +316,27 @@ USB_DISK_INFO Widget::GetCheckedDisk()
 void Widget::OpenfileDaliog()
 {
     //选择文件
-    QString filename = QFileDialog::getOpenFileName(this, tr("Selete one video file"),".", tr("file format(*.avi *.mp4 *.rmvb *.mkv)"));
-//    QFile file(filename);
-//    if(!file.open(QIODevice::ReadOnly))
-//    {
-//        QMessageBox::information(NULL, "Title", "Content", QMessageBox::Cancel);
-//        return;
-//    }
+    QString filename = QFileDialog::getOpenFileName(this, tr("Selete one video file"),".",
+                                                    tr("file format(*.avi *.mp4 *.rmvb *.mkv)"));
     qDebug()<<"\n" << filename;
     m_videoname.clear();
     m_videoname = filename;
-    QString name = filename.split("/").last();
+    QStringList list;
+    list.clear();
+    list<<m_videoname;
+    cfilethread->SetFileList(list);
     this->ui->lineEdit_2->setText(filename);
-    QDir *temp = new QDir;
-    bool exist = temp->exists("C:/Users/yonghao/Desktop/libo/");
-    if (!exist)
-    {
-        bool ok = temp->mkdir("C:/Users/yonghao/Desktop/libo/");
-        qDebug()<< ok <<'\n';
-    }
-    QString newname = "C:/Users/yonghao/Desktop/libo/" + name;
-//    bool flag = Filecopy(filename, newname);
-//    qDebug()<<"\n" << flag;
-    qDebug()<<"\n" << name;
-    Createxml();
-    delete temp;
 }
-
+//open picture Daliog
 void Widget::OpenmultifileDaliog()
 {
-    int i = 0;
     QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open",
                                                       ".","Images (*.png *.jpg)");
-    QDir *temp = new QDir;
-    bool exist = temp->exists("C:/Users/yonghao/Desktop/libo/");
-    if (!exist)
-    {
-        bool ok = temp->mkdir("C:/Users/yonghao/Desktop/libo/");
-        qDebug()<< ok <<'\n';
-    }
-    QStringList list = files;
     m_listview.clear();
     m_listview = files;
-    QStringList::Iterator it = list.begin();
-    while(it != list.end()) {
-       // qDebug() << (*it) << '\n';
-        QString filename = files.at(i);
-        qDebug() << filename << '\n';
-        QString lastname = filename.split("/").last();
-        QString newname = "C:/Users/yonghao/Desktop/libo/"+ lastname;
-//        bool flag = Filecopy(files.at(i), newname);
-        qDebug() << lastname << '\n';
-        qDebug() << newname << '\n';
-//        qDebug() << flag << '\n';
-        i++;
-        ++it;
-    }
+    cfilethread->SetFileList(m_listview);
     QStringListModel *model = new QStringListModel(files);
     this->ui->listView->setModel(model);
-    Createxml();
-    delete temp;
 }
 
 bool Widget::Filecopy(QString sourcefile, QString tofile)
@@ -372,56 +350,13 @@ bool Widget::Filecopy(QString sourcefile, QString tofile)
     }
     return true;
 }
-/*
-void Widget::openProgressDailo()
-{
-    QProgressBar progDlg  = new QProgressDialog("Operation in progress.", "Cancel", 0, 100);
-    progDlg->setWindowTitle("Please wait...");
-    progDlg->setFixedWidth(300);
-    progDlg->setRange(0, 100);
-    progDlg->show();
-}
 
-void Widget::Showcopyprogress()
-{
-    QProgressBar progDlg  = new QProgressDialog("Operation in progress.", "Cancel", 0, 100);
-    progDlg->setWindowTitle("Please wait...");
-    progDlg->setFixedWidth(300);
-    progDlg->setRange(0, 100);
-    progDlg->show();
-    timer = new QTimer();
-    currentValue = 0;
-    progDlg->setValue(currentValue);
-    connect(timer, SIGNAL(timeout()), this, SLOT(updateProgressDialog()));
-    timer->start(100);//开启一个没有终点的定时器
-
-    //执行耗时操作。。。
-
-    //耗时操作完成后，关闭进度对话框
-    timer->stop();//停止定时器
-    if(currentValue != 100)
-        currentValue = 100;
-    progDlg->setValue(currentValue);//进度达到最大值
-    delete progDlg;//关闭进度对话框
-}
-
-//借助定时器，不断更新进度条，直到耗时操纵结束
-void Widget::updateProgressDialog()
-{
-    currentValue++;
-    if( currentValue == 100 )
-        currentValue = 0;
-    progDlg ->setValue(currentValue);
-    QCoreApplication::processEvents();//避免界面冻结
-    if(progDlg->wasCanceled())
-        progDlg->setHidden(true);//隐藏对话框
-}
-*/
 void Widget::Justselectvideo()
 {
     // select video buttuon
     VideoBtnClickedFlag = true;
     PictureBtnClickedFlag = false;
+    this->ui->label_prompt->hide();
     this->ui->listView->hide();
     this->ui->pushbutton_selectpicture->hide();
     this->ui->lineEdit_2->show();
@@ -433,6 +368,7 @@ void Widget::Justselectpicture()
     // select picture button
     VideoBtnClickedFlag = false;
     PictureBtnClickedFlag = true;
+    this->ui->label_prompt->show();
     this->ui->listView->show();
     this->ui->pushbutton_selectpicture->show();
     this->ui->lineEdit_2->hide();
@@ -479,6 +415,7 @@ void Widget::SetspinBoxbright_2()
     this->ui->spinBox_2_bright->setValue((int)this->ui->horizontalSlider_2_bright->value()/1);
 }
 
+// create xml files
 void Widget::Createxml()
 {
     QDomDocument Uiinfo;
@@ -488,18 +425,13 @@ void Widget::Createxml()
 
     QDomElement root = Uiinfo.createElement("root");
     Uiinfo.appendChild(root);
+    root.setAttribute("releasedate", GetCurTime());
+
     if (IsChecked_CheckBox(this->ui->checkBox_Reset))
     {
         QDomElement res = Uiinfo.createElement("reset");
         root.appendChild(res);
-        QDomText no_text = Uiinfo.createTextNode("yes");
-        res.appendChild(no_text);
-    }
-    else
-    {
-        QDomElement res = Uiinfo.createElement("reset");
-        root.appendChild(res);
-        QDomText no_text = Uiinfo.createTextNode("no");
+        QDomText no_text = Uiinfo.createTextNode("true");
         res.appendChild(no_text);
     }
     QDomElement resou = Uiinfo.createElement("resource");
@@ -515,25 +447,27 @@ void Widget::Createxml()
     scrolltext.appendChild(scrtext);
     if (VideoBtnClickedFlag)
     {
-        QDomElement multmedia = Uiinfo.createElement("multmedia");
+        QDomElement multmedia = Uiinfo.createElement("video");
         resou.appendChild(multmedia);
 
-        QDomElement Item = Uiinfo.createElement("Item");
-        Item.setAttribute("type", "video");
         QDomText videotext = Uiinfo.createTextNode(GetLineEdit_text(this->ui->lineEdit_2).split("/").last());
-        Item.appendChild(videotext);
-        multmedia.appendChild(Item);
+        multmedia.appendChild(videotext);
     }
     else if (PictureBtnClickedFlag)
     {
-        QDomElement multmedia = Uiinfo.createElement("multmedia");
+        QDomElement multmedia = Uiinfo.createElement("picture");
         resou.appendChild(multmedia);
+
+        multmedia.setAttribute("interval", "3");
         int num = GetListview_counts();
         int i = 0;
         while(num)
         {
             QDomElement Item = Uiinfo.createElement("Item");
-            Item.setAttribute("type", "picture");
+            QString temp;
+            temp.clear();
+            temp = QString::number(i);
+            Item.setAttribute("index", temp);
             QString str = m_listview.at(i);
             QDomText videotext = Uiinfo.createTextNode(str.split("/").last());
             Item.appendChild(videotext);
@@ -555,6 +489,37 @@ void Widget::Createxml()
     parameter.appendChild(bright);
     QDomText bri = Uiinfo.createTextNode(GetspinBox_text(this->ui->spinBox_bright));
     bright.appendChild(bri);
+    if(IsChecked_CheckBox(this->ui->checkBox_fullscreen))
+    {
+        QDomElement fullscreen = Uiinfo.createElement("fullscreen");
+        parameter.appendChild(fullscreen);
+        QDomText fullscreentext = Uiinfo.createTextNode("true");
+        fullscreen.appendChild(fullscreentext);
+    }
+
+    if (IsChecked_CheckBox(this->ui->checkBox_hideScroText))
+    {
+        QDomElement scrollarea = Uiinfo.createElement("scrollarea");
+        parameter.appendChild(scrollarea);
+        QDomText scrollareatext = Uiinfo.createTextNode("true");
+        scrollarea.appendChild(scrollareatext);
+    }
+
+    if (IsChecked_CheckBox(this->ui->checkBox_hideTime))
+    {
+        QDomElement timearea = Uiinfo.createElement("timearea");
+        parameter.appendChild(timearea);
+        QDomText timeareatext = Uiinfo.createTextNode("true");
+        timearea.appendChild(timeareatext);
+    }
+
+    if (IsChecked_CheckBox(this->ui->checkBox_hideTitle))
+    {
+        QDomElement titlearea = Uiinfo.createElement("titlearea");
+        parameter.appendChild(titlearea);
+        QDomText titleareatext = Uiinfo.createTextNode("true");
+        titlearea.appendChild(titleareatext);
+    }
 
     QDomElement standby = Uiinfo.createElement("standby");
     parameter.appendChild(standby);
@@ -582,66 +547,39 @@ void Widget::Createxml()
     stagetwo.appendChild(stagetwobright);
     QDomText stagetwobrighttext = Uiinfo.createTextNode(GetspinBox_text(this->ui->spinBox_2_bright));
     stagetwobright.appendChild(stagetwobrighttext);
-    if(IsChecked_CheckBox(this->ui->checkBox_fullscreen))
-    {
-        QDomElement fullscreen = Uiinfo.createElement("fullscreen");
-        parameter.appendChild(fullscreen);
-        QDomText fullscreentext = Uiinfo.createTextNode("yes");
-        fullscreen.appendChild(fullscreentext);
-    }
-    else
-    {
-        QDomElement fullscreen = Uiinfo.createElement("fullscreen");
-        parameter.appendChild(fullscreen);
-        QDomText fullscreentext = Uiinfo.createTextNode("no");
-        fullscreen.appendChild(fullscreentext);
-    }
 
-    if (IsChecked_CheckBox(this->ui->checkBox_hideScroText))
+    QDomElement Timeformat = Uiinfo.createElement("time");
+    parameter.appendChild(Timeformat);
+    QDomElement tformat = Uiinfo.createElement("format");
+    Timeformat.appendChild(tformat);
+    QDomText timetext;
+    if (RadioBoxFlag_Twelveformat)
     {
-        QDomElement scrollarea = Uiinfo.createElement("scrollarea");
-        parameter.appendChild(scrollarea);
-        QDomText scrollareatext = Uiinfo.createTextNode("yes");
-        scrollarea.appendChild(scrollareatext);
+         timetext = Uiinfo.createTextNode("12");
     }
-    else
+    else if (RadioBoxFlag_Twentyfourformat)
     {
-        QDomElement scrollarea = Uiinfo.createElement("scrollarea");
-        parameter.appendChild(scrollarea);
-        QDomText scrollareatext = Uiinfo.createTextNode("no");
-        scrollarea.appendChild(scrollareatext);
+        timetext = Uiinfo.createTextNode("24");
     }
+    tformat.appendChild(timetext);
 
-    if (IsChecked_CheckBox(this->ui->checkBox_hideTime))
+    QDomElement dataformat = Uiinfo.createElement("data");
+    parameter.appendChild(dataformat);
+    QDomElement dformat = Uiinfo.createElement("format");
+    dataformat.appendChild(dformat);
+    QDomText datatext;
+    if (yearmouthday)
     {
-        QDomElement timearea = Uiinfo.createElement("timearea");
-        parameter.appendChild(timearea);
-        QDomText timeareatext = Uiinfo.createTextNode("yes");
-        timearea.appendChild(timeareatext);
+        datatext = Uiinfo.createTextNode("yyyy/mm/dd");
     }
-    else
+    else if(mouthdayyear)
     {
-        QDomElement timearea = Uiinfo.createElement("timearea");
-        parameter.appendChild(timearea);
-        QDomText timeareatext = Uiinfo.createTextNode("no");
-        timearea.appendChild(timeareatext);
+        datatext = Uiinfo.createTextNode("mm/dd/yyyy");
     }
+    dformat.appendChild(datatext);
 
-    if (IsChecked_CheckBox(this->ui->checkBox_hideTitle))
-    {
-        QDomElement titlearea = Uiinfo.createElement("titlearea");
-        parameter.appendChild(titlearea);
-        QDomText titleareatext = Uiinfo.createTextNode("yes");
-        titlearea.appendChild(titleareatext);
-    }
-    else
-    {
-        QDomElement titlearea = Uiinfo.createElement("titlearea");
-        parameter.appendChild(titlearea);
-        QDomText titleareatext = Uiinfo.createTextNode("no");
-        titlearea.appendChild(titleareatext);
-    }
-    QString strPath = "C:/Users/yonghao/Desktop/libo/config.xml";
+//    QString strPath = "C:/Users/yonghao/Desktop/libo/conf.xml";
+    QString strPath = GetCheckedDisk().DirPath + "cfg.xml";
     QFile file( strPath );
     file.open(QIODevice::WriteOnly);
 
@@ -660,12 +598,14 @@ int Widget::GetListview_counts()
 {
     int i = 0;
     QStringList::Iterator it = m_listview.begin();
-    while(it != m_listview.end()) {
+    while(it != m_listview.end())
+    {
         qDebug() << (*it) << '\n';
         QString filename = m_listview.at(i);
         qDebug() << filename << '\n';
         QString lastname = filename.split("/").last();
-        QString newname = "C:/Users/yonghao/Desktop/libo/"+ lastname;
+//        QString newname = "C:/Users/yonghao/Desktop/libo/"+ lastname;
+        QString newname = GetCheckedDisk().DirPath + lastname;
         qDebug() << lastname << '\n';
         qDebug() << newname << '\n';
         i++;
@@ -710,4 +650,129 @@ QStringList Widget::GetPictureList()
 QString Widget::getVideoList()
 {
     return m_videoname;
+}
+
+void Widget::copyStation(int flag, QString qsText = NULL)
+{
+    switch(flag)
+    {
+        case COPY_START: progDlg->setWindowTitle("start copy"); break;
+
+        case COPY_STOP: qDebug()<<"stop is coming\n";
+        progDlg->setWindowTitle("copy end...");
+//        ui->pushButton_copy->setEnabled(true);
+        progDlg->setHidden(true);
+        break;
+
+        case COPY_FILE_NAME:
+        progDlg->setWindowTitle(qsText);
+        break;
+
+        case COPY_TOTAL_RATE:
+        progDlg->setValue(qsText.toInt());
+        break;
+
+        case COPY_SINGLE_RATE:
+        progDlg->setValue(qsText.toInt());
+        break;
+
+        case COPY_ERROR_MEM_FULL:
+        progDlg->setWindowTitle("the storage is fulled!");
+        break;
+    }
+}
+
+void Widget::on_copyBtnclicked()
+{
+    if (JudgeCreateXml())
+    {
+        QMessageBox::critical(NULL, "critical", "text area is empty can't create config file");
+        return;
+    }
+//    if(this->ui->lineEdit_2->text().isEmpty() && 0 == GetListview_counts())
+//    {
+//        QMessageBox::critical(NULL, "critical", "copy files is Empty");
+//    }
+    else
+    {
+        Createxml();
+        progDlg  = new QProgressDialog("Operation in progress.","cancel", 0, 100);
+        progDlg->setModal(true);
+        if (NULL == progDlg)
+        {
+            qDebug()<< "progDlg is NULL ,end programe!";
+            return;
+        }
+        connect(progDlg, SIGNAL(canceled()), this, SLOT(CloseProgress()));
+        progDlg->setMinimumDuration(1);
+        QStringList list;
+        list.clear();
+        if (GetvideoClicked())
+        {
+            list<<getVideoList();
+        }
+        else if (GetpictureClicked())
+        {
+            list = GetPictureList();
+        }
+        cfilethread->setDesDirPath(GetCheckedDisk().DirPath); //set copyfile Despath
+        qDebug()<<"list = "<<list;
+        cfilethread->copyStart(list);
+    }
+}
+
+void Widget::CloseProgress()
+{
+    qDebug()<<"canceled is clicked\n";
+    progDlg->setHidden(true);
+    progDlg->close();
+//    delete progDlg;
+    cfilethread->copyStop();
+    cfilethread->wait();
+}
+
+QString Widget::GetCurTime()
+{
+    QDateTime Time = QDateTime::currentDateTime();
+    QString tim = Time.toString("yyyy/MM/dd");
+    qDebug()<<"tim = "<< tim<<'\n';
+    return tim;
+}
+
+void Widget::SetTimeformatclicked_twelve()
+{
+    RadioBoxFlag_Twelveformat = true;
+    RadioBoxFlag_Twentyfourformat = false;
+}
+
+void Widget::SetTimeformatclicked_twentyfour()
+{
+    RadioBoxFlag_Twelveformat = false;
+    RadioBoxFlag_Twentyfourformat = true;
+}
+
+void Widget::Setyearmouthday()
+{
+    yearmouthday = true;
+    mouthdayyear = false;
+}
+
+void Widget::Setmouthdayyear()
+{
+    yearmouthday = false;
+    mouthdayyear = true;
+}
+
+bool Widget::JudgeCreateXml()
+{
+    if ((this->ui->lineEdit_2->text().isEmpty() && 0 == GetListview_counts())
+        || this->ui->lineEdit->text().isEmpty()
+        || this->ui->textEdit->toPlainText().isEmpty()) {
+        Istrue = true;
+    }
+    else
+    {
+        Istrue = false;
+    }
+    return Istrue;
 }

@@ -108,6 +108,8 @@ typedef struct _bvt_id4_ {
 typedef struct _bvt_id5_ {
     unsigned char ID;                  /* ID标签 */
     unsigned char RequestStatus;       /* 请求状态 */
+    unsigned char FileSize[4];         /* 表示升级文件的大小 */
+    unsigned char FileVerify[2];       /* 表示升级文件校验值 */
     /* 0--无需升级 1--开始升级 2--升级结束 3--请求进入升级状态 */
 }s_BVTID5_T;
 
@@ -144,11 +146,15 @@ typedef struct _messagetable {
 
 //ID类型枚举
 typedef enum _id_type_{
-    ID00_BASE = 0x00,	/* 基本信息ID 包含楼层，箭头、功能信息*/
-    ID01_ORDER,
-//    ID01_HEAR,          /* 心跳ID */
-
-    ID_UNKNOW,          /* 未知ID信息 */
+    ID00_BASE = 0x00,	        /* 基本信息ID 包含楼层，箭头、功能信息*/
+    ID01_LIFTSHOWDATA = 0x01,   /* 2.电梯扩展显示数据 (TAG = 0x01) */
+    ID02_BUTTONINPUT = 0x02,    /* 3.按钮输入数据 (TAG = 0x02) */
+    ID03_BUTTONOUTPUT = 0x03,   /* 4.按钮输出数据 (TAG = 0x03) */
+    ID04_MCUVERSION = 0x04,     /* 5.MCU版本信息 (TAG = 0x04) */
+    ID05_UPDATEREQ = 0x05,      /* 6.升级请求 (TAG = 0x05) */
+    ID06_UPDATEREQREPLY = 0x06, /* 7.升级请求应答 (TAG = 0x06) */
+    ID07_UPDATEDATA = 0x07,     /* 8.升级数据 (TAG = 0x07) */
+    ID_UNKNOW                   /* 未知ID信息 */
 }e_IDTYPE_T;
 
 typedef struct _updateversion {
@@ -157,8 +163,8 @@ typedef struct _updateversion {
 
 #pragma pack(pop)
 
-class Widget;
-class FileUpdate;
+//class Widget;
+//class FileUpdate;
 // 读取串口数据的线程
 class ProducerFromBottom : public QObject /*QThread*/
 {
@@ -206,7 +212,10 @@ public:
     void RunNormal();
     void ReplyRun();
     void UpdateEnd(unsigned char req);
-
+    void ConvertFileSize(const char* filename, unsigned char *str, int Cpcount);
+    void IntToUnsignedChar(int length, unsigned char *str, int Cpcount);
+    void SplitNumber(int length, int array[], int &i);// 将length拆分到数组中，并使得是顺序的显示
+    void WholeFileVerify(const char*filename, unsigned char *str, int Cpcount);
 public slots:
     void Updating();
 };
@@ -280,8 +289,8 @@ private:
     int RunNormalFlag;
     bool VersionComFlag;
     bool UsbInsertFlag;
-    Widget *wid;
-    FileUpdate *fileup;
+//    Widget *wid;
+//    FileUpdate *fileup;
     QDeviceWatcher *UsbDetect;
 };
 

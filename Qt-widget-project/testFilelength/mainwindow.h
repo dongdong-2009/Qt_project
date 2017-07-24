@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QFile>
 #include <QDebug>
-#define FILENAME  "/home/libo/Desktop/a.txt"
+#define FILENAME  "/home/devin/Desktop/Repository/Qt_project/Qt_project/Qt-widget-project/testFilelength/a.txt"
 namespace Ui {
 class MainWindow;
 }
