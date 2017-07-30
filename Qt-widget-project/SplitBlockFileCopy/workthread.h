@@ -1,9 +1,10 @@
 #ifndef WORKTHREAD_H
 #define WORKTHREAD_H
 
-#include <QObject>
+#include <QThread>
 #include <QDebug>
-
+#include <QFile>
+#define MAXSIZE 20
 typedef enum{
    COPY_START = 0,
    COPY_STOP,
@@ -21,16 +22,28 @@ typedef enum{
    ERROR_MEM_FULL
 }RETURN_VALUE;
 
-class WorkThread : public QObject
+class WorkThread : public QThread
 {
     Q_OBJECT
 public:
-    explicit WorkThread(QObject *parent = 0);
+    explicit WorkThread();
     void run();
+    void splitFileLength(const char* filename, int Max);
+    void fileCopyStar();
     ~WorkThread();
 signals:
 
 public slots:
+private:
+    bool m_IsAverage;
 };
+
+typedef struct _THREADCOPY
+{
+    int id;                // 线程的id
+    WorkThread *wThread;   // 线程
+    int size;              // 文件大小
+    int offset_filehead;   // 文件偏移的位置
+}THREADCOPY;
 
 #endif // WORKTHREAD_H
