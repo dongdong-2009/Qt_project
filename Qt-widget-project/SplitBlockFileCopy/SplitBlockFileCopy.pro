@@ -14,11 +14,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         widget.cpp \
-    blockfilecopy.cpp \
     workthread.cpp
 
 HEADERS  += widget.h \
-    blockfilecopy.h \
     workthread.h
 
 FORMS    += widget.ui
