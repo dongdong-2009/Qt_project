@@ -17,6 +17,7 @@ SOURCES += main.cpp\
     workthread.cpp
 
 HEADERS  += widget.h \
-    workthread.h
+    workthread.h \
+    log.h
 
 FORMS    += widget.ui

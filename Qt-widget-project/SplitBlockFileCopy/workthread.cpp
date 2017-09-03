@@ -21,12 +21,21 @@ void WorkThread::run()
 
 }
 
-void WorkThread::splitFileLength(const char *filename, int Max)
+void WorkThread::setJob(int jobId, QString src, QString dst, qint64 offset, qint64 len)
+{
+    this->jobId = jobId;
+    this->src = src;
+    this->dst = dst;
+    this->offset = offset;
+    this->len = len;
+}
+
+void WorkThread::splitFileLength(const QString &filename, int Max)
 {
     qDebug()<< __PRETTY_FUNCTION__;
     QFile file(filename);
     int flen = file.size();
-    int blocksize = flen / Max;
+    int blocksize = flen / Max;  // Max 是最大的线程数
     if (0 == flen - blocksize * Max) // 刚好能整除
     {
         int i = 0;

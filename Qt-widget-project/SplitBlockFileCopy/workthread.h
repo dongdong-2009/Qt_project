@@ -4,7 +4,9 @@
 #include <QThread>
 #include <QDebug>
 #include <QFile>
-#define MAXSIZE 20
+#include <QString>
+#define MAXSIZE 10
+
 typedef enum{
    COPY_START = 0,
    COPY_STOP,
@@ -28,14 +30,24 @@ class WorkThread : public QThread
 public:
     explicit WorkThread();
     void run();
-    void splitFileLength(const char* filename, int Max);
+    void splitFileLength(const QString & filename, int Max);
     void fileCopyStar();
     ~WorkThread();
+    void setJob(int jobId, QString src, QString dst, qint64 offset, qint64 len);
+
 signals:
 
 public slots:
 private:
     bool m_IsAverage;
+    qint32 bufferLength;
+    volatile bool runningFlag;
+    int jobId;
+    QString src;
+    QString dst;
+    qint64 offset;
+    qint64 len;
+    qint64 copyedBytes;
 };
 
 typedef struct _THREADCOPY
