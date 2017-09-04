@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QString>
+#include "define.h"
 #define MAXSIZE 10
 
 typedef enum{
@@ -24,6 +25,14 @@ typedef enum{
    ERROR_MEM_FULL
 }RETURN_VALUE;
 
+typedef struct _THREADCOPY
+{
+    int id;                // 线程的id
+//    WorkThread *wThread;   // 线程
+    int size;              // 文件大小
+    int offset_filehead;   // 文件偏移的位置
+}THREADCOPY;
+
 class WorkThread : public QThread
 {
     Q_OBJECT
@@ -36,6 +45,8 @@ public:
     void setJob(int jobId, QString src, QString dst, qint64 offset, qint64 len);
 
 signals:
+    void copyedbytes(int jobId, qint64 bytes);
+    void jobFinished(int jobId);
 
 public slots:
 private:
@@ -50,12 +61,6 @@ private:
     qint64 copyedBytes;
 };
 
-typedef struct _THREADCOPY
-{
-    int id;                // 线程的id
-    WorkThread *wThread;   // 线程
-    int size;              // 文件大小
-    int offset_filehead;   // 文件偏移的位置
-}THREADCOPY;
+
 
 #endif // WORKTHREAD_H

@@ -18,6 +18,7 @@ SOURCES += main.cpp\
 
 HEADERS  += widget.h \
     workthread.h \
-    log.h
+    log.h \
+    define.h
 
 FORMS    += widget.ui
