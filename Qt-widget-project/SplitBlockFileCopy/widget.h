@@ -23,7 +23,7 @@ public:
     explicit Widget(QWidget *parent = 0);
     void initUi();
     ~Widget();
-    QStringList getFileList(QListView *qlist);
+    QStringList getFileList(QStringListModel *qlistmode);
 
 private:
     Ui::Widget *ui;
@@ -34,6 +34,9 @@ private:
 public slots:
     void openmultifileDaliog();
     void startWork();
+//    QStringListModel * clearFileList(QStringList files);
+//    QStringListModel * deleteFileList(QStringList files);
+    void clearFileList();
 };
 
 #endif // WIDGET_H
