@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QString>
-#include "define.h"
+#include "log.h"
 #define MAXSIZE 10
 
 typedef enum{

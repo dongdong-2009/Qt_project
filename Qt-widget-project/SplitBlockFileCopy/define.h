@@ -1,6 +1,5 @@
 #ifndef DEFINE_H
 #define DEFINE_H
-
 #include<QDebug>
 #include<QObject>
 
@@ -12,13 +11,11 @@
 #define IDE_PRINTF(fmt, ...) qDebug() << (QString("[%s,%s(),Line %s]-"#fmt, __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__))
 #endif
 
-
-//默认搜索最大的盘符数量
-#define MAX_DIR_NUMBER 20
-//软件版本号-见Main.qml
-//#define RELEASE_VERSION ("1.0.0")
 #define        D_FILE_10M    10485760  //10Mb
 #define        D_FILE_50M    52428800  //50Mb
 #define        D_FILE_512M   536870912 //512GMb
 #define        D_FILE_PER_BUFFER   10240 //10Kb
+#define MAX_DIR_NUMBER 20
+
 #endif // DEFINE_H
+

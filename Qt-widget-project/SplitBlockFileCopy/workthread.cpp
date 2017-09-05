@@ -40,13 +40,14 @@ void WorkThread::run()
 
     srcfile.seek(offset);
     dstfile.seek(offset);
-    char * buf = new char[bufferLength];
+//    char * buf = new char[bufferLength];
+    char buf[bufferLength];
     //int count = len/bufferLength;
     qint64 readLength = 0;
     copyedBytes = 0;
-    while(copyedBytes < len && runningFlag){
+    while(copyedBytes < len && runningFlag) {
         readLength = srcfile.read(buf, bufferLength);
-        if((copyedBytes + readLength) <= len){// 当已经拷贝的文件长度加上当前读到的文件长度小于等于需要拷贝的长度的时候
+        if((copyedBytes + readLength) <= len) {// 当已经拷贝的文件长度加上当前读到的文件长度小于等于需要拷贝的长度的时候
             dstfile.write(buf, readLength);  // 因为文件没有结束，可能会读到超过既定长度的文件
             copyedBytes += readLength;
             //emit copyedbytes(jobId,readLength);
@@ -97,12 +98,10 @@ void WorkThread::splitFileLength(const QString &filename, int Max)
         for(i = 0; i < Max-1; i++)
         {
             CopyThread[i].id = i;
-            CopyThread[i].wThread = new WorkThread();
             CopyThread[i].size = blocksize;
             CopyThread[i].offset_filehead = CopyThread[i].id * CopyThread[i].size;
         }
         CopyThread[i].id = i;
-//        CopyThread[i].wThread = new WorkThread();
         CopyThread[i].size = flen - blocksize * (Max-1);
         CopyThread[i].offset_filehead = flen;
         m_IsAverage = false;

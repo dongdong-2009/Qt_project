@@ -3,6 +3,8 @@
 #include<QDebug>
 #include<QObject>
 
+#define DEBUG
+
 #ifdef DEBUG
 #define IDE_DEBUG(x)         qDebug() << (QString("[%1,%2(),Line %3]-%4").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__).arg(QString(x)))
 #define IDE_TRACE()			 qDebug() << (QString("[%1,%2(),Line %3]-Trace").arg(__FILE__).arg(__FUNCTION__).arg(__LINE__))

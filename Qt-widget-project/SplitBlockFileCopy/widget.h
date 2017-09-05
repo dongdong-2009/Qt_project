@@ -8,6 +8,8 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QListView>
+#include <QMap>
+#include "workthread.h"
 
 namespace Ui {
 class Widget;
@@ -21,13 +23,17 @@ public:
     explicit Widget(QWidget *parent = 0);
     void initUi();
     ~Widget();
+    QStringList getFileList(QListView *qlist);
 
 private:
     Ui::Widget *ui;
     QStringList m_listview;
+    QStringListModel *m_filemodel;
+    QMap<int, WorkThread*> wThread;
 
 public slots:
-    void OpenmultifileDaliog();
+    void openmultifileDaliog();
+    void startWork();
 };
 
 #endif // WIDGET_H
