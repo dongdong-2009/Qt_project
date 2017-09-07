@@ -1,25 +1,34 @@
 #include "workthread.h"
-THREADCOPY CopyThread[MAXSIZE];
+
+THREADCOPY cpThreadFileLen[MAXSIZE];
 
 WorkThread::WorkThread()
 {
     qDebug()<< __PRETTY_FUNCTION__;
+    m_FileTotalSize = 0;
+    m_wthreadFileList = QStringList();
     runningFlag = true;
     bufferLength = 1024;
     offset = 0;
     len = 0;
     copyedBytes = 0;
     jobId = -1;
+    for(int i = 0; i < MAXSIZE; i++)
+    {
+        cpThreadFileLen[i].id = -1;
+        cpThreadFileLen[i].size = 0;
+        cpThreadFileLen[i].offset_filehead = -1;
+    }
 }
 
 WorkThread::~WorkThread()
 {
     qDebug()<< __PRETTY_FUNCTION__;
-    int i = 0;
-    for(i = 0; i < MAXSIZE; i++)
-    {
+//    int i = 0;
+//    for(i = 0; i < MAXSIZE; i++)
+//    {
 
-    }
+//    }
 }
 
 void WorkThread::run()
@@ -74,6 +83,18 @@ void WorkThread::setJob(int jobId, QString src, QString dst, qint64 offset, qint
     this->len = len;
 }
 
+void WorkThread::setFileStringList(QStringList m_list)
+{
+    m_wthreadFileList = m_list;
+    qDebug()<< "m_wthreadFileList = "<< m_wthreadFileList;
+}
+
+void WorkThread::setFileTotalSize(qint64 size)
+{
+    m_FileTotalSize = size;
+    qDebug()<< "m_FileTotalSize = "<< m_FileTotalSize;
+}
+
 void WorkThread::splitFileLength(const QString &filename, int Max)
 {
     qDebug()<< __PRETTY_FUNCTION__;
@@ -85,10 +106,10 @@ void WorkThread::splitFileLength(const QString &filename, int Max)
         int i = 0;
         for(i = 0; i < Max; i++)
         {
-            CopyThread[i].id = i;
-//            CopyThread[i].wThread = new WorkThread();
-            CopyThread[i].size = blocksize;
-            CopyThread[i].offset_filehead = CopyThread[i].id * CopyThread[i].size;
+            cpThreadFileLen[i].id = i;
+//            cpThreadFileLen[i].wThread = new WorkThread();
+            cpThreadFileLen[i].size = blocksize;
+            cpThreadFileLen[i].offset_filehead = cpThreadFileLen[i].id * cpThreadFileLen[i].size;
         }
         m_IsAverage = true;
     }
@@ -97,13 +118,13 @@ void WorkThread::splitFileLength(const QString &filename, int Max)
         int i = 0;
         for(i = 0; i < Max-1; i++)
         {
-            CopyThread[i].id = i;
-            CopyThread[i].size = blocksize;
-            CopyThread[i].offset_filehead = CopyThread[i].id * CopyThread[i].size;
+            cpThreadFileLen[i].id = i;
+            cpThreadFileLen[i].size = blocksize;
+            cpThreadFileLen[i].offset_filehead = cpThreadFileLen[i].id * cpThreadFileLen[i].size;
         }
-        CopyThread[i].id = i;
-        CopyThread[i].size = flen - blocksize * (Max-1);
-        CopyThread[i].offset_filehead = flen;
+        cpThreadFileLen[i].id = i;
+        cpThreadFileLen[i].size = flen - blocksize * (Max-1);
+        cpThreadFileLen[i].offset_filehead = flen;
         m_IsAverage = false;
     }
 }

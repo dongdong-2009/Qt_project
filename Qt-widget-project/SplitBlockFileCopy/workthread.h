@@ -6,6 +6,8 @@
 #include <QFile>
 #include <QString>
 #include "log.h"
+#include <QStringList>
+
 #define MAXSIZE 10
 
 typedef enum{
@@ -37,12 +39,15 @@ class WorkThread : public QThread
 {
     Q_OBJECT
 public:
+//    static THREADCOPY copyThreadLength[MAXSIZE];
     explicit WorkThread();
     void run();
     void splitFileLength(const QString & filename, int Max);
     void fileCopyStar();
     ~WorkThread();
     void setJob(int jobId, QString src, QString dst, qint64 offset, qint64 len);
+    void setFileStringList(QStringList m_list);
+    void setFileTotalSize(qint64 size);
 
 signals:
     void copyedbytes(int jobId, qint64 bytes);
@@ -59,6 +64,8 @@ private:
     qint64 offset;
     qint64 len;
     qint64 copyedBytes;
+    QStringList m_wthreadFileList;
+    qint64 m_FileTotalSize;
 };
 
 
