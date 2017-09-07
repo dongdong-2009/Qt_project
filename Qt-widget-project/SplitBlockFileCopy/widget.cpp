@@ -1,6 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
-
+qint64 CopyedBytes[MAXSIZE];
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
@@ -24,6 +24,7 @@ void Widget::initUi()
     connect(this, &Widget::btnEnabledChanged, this, &Widget::setBtnEnabled);
     m_DestPath = QApplication::applicationDirPath();
     qDebug()<< "m_DestPath = " << m_DestPath; // 是一个目录不带 /
+    initCopyThread();
 }
 
 Widget::~Widget()
@@ -54,12 +55,63 @@ void Widget::countTotalFileSize(QStringList m_list)
     }
 }
 
+QString Widget::getFileName(QString filepath)
+{
+    QString flist = filepath.split("/").last();
+    qDebug()<< "flist = "<< flist;
+    return flist;
+}
+
+// QMap<int, WorkThread *> 不能没有参数<int , WorkThread*>
+QMap<int, WorkThread *> Widget::initCopyThread()
+{
+    wThread.clear();
+    for (int j = 0; j < MAXSIZE; j++)
+    {
+        WorkThread *cthread = new WorkThread();
+        if (NULL != cthread)
+        {
+            wThread.insert(j, cthread);
+        }
+        CopyedBytes[j] = 0;
+    }
+    return wThread;
+}
+
+// 连接所有新建线程的信号和槽函数
+void Widget::connThreadSlot()
+{
+    QMap<int, WorkThread *>::const_iterator it = wThread.constBegin();
+    WorkThread *wjob;
+    while (it != wThread.constEnd()) {
+        wjob = it.value();
+        connect(wjob, SIGNAL(copyedbytes(int,qint64)), this, SLOT(countPercentage(int,qint64)));
+        ++it;
+    }
+}
+
+// 将全局的拷贝了字节数目的数组清零
+void Widget::resetCopyBytes()
+{
+    for(int i = 0; i < MAXSIZE; i++)
+    {
+        CopyedBytes[i] = 0;
+    }
+}
+
 void Widget::startWork()
 {
     countTotalFileSize(m_listview);
     for(int i = 0; i < m_listview.length(); i++)
     {
         qDebug()<<"m_listview.at(i) = "<< m_listview.at(i);
+        getFileName(m_listview.at(i));
+        QMap<int, WorkThread *>::iterator it = wThread.constBegin();
+        WorkThread *beginThread;
+        while (it != wThread.constEnd()) {
+            beginThread = it.value();
+            beginThread->setJob();
+        }
     }
 }
 
@@ -85,6 +137,19 @@ void Widget::setBtnEnabled(QStringList m_list)
         ui->btn_delete->setEnabled(false);
         ui->btn_clear->setEnabled(false);
     }
+}
+
+void Widget::countPercentage(int id, qint64 fbytes)
+{
+    qint64 tmp = 0;
+    int percent = 0;
+    CopyedBytes[id-1] = fbytes;
+    for(int i = 0; i< MAXSIZE; i++){
+        tmp += CopyedBytes[i]; // 计算多线程总的拷贝长度
+    }
+    percent = tmp / m_FileTotalSize * 100;
+    emit copyPercentages(percent);
+
 }
 
 void Widget::updateProgressBar(int value)
