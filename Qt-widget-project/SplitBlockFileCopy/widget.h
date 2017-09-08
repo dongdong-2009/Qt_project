@@ -41,6 +41,8 @@ private:
     QMap<int, WorkThread*> wThread;
     qint64 m_FileTotalSize;
     QString m_DestPath;
+    int m_perPercent;
+    int m_curPercent;
 
 public slots:
     void openmultifileDaliog();

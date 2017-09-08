@@ -45,10 +45,12 @@ public:
     void splitFileLength(const QString & filename, int Max);
     void fileCopyStar();
     ~WorkThread();
-    void setJob(int jobId, QString src, QString dst, qint64 offset, qint64 len);
+    void setJob(int jobId, QString src, QString dst/*, qint64 offset, qint64 len*/);
     void setFileStringList(QStringList m_list);
     void setFileTotalSize(qint64 size);
 
+public:
+    volatile bool selfCopyEndFlag;
 signals:
     void copyedbytes(int jobId, qint64 bytes);
     void jobFinished(int jobId);

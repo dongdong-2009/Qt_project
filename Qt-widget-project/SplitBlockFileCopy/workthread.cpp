@@ -1,4 +1,5 @@
 #include "workthread.h"
+#include <QCoreApplication>
 
 THREADCOPY cpThreadFileLen[MAXSIZE];
 
@@ -8,6 +9,7 @@ WorkThread::WorkThread()
     m_FileTotalSize = 0;
     m_wthreadFileList = QStringList();
     runningFlag = true;
+    selfCopyEndFlag = false;
     bufferLength = 1024;
     offset = 0;
     len = 0;
@@ -34,7 +36,6 @@ WorkThread::~WorkThread()
 void WorkThread::run()
 {
     qDebug()<< __PRETTY_FUNCTION__;
-    //IDE_TRACE_INT(len);
     QFile srcfile(src);
     QFile dstfile(dst);
     if(!srcfile.open(QIODevice::ReadOnly)){
@@ -46,15 +47,21 @@ void WorkThread::run()
         IDE_TRACE();
         return;
     }
-
+    dstfile.resize(srcfile.size());
     srcfile.seek(offset);
-    dstfile.seek(offset);
+    dstfile.seek(offset);qDebug()<< "srcfile size = "<< srcfile.size();
 //    char * buf = new char[bufferLength];
     char buf[bufferLength];
     //int count = len/bufferLength;
     qint64 readLength = 0;
     copyedBytes = 0;
-    while(copyedBytes < len && runningFlag) {
+    while(copyedBytes < len /*&& runningFlag*/) {
+//        qDebug()<<"readfile";
+        if (this->jobId == 9)
+        {
+            qDebug()<< "copyBytes = "<< copyedBytes << "len = "<< len << "offset = "<< offset;
+
+        }
         readLength = srcfile.read(buf, bufferLength);
         if((copyedBytes + readLength) <= len) {// 当已经拷贝的文件长度加上当前读到的文件长度小于等于需要拷贝的长度的时候
             dstfile.write(buf, readLength);  // 因为文件没有结束，可能会读到超过既定长度的文件
@@ -66,21 +73,24 @@ void WorkThread::run()
             //emit copyedbytes(jobId,len - copyedBytes);
         }
         emit copyedbytes(jobId, copyedBytes);
+//        QCoreApplication::processEvents();
         //qDebug()<<"id:"<<jobId <<"copyedBytes: "<<copyedBytes;
     }
+    this->selfCopyEndFlag = true;
     srcfile.close();
     dstfile.close();
-
-    emit jobFinished(jobId);
+    qDebug()<< "run ended!";
 }
 
-void WorkThread::setJob(int jobId, QString src, QString dst, qint64 offset, qint64 len)
+void WorkThread::setJob(int jobId, QString src, QString dst/*, qint64 offset, qint64 len*/)
 {
     this->jobId = jobId;
     this->src = src;
     this->dst = dst;
-    this->offset = offset;
-    this->len = len;
+    this->offset = cpThreadFileLen[jobId].offset_filehead;
+    this->len = cpThreadFileLen[jobId].size;
+    qDebug()<< __PRETTY_FUNCTION__;
+    qDebug()<< "the copy len = " << len;
 }
 
 void WorkThread::setFileStringList(QStringList m_list)
@@ -107,7 +117,6 @@ void WorkThread::splitFileLength(const QString &filename, int Max)
         for(i = 0; i < Max; i++)
         {
             cpThreadFileLen[i].id = i;
-//            cpThreadFileLen[i].wThread = new WorkThread();
             cpThreadFileLen[i].size = blocksize;
             cpThreadFileLen[i].offset_filehead = cpThreadFileLen[i].id * cpThreadFileLen[i].size;
         }
@@ -124,7 +133,7 @@ void WorkThread::splitFileLength(const QString &filename, int Max)
         }
         cpThreadFileLen[i].id = i;
         cpThreadFileLen[i].size = flen - blocksize * (Max-1);
-        cpThreadFileLen[i].offset_filehead = flen;
+        cpThreadFileLen[i].offset_filehead = cpThreadFileLen[i].id * cpThreadFileLen[i-1].size;
         m_IsAverage = false;
     }
 }
