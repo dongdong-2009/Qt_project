@@ -6,10 +6,16 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
+    m_listview = QStringList();
+    m_filemodel = QStringListModel();
     m_FileTotalSize = 0;
-    initUi();
+    m_DestPath = QString();
+    cpthread = NULL;
+    qthread = NULL;
     m_curPercent = 0;
     m_perPercent = 0;
+
+    initUi();
 }
 
 void Widget::initUi()
@@ -19,12 +25,14 @@ void Widget::initUi()
     ui->btn_delete->setEnabled(false);
     ui->btn_clear->setEnabled(false);
 //    ui->label_copyname->setVisible(false);
-    connect(ui->btn_selectFile, &QPushButton::clicked, this, &Widget::openmultifileDaliog);
+
+
+    connect(ui->btn_selectFile, &QPushButton::clicked, this, &Widget::onOpenmultifileDaliog);
     connect(ui->btn_copyFile, &QPushButton::clicked, this, &Widget::startWork);
-    connect(ui->btn_clear, &QPushButton::clicked, this, &Widget::clearFileList);
-    connect(ui->btn_delete, &QPushButton::clicked, this, &Widget::deleteFileList);
-    connect(this, &Widget::btnEnabledChanged, this, &Widget::setBtnEnabled);
-    connect(this, SIGNAL(copyPercentages(int)), this, SLOT(updateProgressBar(int)));
+    connect(ui->btn_clear, &QPushButton::clicked, this, &Widget::onClearFileList);
+    connect(ui->btn_delete, &QPushButton::clicked, this, &Widget::onDeleteFileList);
+    connect(this, &Widget::btnEnabledChanged, this, &Widget::onSetBtnEnabled);
+    connect(this, SIGNAL(copyPercentages(int)), this, SLOT(onUpdateProgressBar(int)));
     m_DestPath = QApplication::applicationDirPath();
     qDebug()<< "m_DestPath = " << m_DestPath; // 是一个目录不带 /
     initCopyThread();
@@ -183,7 +191,7 @@ void Widget::startWork()
     }
 }
 
-void Widget::clearFileList()
+void Widget::onClearFileList()
 {
     m_filemodel = NULL;
     this->ui->listView->setModel(m_filemodel);
@@ -191,7 +199,7 @@ void Widget::clearFileList()
     emit btnEnabledChanged(m_listview);
 }
 
-void Widget::setBtnEnabled(QStringList m_list)
+void Widget::onSetBtnEnabled(QStringList m_list)
 {
     if (m_list.length() > 0)
     {
@@ -207,7 +215,7 @@ void Widget::setBtnEnabled(QStringList m_list)
     }
 }
 
-void Widget::countPercentage(int id, qint64 fbytes)
+void Widget::onCountPercentage(int id, qint64 fbytes)
 {
     qDebug()<< __PRETTY_FUNCTION__ << "id = "<< id << " fbytes = "<< fbytes;
     qint64 tmp = 0;
@@ -227,7 +235,7 @@ void Widget::countPercentage(int id, qint64 fbytes)
     }
 }
 
-void Widget::updateProgressBar(int value)
+void Widget::onUpdateProgressBar(int value)
 {
     if (value <= 100)
     {
@@ -236,14 +244,26 @@ void Widget::updateProgressBar(int value)
     }
 }
 
-void Widget::controlProgressBar(bool visflag)
+void Widget::onControlProgressBar(bool visflag)
 {
     qDebug()<< "visflag = "<< visflag;
     ui->progressBar->setVisible(visflag);
     ui->label_copyname->setVisible(visflag);
 }
 
-QStringListModel * Widget::deleteFileList(/*QStringList files*/)
+// 当用户点击完复制文件之后，所做的处理
+void Widget::onCopyFileClick()
+{
+    qDebug()<< __PRETTY_FUNCTION__;
+    /*将拷贝的线程单独放到一个线程中进行，不能在主线程中进行，在主线程中会阻碍界面的更新*/
+    qthread = new QThread(this);
+    cpthread = new CopyThread();
+    cpthread->moveToThread(qthread);
+
+    qthread->start();
+}
+
+QStringListModel * Widget::onDeleteFileList(/*QStringList files*/)
 {
     int index = getFileList(m_filemodel).length() - 1;
     m_filemodel->removeRow(index);
@@ -252,7 +272,7 @@ QStringListModel * Widget::deleteFileList(/*QStringList files*/)
     return m_filemodel;
 }
 
-void Widget::openmultifileDaliog()
+void Widget::onOpenmultifileDaliog()
 {
     QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open",
     ".","Files you choice (*.png *.jpg *.mp4 *.flv *.rmvb *.sh *.txt *.doc *.pdf *.xlsx)");

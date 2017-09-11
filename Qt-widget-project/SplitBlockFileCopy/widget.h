@@ -13,11 +13,24 @@
 #include <QFileInfo>
 #include <QApplication>
 #include "workthread.h"
+#include <QThread>
 #define ONE_KB 1024
 
 namespace Ui {
 class Widget;
 }
+
+class CopyThread:public QObject
+{
+public slots:
+    void startWork();
+    void connThreadSlot();
+
+signals:
+    void showProgress(bool flag);
+    void updateProgess(int pvalue);
+    void showLabelText(int i);
+};
 
 class Widget : public QWidget
 {
@@ -43,16 +56,19 @@ private:
     QString m_DestPath;
     int m_perPercent;
     int m_curPercent;
+    CopyThread *cpthread;
+    QThread *qthread;
 
 public slots:
-    void openmultifileDaliog();
+    void onOpenmultifileDaliog();
     void startWork();
-    QStringListModel * deleteFileList(); // 注意信号的参数要大于等于槽函数的信号的个数
-    void clearFileList();
-    void setBtnEnabled(QStringList m_list);
-    void countPercentage(int id, qint64 fbytes);
-    void updateProgressBar(int value);
-    void controlProgressBar(bool visflag);
+    QStringListModel * onDeleteFileList(); // 注意信号的参数要大于等于槽函数的信号的个数
+    void onClearFileList();
+    void onSetBtnEnabled(QStringList m_list);
+    void onCountPercentage(int id, qint64 fbytes);
+    void onUpdateProgressBar(int value);
+    void onControlProgressBar(bool visflag);
+    void onCopyFileClick();
 
 signals:
     void btnEnabledChanged(QStringList m_list);
