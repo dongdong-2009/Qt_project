@@ -26,16 +26,11 @@ WorkThread::WorkThread()
 WorkThread::~WorkThread()
 {
     qDebug()<< __PRETTY_FUNCTION__;
-//    int i = 0;
-//    for(i = 0; i < MAXSIZE; i++)
-//    {
-
-//    }
 }
 
 void WorkThread::run()
 {
-    qDebug()<< __PRETTY_FUNCTION__;
+    qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
     QFile srcfile(src);
     QFile dstfile(dst);
     if(!srcfile.open(QIODevice::ReadOnly)){
@@ -52,11 +47,9 @@ void WorkThread::run()
     dstfile.seek(offset);qDebug()<< "srcfile size = "<< srcfile.size();
 //    char * buf = new char[bufferLength];
     char buf[bufferLength];
-    //int count = len/bufferLength;
     qint64 readLength = 0;
     copyedBytes = 0;
     while(copyedBytes < len /*&& runningFlag*/) {
-//        qDebug()<<"readfile";
         if (this->jobId == 9)
         {
             qDebug()<< "copyBytes = "<< copyedBytes << "len = "<< len << "offset = "<< offset;

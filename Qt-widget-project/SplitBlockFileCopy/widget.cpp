@@ -177,6 +177,7 @@ void Widget::resetCopyBytes()
 
 void Widget::onClearFileList()
 {
+    qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
     m_filemodel = NULL;
     this->ui->listView->setModel(m_filemodel);
     m_listview = getFileList(m_filemodel);  // 将m_listview 置为空
@@ -185,6 +186,7 @@ void Widget::onClearFileList()
 
 void Widget::onSetBtnEnabled(QStringList m_list)
 {
+    qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
     if (m_list.length() > 0)
     {
         ui->btn_copyFile->setEnabled(true);
@@ -201,17 +203,18 @@ void Widget::onSetBtnEnabled(QStringList m_list)
 
 void CopyThread::onCountPercentage(int id, qint64 fbytes)
 {
-    qDebug()<< __PRETTY_FUNCTION__ << "id = "<< id << " fbytes = "<< fbytes;
+    qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
+//    qDebug()<< __PRETTY_FUNCTION__ << "id = "<< id << " fbytes = "<< fbytes;
     qint64 tmp = 0;
     int percent = 0;
     CopyedBytes[id] = fbytes;
     for(int i = 0; i< MAXSIZE; i++){
         tmp += CopyedBytes[i]; // 计算多线程总的拷贝长度
     }
-    qDebug()<< "tmp = "<< tmp << "m_FileTotalsize = "<< m_FileTotalSize;
+//    qDebug()<< "tmp = "<< tmp << "m_FileTotalsize = "<< m_FileTotalSize;
     percent = tmp * 100 / m_FileTotalSize ;
     m_curPercent = percent;
-    qDebug()<<"percent = "<< percent;
+//    qDebug()<<"percent = "<< percent;
     if (m_curPercent > m_perPercent)
     {
         m_perPercent = m_curPercent;
@@ -221,9 +224,10 @@ void CopyThread::onCountPercentage(int id, qint64 fbytes)
 
 void Widget::onUpdateProgressBar(int value)
 {
+    qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
     if (value <= 100)
     {
-        qDebug()<<"progressBar value = "<< value;
+//        qDebug()<<"progressBar value = "<< value;
         ui->progressBar->setValue(value);
     }
 }
@@ -236,6 +240,7 @@ void Widget::onShowProgress(bool visflag)
 
 void Widget::onShowLabelText(int i)
 {
+    qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
     qDebug()<< __PRETTY_FUNCTION__<< "i = "<< i;
     ui->label_copyname->setText(m_listview.at(i));
 }
@@ -344,20 +349,20 @@ void CopyThread::startWork()
         bool flag = false;
         while(1) // 等待第一个文件拷贝结束之后，进行第二个文件的拷贝
         {
-            int k = 0; qDebug()<< "enter while 1";
+            int k = 0; /*qDebug()<< "enter while 1";*/
             while(itstart1 != wThreadMap.end())
             {
                 beginThread = itstart1.value();
                 if (beginThread->selfCopyEndFlag)
                 {
                     flagarr[k] = 1;
-                    qDebug("flagarr[%d]=  %d",k, flagarr[k]);
+//                    qDebug("flagarr[%d]=  %d",k, flagarr[k]);
                     k++;
                 }
                 else
                 {
                     flagarr[k] = 0;
-                    qDebug("flagarr[%d]=  %d",k, flagarr[k]);
+//                    qDebug("flagarr[%d]=  %d",k, flagarr[k]);
                     k++;
                 }
                 ++ itstart1;
@@ -366,14 +371,14 @@ void CopyThread::startWork()
             {
                 if (0 == flagarr[p])
                 {
-                    flag = false; qDebug()<< "0 flag = "<< flag;
+                    flag = false; /*qDebug()<< "0 flag = "<< flag;*/
                     break;
                 }
                 else
                 {
-                    flag = true; qDebug()<< "1 flag = "<< flag;
+                    flag = true; /*qDebug()<< "1 flag = "<< flag;*/
                 }
-                QCoreApplication::processEvents();
+//                QCoreApplication::processEvents();
             }
             if (flag)
             {
