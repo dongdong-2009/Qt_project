@@ -30,6 +30,7 @@ WorkThread::~WorkThread()
 
 void WorkThread::run()
 {
+//    int i = 0;
     qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
     QFile srcfile(src);
     QFile dstfile(dst);
@@ -65,7 +66,13 @@ void WorkThread::run()
             copyedBytes = len;
             //emit copyedbytes(jobId,len - copyedBytes);
         }
-        emit copyedbytes(jobId, copyedBytes);
+//        ++i;
+//        if (i == 2000)
+//        {
+//            emit copyedbytes(jobId, copyedBytes);
+//            i = 0;
+//        }
+    emit copyedbytes(jobId, copyedBytes);
 //        QCoreApplication::processEvents();
         //qDebug()<<"id:"<<jobId <<"copyedBytes: "<<copyedBytes;
     }

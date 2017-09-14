@@ -30,13 +30,38 @@ public:
 
 public slots:
     void startWork();
+//    void connThreadSlot();
+//    void onCountPercentage(int id, qint64 fbytes);
+//    void countTotalFileSize(QStringList m_list);
+
+signals:
+//    void showProgress(bool flag);
+//    void updateProgess(int pvalue);
+    void showLabelText(int i);
+//    void copyPercentages(int per);
+    void startCopy();
+
+private:
+    QString m_DestPath;
+//    int m_perPercent;
+//    int m_curPercent;
+//    qint64 m_FileTotalSize;
+};
+
+class UpdatePro:public QObject
+{
+    Q_OBJECT
+public:
+    UpdatePro();
+    ~UpdatePro();
+public slots:
     void connThreadSlot();
     void onCountPercentage(int id, qint64 fbytes);
     void countTotalFileSize(QStringList m_list);
 
 signals:
     void showProgress(bool flag);
-    void updateProgess(int pvalue);
+//    void updateProgess(int pvalue);
     void showLabelText(int i);
     void copyPercentages(int per);
 
@@ -69,7 +94,9 @@ private:
 //    QString m_DestPath;
 
     CopyThread *cpthread;
+    UpdatePro *updatethread;
     QThread *qthread;
+    QThread *qthread1;
 
 public slots:
     void onOpenmultifileDaliog();
