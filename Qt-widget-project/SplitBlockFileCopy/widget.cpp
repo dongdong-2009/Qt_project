@@ -149,10 +149,10 @@ void UpdatePro::onCountPercentage(int id, qint64 fbytes)
     for(int i = 0; i< MAXSIZE; i++){
         tmp += CopyedBytes[i]; // 计算多线程总的拷贝长度
     }
-//    qDebug()<< "tmp = "<< tmp << "m_FileTotalsize = "<< m_FileTotalSize;
+    qDebug()<< "tmp = "<< tmp << "m_FileTotalsize = "<< m_FileTotalSize;
     percent = tmp * 100 / m_FileTotalSize ;
     m_curPercent = percent;
-//    qDebug()<<"percent = "<< percent;
+    qDebug()<<"percent = "<< percent;
     if (m_curPercent > m_perPercent)
     {
         m_perPercent = m_curPercent;
@@ -262,7 +262,6 @@ void UpdatePro::connThreadSlot()
 void CopyThread::startWork()
 {
     qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
-//    connThreadSlot();
     QStringList temp_list = m_listview;
 
     for(int i = 0; i < temp_list.length(); i++)
