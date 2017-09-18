@@ -45,13 +45,15 @@ void WorkThread::run()
     }
     dstfile.resize(srcfile.size());
     srcfile.seek(offset);
-    dstfile.seek(offset);qDebug()<< "srcfile size = "<< srcfile.size();
+    dstfile.seek(offset);
+    qDebug()<< "srcfile size = "<< srcfile.size();
 //    char * buf = new char[bufferLength];
     char buf[bufferLength];
     qint64 readLength = 0;
     copyedBytes = 0;
+    this->selfCopyEndFlag = false;
     while(copyedBytes < len /*&& runningFlag*/) {
-        if (this->jobId == 9)
+        if (this->jobId == 0)
         {
             qDebug()<< "copyBytes = "<< copyedBytes << "len = "<< len << "offset = "<< offset;
 
@@ -60,23 +62,15 @@ void WorkThread::run()
         if((copyedBytes + readLength) <= len) {// 当已经拷贝的文件长度加上当前读到的文件长度小于等于需要拷贝的长度的时候
             dstfile.write(buf, readLength);  // 因为文件没有结束，可能会读到超过既定长度的文件
             copyedBytes += readLength;
-            //emit copyedbytes(jobId,readLength);
         }else{
             dstfile.write(buf, len - copyedBytes);
             copyedBytes = len;
-            //emit copyedbytes(jobId,len - copyedBytes);
         }
-//        ++i;
-//        if (i == 2000)
-//        {
-//            emit copyedbytes(jobId, copyedBytes);
-//            i = 0;
-//        }
-    emit copyedbytes(jobId, copyedBytes);
-//        QCoreApplication::processEvents();
-        //qDebug()<<"id:"<<jobId <<"copyedBytes: "<<copyedBytes;
+        if (copyedBytes == len || sendBytesCopyed(copyedBytes, len/MAXSIZE))
+            emit copyedbytes(jobId, copyedBytes);
     }
     this->selfCopyEndFlag = true;
+    copyedBytes = 0;
     srcfile.close();
     dstfile.close();
     qDebug()<< "run ended!";
@@ -104,6 +98,26 @@ void WorkThread::setFileTotalSize(qint64 size)
     m_FileTotalSize = size;
     qDebug()<< "m_FileTotalSize = "<< m_FileTotalSize;
 }
+
+void WorkThread::setEndFlag(bool flag)
+{
+    selfCopyEndFlag = flag;
+}
+
+bool WorkThread::sendBytesCopyed(qint64 cplen, qint64 comparenum)
+{
+    if (cplen == comparenum || cplen == comparenum *2 || cplen == comparenum *3
+        || cplen == comparenum *4 || cplen == comparenum *5 || cplen == comparenum *6
+        || cplen == comparenum *7 || cplen == comparenum *8 || cplen == comparenum *9)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 
 void WorkThread::splitFileLength(const QString &filename, int Max)
 {

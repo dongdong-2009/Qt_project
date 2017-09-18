@@ -48,6 +48,8 @@ public:
     void setJob(int jobId, QString src, QString dst/*, qint64 offset, qint64 len*/);
     void setFileStringList(QStringList m_list);
     void setFileTotalSize(qint64 size);
+    void setEndFlag(bool flag);
+    bool sendBytesCopyed(qint64 cplen, qint64 comparenum);
 
 public:
     volatile bool selfCopyEndFlag;
