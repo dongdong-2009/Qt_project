@@ -29,8 +29,8 @@ MediaPlayer::~MediaPlayer()
 
 void MediaPlayer::wait(int pTimeout)
 {
-    quint32 i=0;
-    while((i+=10) < pTimeout && !m_Quit)
+    quint32 i = 0;
+    while((i += 10) < pTimeout && !m_Quit)
         msleep(10);
 }
 

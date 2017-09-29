@@ -9,10 +9,15 @@ UiElement {
 
     MouseArea{
         anchors.fill: parent
+//        onClicked: {
+//            setFloor("",
+//                     "file:///C:/Users/lishaoxiang.SHBST/Desktop/theme/sodimas/floor/T50.png",
+//                     "file:///C:/Users/lishaoxiang.SHBST/Desktop/theme/sodimas/floor/T51.png")
+//        }
         onClicked: {
             setFloor("",
-                     "file:///C:/Users/lishaoxiang.SHBST/Desktop/theme/sodimas/floor/T50.png",
-                     "file:///C:/Users/lishaoxiang.SHBST/Desktop/theme/sodimas/floor/T51.png")
+                     "file:///home/libo/Desktop/Repository/Qt_project/BST_Codes/SodimasDisplay/theme/sodimas/floor/T50.png",
+                     "file:///home/libo/Desktop/Repository/Qt_project/BST_Codes/SodimasDisplay/theme/sodimas/floor/T51.png")
         }
     }
 

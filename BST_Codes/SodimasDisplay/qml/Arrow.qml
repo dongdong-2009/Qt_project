@@ -6,7 +6,7 @@ UiElement{
     property string upArrow: ""
     property string downArrow: ""
     property string doubleArrow: ""
-    property string arrowUrl: ""  //rootpath+"arrow/t1.png"
+    property string arrowUrl: ""  //rootpath+"arrow/1.png"
 
     MouseArea{
         anchors.fill: parent

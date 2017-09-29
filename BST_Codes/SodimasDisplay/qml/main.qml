@@ -8,8 +8,8 @@ Item {
     property int windowsWidth: 480
     property int windowsHeight: 272
     property int rotateYOffset: (windowsHeight- windowsWidth)/2
-    property string rootpath: "file:///C:/Users/lishaoxiang.SHBST/Desktop/theme/sodimas/"
-
+//    property string rootpath: "file:///C:/Users/lishaoxiang.SHBST/Desktop/theme/sodimas/"
+    property string rootpath: "file:///home/libo/Desktop/Repository/Qt_project/BST_Codes/SodimasDisplay/theme/sodimas/"
     property bool inOperational: false   ///
     property bool isShowLogo: false ///false: Floor,    true : Function Logo
     property bool isFCT_AFF: false ///false: Floor+Arrow , true: email
@@ -97,7 +97,7 @@ Item {
                 //width:200
                 //height:182
                 visible: isShowLogo
-                funcImage: rootpath+"function/t41.png"
+                funcImage: rootpath+"function/T41.png"
             }
 
             Floor{

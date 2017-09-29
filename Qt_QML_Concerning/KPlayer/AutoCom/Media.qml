@@ -59,7 +59,8 @@ ApplicationWindow{
                 anchors.left: parent.left
                 //调节播放速度
                 Slider{
-                    id:playPos
+                    id: playPos
+                    property bool sync: false
                     width: kPlayer.width*0.75
                     height: 10
                     maximumValue: player.duration
@@ -80,7 +81,6 @@ ApplicationWindow{
                                 width: player.duration>0?parent.width*player.position/player.duration:0
                                 color: "blue"
                             }
-
                         }
                         handle: Rectangle {
                             anchors.centerIn: parent
@@ -98,7 +98,33 @@ ApplicationWindow{
                                 anchors.centerIn: parent
                             }
                         }
+
                     }
+                    onValueChanged: {
+                        if(!sync)
+                        {
+                            player.seek(value);
+                            console.log("ValueChanged!")
+                        }
+                    }
+
+                    Connections {
+                        target: player
+                        onPositionChanged: {
+                            playPos.sync = true;
+                            playPos.value = player.position;
+                            playPos.sync = false;
+                            console.log("onPositionChanged!")
+                        }
+                    }
+                    Connections {
+                        target: player
+                        onStopped: {
+                            playPos.value = 0;
+//                            player.position = 0;
+                        }
+                    }
+
                     //点击鼠标设置播放位置
                     MouseArea {
                         property int pos
@@ -229,7 +255,7 @@ ApplicationWindow{
                     iconImage: "./Images/add.png"
                     FileDialog{
                         id:fd
-                        nameFilters: ["Vedio Files(*.avi *.mp4 *rmvb *.rm)"]  //格式过滤
+                        nameFilters: ["Vedio Files(*.avi *.mp4 *rmvb *.rm *.mp3 *.wmv)"]  //格式过滤
                         selectMultiple: false
                     }
                 }
@@ -242,10 +268,10 @@ ApplicationWindow{
                 //时间格式化
                 function currentTime(time)
                 {
-                    var sec= Math.floor(time/1000);
-                    var hours=Math.floor(sec/3600);
-                    var minutes=Math.floor((sec-hours*3600)/60);
-                    var seconds=sec-hours*3600-minutes*60;
+                    var sec= Math.floor(time/1000);  // floor 向下取整，sec将time从毫秒换成秒
+                    var hours = Math.floor(sec/3600);
+                    var minutes = Math.floor((sec - hours*3600)/60);
+                    var seconds = sec-hours*3600 - minutes*60;
                     var hh,mm,ss;
                     if(hours.toString().length<2)
                         hh="0"+hours.toString();

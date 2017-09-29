@@ -627,7 +627,7 @@ QString getParentDirectory(QString pDirPath)
     return pDirPath.mid(0, index2 + 1);
 
 }
-
+// 获取文件夹名
 QString getDirectoryName(QString pDirPath)
 {
     if (pDirPath.isEmpty())
@@ -635,15 +635,16 @@ QString getDirectoryName(QString pDirPath)
     pDirPath.replace("\\", "/");
     if(!pDirPath.endsWith('/'))
         pDirPath.append('/');
-    int index1 = pDirPath.lastIndexOf('/');
+    int index1 = pDirPath.lastIndexOf('/');//找到最后一个/的位置
     if(index1 < 0)
         return QString();
-    int index2 = pDirPath.lastIndexOf('/', index1-1);
+    int index2 = pDirPath.lastIndexOf('/', index1-1);//找到index1-1之前的最后一个/的位置
     if(index2 < 0)
         return QString();
-    return pDirPath.mid(index2 + 1, index1 - index2 - 1);
+    return pDirPath.mid(index2 + 1, index1 - index2 - 1); //从index2+1,到index1-index2-1之间的就是文件夹的名称
 }
 
+// 返回一个以给定坐标和宽高的矩形对象
 QRect getRectFromString(QString pRectString)
 {
     if(pRectString.isEmpty())
@@ -651,7 +652,7 @@ QRect getRectFromString(QString pRectString)
     QStringList tmpList = pRectString.split(",");
     if(tmpList.count() != 4)
     {
-        return QRect();
+        return QRect(); // Constructs a null rectangle.
     }
     int tmpX = tmpList.at(0).toInt();
     int tmpY = tmpList.at(1).toInt();
@@ -692,7 +693,7 @@ QStringList findFilesInFloder(QString DirName, QString fileName, bool subfolder)
     return findFileList;
 }
 
-QStringList findFiles(const QDir &dir,const QString &fileName,const QString &txt,Qt::CaseSensitivity sensitive)
+QStringList findFiles(const QDir &dir, const QString &fileName, const QString &txt, Qt::CaseSensitivity sensitive)
 {
     QString tmpDirPath = dir.path();
     if(!tmpDirPath.endsWith('/'))
@@ -700,12 +701,12 @@ QStringList findFiles(const QDir &dir,const QString &fileName,const QString &txt
     QStringList foundFiles;
     QStringList files;
     if(fileName.isEmpty())
-        files = dir.entryList(QDir::Files | QDir::NoSymLinks);
+        files = dir.entryList(QDir::Files | QDir::NoSymLinks);// 返回目录下的所有文件不包括符号链接
     else
         files = dir.entryList(QStringList(fileName), QDir::Files | QDir::NoSymLinks);
     if(txt.isEmpty())
     {
-        for(int i=0;i<files.count();i++)
+        for(int i = 0; i<files.count(); i++)
         {
             foundFiles.append(tmpDirPath + files.at(i));
         }
@@ -901,11 +902,11 @@ bool creatPath(QString pPath)
     {
         if(!dir.mkpath(pPath))
         {
-            dir.cdUp();
+            dir.cdUp(); // 进入上一层目录
             IDE_TRACE();
             return false;
         }
-        dir.cdUp();
+        dir.cdUp(); // 进入上一层目录
     }
     return true;
 }

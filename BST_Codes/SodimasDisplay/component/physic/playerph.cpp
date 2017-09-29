@@ -30,7 +30,7 @@ bool PlayerPh::initDevice(PH_Type pPHType, QDomElement pElement)
     if(tmpParaNodeList.count() < 1)
         return 0;
     quint32 validcount = 0;
-    for(int i=0;i<tmpParaNodeList.count();i++)
+    for(int i = 0; i<tmpParaNodeList.count(); i++)
     {
         QDomElement tmpElement = tmpParaNodeList.at(i).toElement();
         if(tmpElement.isNull())
@@ -40,7 +40,7 @@ bool PlayerPh::initDevice(PH_Type pPHType, QDomElement pElement)
         if(!tmpName.compare("liftflrvol"))
         {
             QStringList tmpValueList = tmpElement.attribute("list").split(';');
-            if(tmpValueList.count()==2)
+            if(tmpValueList.count() == 2)
             {
                 mAoParas[AO_LIFTFLR].mVolume.setnum(tmpElement.text().toInt(), tmpValueList.at(0).toInt(), tmpValueList.at(1).toInt());
             }
@@ -60,7 +60,7 @@ bool PlayerPh::initDevice(PH_Type pPHType, QDomElement pElement)
         else if(!tmpName.compare("beepvol"))
         {
             QStringList tmpValueList = tmpElement.attribute("list").split(';');
-            if(tmpValueList.count()==2)
+            if(tmpValueList.count() == 2)
             {
                 mAoParas[AO_BEEP].mVolume.setnum(tmpElement.text().toInt(), tmpValueList.at(0).toInt(), tmpValueList.at(1).toInt());
             }
@@ -70,7 +70,7 @@ bool PlayerPh::initDevice(PH_Type pPHType, QDomElement pElement)
         else if(!tmpName.compare("admusicvol"))
         {
             QStringList tmpValueList = tmpElement.attribute("list").split(';');
-            if(tmpValueList.count()==2)
+            if(tmpValueList.count() == 2)
             {
                 mAoParas[AO_ADMUSIC].mVolume.setnum(tmpElement.text().toInt(), tmpValueList.at(0).toInt(), tmpValueList.at(1).toInt());
             }
@@ -147,9 +147,8 @@ void PlayerPh::initPlayer()
     QStringList tmpAoDrvList = mAoDriver.split(';');
     IDE_TRACE_STR(mAoDriver);
     int count = qMin(tmpAoDrvList.count(), AOTRACK_MAXNUM);
-    for(int i=0;i<count;i++)
+    for(int i = 0; i < count; i++)
     {
-
         QString tmpString = tmpAoDrvList.at(i);
         if(tmpString.isEmpty())
             continue;
@@ -180,7 +179,7 @@ void PlayerPh::initPlayer()
             mFinishMapper->setMapping(mPlayerList[i], i);
             mPlayerList[i]->setTrackNum(i);
             //>@建立音频类型与声道的关系
-            for(int j=0;j<tmpAoList.count();j++)
+            for(int j = 0; j < tmpAoList.count(); j++)
             {
                 AO_TYPE tmpType = GetAoType(tmpAoList.at(j));
                 if(tmpType == AO_NONE)
@@ -277,7 +276,7 @@ void PlayerPh::slot_AudioStarted(int pTrack) //只要发出开始信号的，都
         IDE_DEBUG(QString("Track[%1] %2 is started!").arg(pTrack).arg(tmpMedia->mPath));
     }
 
-    for(int i=0;i<AOTRACK_MAXNUM;i++)
+    for(int i = 0; i < AOTRACK_MAXNUM; i++)
     {
         if(pTrack == i)
             continue;
@@ -295,7 +294,7 @@ void PlayerPh::slot_AudioFinished(int pTrack) //只要发出结束信号的，�
     }else{
         IDE_DEBUG(QString("Track[%1] %2 is finished!").arg(pTrack).arg(tmpMedia->mPath));
     }
-    for(int i=0;i<AOTRACK_MAXNUM;i++)
+    for(int i = 0; i<AOTRACK_MAXNUM; i++)
     {
         if(pTrack == i)
             continue;
@@ -345,7 +344,7 @@ bool PlayerPh::isTrackEnable(int pId)
 {
     bool tmpEnable = false;
     QList<int> tmpList = mTrackRelationHash.values(pId);
-    for(int j=0;j<tmpList.count();j++)
+    for(int j = 0; j<tmpList.count(); j++)
     {
         int id = tmpList.at(j);
         if(mAoParas[id].mEnable[0] == true)
@@ -362,10 +361,10 @@ void PlayerPh::restore(int pStopType)
     if(!(mEnable && mSoundOn))
         return;
 
-    for(int i=0;i<AO_MAXNUM;i++)
+    for(int i = 0; i < AO_MAXNUM; i++)
         mAoParas[i].mEnable[0] = mAoParas[i].mEnable[1];
 
-    for(int i=0;i<AOTRACK_MAXNUM;i++)
+    for(int i = 0; i<AOTRACK_MAXNUM; i++)
     {
         //IDE_TRACE_INT(i);
         MediaPlayer *tmpTrackPlayer = mPlayerList[i];
@@ -379,7 +378,7 @@ void PlayerPh::restore(int pStopType)
 
 void PlayerPh::abort(int pStopType)
 {
-    for(int i=0;i<AOTRACK_MAXNUM;i++)
+    for(int i = 0; i<AOTRACK_MAXNUM; i++)
     {
         if(mPlayerList[i])
         {
@@ -388,7 +387,7 @@ void PlayerPh::abort(int pStopType)
         }
     }
 
-    for(int i=0;i<AO_MAXNUM;i++){
+    for(int i = 0; i<AO_MAXNUM; i++){
         mAoParas[i].mEnable[0] = false;
     }
 }

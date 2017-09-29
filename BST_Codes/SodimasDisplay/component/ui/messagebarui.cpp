@@ -13,7 +13,7 @@ MessageBarUi::MessageBarUi(ThemeParser *pthemeManager, QDomElement &pElement)
 
 bool MessageBarUi::initGeometry(DIRECTION direction, int layout){
     QVariant arg1 = getComRect(direction,layout);
-    return invokeQmlMethod("setGeometry",arg1);
+    return invokeQmlMethod("setGeometry", arg1);
 }
 
 bool MessageBarUi::initUi(DIRECTION direction)
@@ -23,5 +23,5 @@ bool MessageBarUi::initUi(DIRECTION direction)
 
 bool MessageBarUi::updateMsg(QString msg){
     QVariant arg = msg;
-    return invokeQmlMethod("updateMsg",arg);
+    return invokeQmlMethod("updateMsg", arg);
 }

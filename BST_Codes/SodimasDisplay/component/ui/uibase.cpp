@@ -223,7 +223,7 @@ bool UiBase::invokeQmlMethod(char *name,QVariant arg1){
 
 }
 
-bool UiBase::invokeQmlMethod(char *name,QVariant arg1,QVariant arg2){
+bool UiBase::invokeQmlMethod(char *name, QVariant arg1, QVariant arg2){
     if(m_QmlItem){
         QVariant returnedValue;
         return   QMetaObject::invokeMethod(m_QmlItem, name,

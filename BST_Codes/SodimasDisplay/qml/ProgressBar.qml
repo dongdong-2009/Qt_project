@@ -32,6 +32,6 @@ UiElement {
 
     function updateProgress(progress){
         if(progress>=0 && progress <=100)
-            value = progress
+         {   value = progress; console.log("progress");}
     }
 }

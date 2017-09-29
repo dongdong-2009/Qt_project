@@ -129,11 +129,11 @@ bool PhysicBase::setPara(QDomElement pElement, QString pParaValue, bool pSyncUI)
 
 bool PhysicBase::setPara(QDomElement &pElement, XmlParse *pParse)
 {
-    if(pElement.isNull() || pParse==0)
+    if(pElement.isNull() || pParse == 0)
         return false;
     //设置参数部分
     QDomNodeList tmpParaList = pElement.childNodes();
-    for(int i=0;i<tmpParaList.count();i++)
+    for(int i = 0; i < tmpParaList.count(); i++)
     {
         QDomElement tmpParaElement = tmpParaList.at(i).toElement();
         if(!tmpParaElement.isNull())
@@ -144,7 +144,7 @@ bool PhysicBase::setPara(QDomElement &pElement, XmlParse *pParse)
                 continue;
             //设置参数的属性部分
             QList<QDomAttr> tmpList = pParse->getItemElementAttrs(tmpParaElement);
-            for(int j=0;j<tmpList.count();j++)
+            for(int j = 0; j<tmpList.count(); j++)
             {
                 QDomAttr tmpDomAttr = tmpList.at(j);
                 if(tmpDomAttr.isNull())

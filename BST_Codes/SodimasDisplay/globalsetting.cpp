@@ -23,7 +23,7 @@
 
 #include "component/logic/themelg.h"
 
-
+#include <QDebug>
 GlobalSetting *appGlobalSetting;
 
 GlobalSetting * GlobalSetting::getGlobalSetting(){
@@ -88,15 +88,17 @@ void GlobalSetting::getAppRunningDir()
     m_appAbsPath.replace("\\", "/");
     if(!this->m_appAbsPath.endsWith("/"))
         this->m_appAbsPath.append("/");
-    m_appAbsPath = "C:/Users/lishaoxiang.SHBST/Desktop/";
+//    m_appAbsPath = "C:/Users/lishaoxiang.SHBST/Desktop/";
+    m_appAbsPath = "/home/libo/Desktop/Repository/Qt_project/BST_Codes/SodimasDisplay/";
+    qDebug()<< "before m_appAbsPath ="<< m_appAbsPath;
 }
 
 bool GlobalSetting::initApp()
 {
-    m_rootContent->setContextProperty("GlobalSetting",this);
-    m_rootContent->setContextProperty("DeclarativeView",m_declarativeView);
+    m_rootContent->setContextProperty("GlobalSetting", this); // 设置qml的上下文属性
+    m_rootContent->setContextProperty("DeclarativeView", m_declarativeView);
     m_bootSplash = new BootSplash();
-    m_rootContent->setContextProperty("BootSplash",m_bootSplash);
+    m_rootContent->setContextProperty("BootSplash", m_bootSplash);
 
     getAppRunningDir();
     initEarly();
@@ -108,6 +110,7 @@ bool GlobalSetting::initApp()
     QtSleep(1000);///等待加载完成
     m_declarativeView->show();
 }
+
 bool GlobalSetting::initEarly(){
     m_declarativeView->setMainQmlFile(QLatin1String("qrc:///qml/bootScreen.qml"));
     m_declarativeView->show();
@@ -138,6 +141,8 @@ bool GlobalSetting::initEarly(){
 
     m_bundlePath = m_appAbsPath + D_BUNDLEDIR + "/" +D_MDPFILENAME;
     m_curRotate = getRotateType(getRotate(m_bundlePath));
+    qDebug()<< "m_appAbsPath ="<< m_appAbsPath;
+    qDebug()<< "m_bundlePath ="<< m_bundlePath;
     if(m_curRotate == ROTATE_INVALID)
         m_curRotate = ROTATE_0;
     //IDE_TRACE_INT(m_curRotate);
@@ -210,7 +215,7 @@ bool GlobalSetting::initMdp()
         QDomElement tmpElement = m_mdpParser->m_PHElementGroup.value(tmpType);
         if(tmpElement.isNull())
             continue;
-        emit sigInfoProgress("",10+tmpPgDiff*(i+1));
+        emit sigInfoProgress("", 10+tmpPgDiff*(i+1));
         addPHDevice(tmpType, tmpElement);
         QtSleep(200);
     }
@@ -234,6 +239,7 @@ bool GlobalSetting::initMdp()
     }
     return true;
 }
+
 bool GlobalSetting::initTheme()
 {
     m_themeLg  =  (ThemeLg *) m_LGDevList.value(L_ThemeManager);
@@ -258,7 +264,7 @@ bool GlobalSetting::initTheme()
 
         QString tmpMessage;
         qreal tmpPgDiff = 20.0 / count;
-        for(int i=0;i<count;i++)
+        for(int i=0; i<count; i++)
         {
             COM_TYPE tmpType = tmpComTypeList.at(i);
 
@@ -272,8 +278,8 @@ bool GlobalSetting::initTheme()
             QtSleep(500);//
             emit sigInfoProgress("",70+tmpPgDiff*i);
         }
-        m_ComComponentGroup.insert(COM_USBLOGO,new UsbLogo());
-        m_ComComponentGroup.insert(COM_WIFILOGO,new WifiLogo());
+        m_ComComponentGroup.insert(COM_USBLOGO, new UsbLogo());
+        m_ComComponentGroup.insert(COM_WIFILOGO, new WifiLogo());
 
     }else{
         emit sigError("Parser theme.xml failed.");

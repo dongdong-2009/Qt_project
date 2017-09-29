@@ -1,5 +1,6 @@
 #include "xmlparse.h"
 #include "globalfun.h"
+#include <QDebug>
 const QString XmlParse::XmlHead = "version=\"1.0\" encoding=\"UTF-8\"";
 const QString XmlParse::XmlSuffix = ".xml";
 
@@ -102,7 +103,7 @@ bool XmlParse::getItemElement(QDomElement itemDomElement, QString itemPath)
     while(index < itemPath.length()-1)
     {
         index = itemPath.indexOf('/', index+1, Qt::CaseInsensitive);
-        if(index<0)
+        if(index < 0)
         {
             nodeFlag = false;
             break;
@@ -396,7 +397,7 @@ bool XmlParse::clearItemElement(QDomElement itemDomElement)
 
 bool XmlParse::writeXml(QIODevice *device)
 {
-    const int IndentSize = 4;
+    const int IndentSize = 4; //缩进的长度为4
     if(device->isOpen() == false)
     {
         IDE_TRACE();
@@ -431,7 +432,7 @@ bool XmlParse::openXml()
     if(!m_FileDir.endsWith("/"))
         m_FileDir.append("/");
     QFile file(m_FileDir + m_FileName);
-
+    qDebug() <<"m_FileDir= "<< m_FileDir << m_FileName;
     bool flag = file.exists();
     if(flag == true)
     {

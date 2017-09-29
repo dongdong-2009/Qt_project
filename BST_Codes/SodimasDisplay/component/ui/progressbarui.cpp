@@ -12,7 +12,7 @@ ProgressBarUi::ProgressBarUi(ThemeParser *pthemeManager, QDomElement &pElement)
 
 bool ProgressBarUi::initGeometry(DIRECTION direction, int layout){
     QVariant arg1 = getComRect(direction,layout);
-    return invokeQmlMethod("setGeometry",arg1);
+    return invokeQmlMethod("setGeometry", arg1);
 }
 
 bool ProgressBarUi::initUi(DIRECTION direction)
@@ -22,6 +22,6 @@ bool ProgressBarUi::initUi(DIRECTION direction)
 
 bool ProgressBarUi::updateValue(int progress){
     QVariant arg = progress;
-    return invokeQmlMethod("updateProgress",arg);
+    return invokeQmlMethod("updateProgress", arg);
 }
 
