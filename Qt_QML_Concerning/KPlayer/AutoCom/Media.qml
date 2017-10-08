@@ -6,53 +6,56 @@ import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
 ApplicationWindow{
-    id:kPlayer
+    id: kPlayer
     width: 1024
     height: 650
     visible: true
-    title:getVedioName(fd.fileUrl.toString())
+    title: getVedioName(fd.fileUrl.toString())
     //获取影音名称
     function getVedioName(str)
     {
-        var url=fd.fileUrl.toString();
-        var strList=new Array();
-        strList=url.split("/");
-        var name=strList[strList.length-1];
+        var url = fd.fileUrl.toString();
+        var strList = new Array(1);
+        strList = url.split("/");
+        var name = strList[strList.length-1];
         return name;
-
     }
 
     Column{
         Rectangle{
-            id:screen
-            color:"black"
-            width:kPlayer.width
+            id: screen
+            color: "black"
+            width: kPlayer.width
             height: kPlayer.height-50
             Image{
-                id:img
-                source: "./Images/KPlayer.png"
+                id: img
+                source: "./Images/kplayer.png"
                 anchors.fill: parent
             }
 
             MediaPlayer{
-                id:player
+                id: player
                 source: fd.fileUrl
                 autoPlay: true
                 volume: voice.value
+                onStopped: {
+                    playtimers.text = "00:00:00/00:00:00"
+                }
             }
             VideoOutput {
                 anchors.fill: parent
                 source: player
+                fillMode: VideoOutput.Stretch
             }
         }
         Rectangle{
-            id:control
-            color:"#80202020"
+            id: control
+            color: "#80202020"
             border.color: "gray"
             border.width: 1
-            width:kPlayer.width
+            width: kPlayer.width
             height: 20
-            Row{
+            Row {
                 spacing: 10
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.leftMargin: 10
@@ -65,9 +68,9 @@ ApplicationWindow{
                     height: 10
                     maximumValue: player.duration
                     minimumValue: 0
-                    value:player.position
+                    value: player.position
                     anchors.verticalCenter: parent.verticalCenter
-                    stepSize:1000
+                    stepSize: 1000
                     style: SliderStyle {
                         groove: Rectangle {
                             width: kPlayer.width*0.8
@@ -89,8 +92,8 @@ ApplicationWindow{
                             border.width: 2
                             implicitWidth: 15
                             implicitHeight: 15
-                            radius:7.5
-                            Rectangle{
+                            radius: 7.5
+                            Rectangle {
                                 width: parent.width-8
                                 height: width
                                 radius: width/2
@@ -114,14 +117,19 @@ ApplicationWindow{
                             playPos.sync = true;
                             playPos.value = player.position;
                             playPos.sync = false;
-                            console.log("onPositionChanged!")
+                            if (1 === btn_play_pause.status)
+                                playtimers.text = currentTime(player.position)+"/"+currentTime(player.duration)
+                            console.log("onPositionChanged will update sth!")
                         }
                     }
                     Connections {
                         target: player
                         onStopped: {
                             playPos.value = 0;
-//                            player.position = 0;
+                            playtimers.text = "00:00:00/00:00:00"
+                            btn_play_pause.status = 0;
+                            btn_play_pause.iconImage = "./Images/play.png"
+                            console.log("recevice stop signals")
                         }
                     }
 
@@ -131,9 +139,14 @@ ApplicationWindow{
                         anchors.fill: parent
                         onClicked: {
                             if (player.seekable)
+                            {
                                 pos = player.duration * mouse.x/parent.width
+                                btn_play_pause.status = 1;
+                                btn_play_pause.iconImage = "Images/pause.png";
+                                player.play();
+                            }
                             player.seek(pos)
-                            playPos.value=pos;
+                            playPos.value = pos;
                         }
                     }
                 }
@@ -148,7 +161,7 @@ ApplicationWindow{
                     id:voice
                     width: kPlayer.width*0.2
                     height: 10
-                    value:player.volume
+                    value: player.volume
                     stepSize: 0.1
                     maximumValue: 1
                     minimumValue: 0
@@ -174,7 +187,7 @@ ApplicationWindow{
                             border.width: 2
                             implicitWidth: 15
                             implicitHeight: 15
-                            radius:7.5
+                            radius: 7.5
                             Rectangle{
                                 width: parent.width-8
                                 height: width
@@ -186,7 +199,6 @@ ApplicationWindow{
                     }
                 }
             }
-
         }
         //控制区域
         Rectangle{
@@ -202,38 +214,47 @@ ApplicationWindow{
                 anchors.leftMargin: 10
                 spacing: 10
                 ButtonImage{
+                    enabled: ("" === getVedioName(fd.fileUrl.toString())?false:true )
+                    id: btn_play_pause
                     width: 30
                     height: 30
                     property int status: 1  //默认播放
                     iconImage: "./Images/pause.png"
                     onClicked: {
-                        if(status===1)
+                        if(status === 1)
                         {
                             player.pause();
-                            tooltip="开始";
+                            tooltip = "开始";
                             console.log("start")
-                            status=0;
-                            iconImage="./Images/play.png"
+                            status = 0;
+                            iconImage = "./Images/play.png"
+                            playtimers.text = currentTime(player.position)+"/"+currentTime(player.duration)
                         }
                         else{
                             player.play() ;
-                            tooltip="暂停";
+                            tooltip = "暂停";
                             console.log("pause")
-                            status=1;
-                            iconImage="./Images/pause.png"
+                            status = 1;
+                            iconImage ="./Images/pause.png"
+                            playtimers.text = currentTime(player.position)+"/"+currentTime(player.duration)
                         }
-
                     }
                 }
-                ButtonImage{
+                ButtonImage {
+                    enabled: ("" === getVedioName(fd.fileUrl.toString())?false:true )
                     width: 30
                     height: 30
-                    onClicked: player.stop()
+                    onClicked: {
+                        player.stop()
+                        playtimers.text = "00:00:00/00:00:00"
+                        console.log("stop btn is clicked!")
+                    }
                     tooltip: "停止"
                     iconImage: "./Images/stop.png"
                 }
                 //快进快退10s
-                ButtonImage{
+                ButtonImage {
+                    enabled: ("" === getVedioName(fd.fileUrl.toString())?false:true )
                     width: 30
                     height: 30
                     onClicked: player.seek(player.position+10000)
@@ -241,6 +262,7 @@ ApplicationWindow{
                     iconImage: "./Images/back.png"
                 }
                 ButtonImage{
+                    enabled: ("" === getVedioName(fd.fileUrl.toString())?false:true )
                     width: 30
                     height: 30
                     onClicked: player.seek(player.position-10000)
@@ -255,43 +277,41 @@ ApplicationWindow{
                     iconImage: "./Images/add.png"
                     FileDialog{
                         id:fd
-                        nameFilters: ["Vedio Files(*.avi *.mp4 *rmvb *.rm *.mp3 *.wmv)"]  //格式过滤
+                        nameFilters: ["Vedio Files(*.avi *.mp4 *rmvb *.rm *.mp3 *.wmv *.mkv)"]  //格式过滤
                         selectMultiple: false
                     }
                 }
 
                 Text{
+                    id: playtimers
                     anchors.verticalCenter: parent.verticalCenter
-                    text:parent.currentTime(player.position)+"/"+parent.currentTime(player.duration)
+                    text: currentTime(player.position)+"/"+currentTime(player.duration)
                     color: "white"
-                }
-                //时间格式化
-                function currentTime(time)
-                {
-                    var sec= Math.floor(time/1000);  // floor 向下取整，sec将time从毫秒换成秒
-                    var hours = Math.floor(sec/3600);
-                    var minutes = Math.floor((sec - hours*3600)/60);
-                    var seconds = sec-hours*3600 - minutes*60;
-                    var hh,mm,ss;
-                    if(hours.toString().length<2)
-                        hh="0"+hours.toString();
-                    else
-                        hh=hours.toString();
-                    if(minutes.toString().length<2)
-                        mm="0"+minutes.toString();
-                    else
-                        mm=minutes.toString();
-                    if(seconds.toString().length<2)
-                        ss="0"+seconds.toString();
-                    else
-                        ss=seconds.toString();
-                    return hh+":"+mm+":"+ss
-
-                }
-
+                }                
             }
-
         }
+    }
+    //时间格式化
+    function currentTime(time)
+    {
+        var sec = Math.floor(time/1000);  // floor 向下取整，sec将time从毫秒换成秒
+        var hours = Math.floor(sec/3600);
+        var minutes = Math.floor((sec - hours*3600)/60);
+        var seconds = sec-hours*3600 - minutes*60;
+        var hh, mm, ss;
+        if(hours.toString().length < 2)
+            hh = "0"+hours.toString();
+        else
+            hh = hours.toString();
+        if(minutes.toString().length < 2)
+            mm = "0"+minutes.toString();
+        else
+            mm = minutes.toString();
+        if(seconds.toString().length < 2)
+            ss = "0"+seconds.toString();
+        else
+            ss = seconds.toString();
+        return hh+":"+mm+":"+ss
     }
 }
 

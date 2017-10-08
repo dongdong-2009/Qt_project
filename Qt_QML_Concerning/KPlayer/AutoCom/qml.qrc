@@ -11,5 +11,6 @@
         <file>Images/play.png</file>
         <file>Images/stop.png</file>
         <file>Images/voice.png</file>
+        <file>Images/kplayer.png</file>
     </qresource>
 </RCC>
