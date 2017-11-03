@@ -20,6 +20,8 @@ ApplicationWindow{
         var name = strList[strList.length-1];
         return name;
     }
+    property bool bgimg_visible: false
+    property bool bggif_visible: false
 
     Column{
         Rectangle{
@@ -29,8 +31,26 @@ ApplicationWindow{
             height: kPlayer.height-50
             Image{
                 id: img
-                source: "./Images/kplayer.png"
+                visible: ("" === getVedioName(fd.fileUrl.toString())?true:false )
+                source: "./Images/KPlayer_new.png"
                 anchors.fill: parent
+            }
+            Image {
+                id: img_static
+                visible: bgimg_visible
+                source: "./Images/Music.gif"
+                anchors.fill: parent
+            }
+
+            Rectangle {
+                id: img_gif
+                color: "transparent"
+                visible: bggif_visible
+                anchors.fill: parent
+                AnimatedImage {
+                    source: "./Images/Music.gif"
+                    anchors.fill: parent
+                }
             }
 
             MediaPlayer{
@@ -40,6 +60,29 @@ ApplicationWindow{
                 volume: voice.value
                 onStopped: {
                     playtimers.text = "00:00:00/00:00:00"
+                    img_gif.visible = false;
+                    img.visible = true;
+                }
+                onPlaying: {
+                    console.log("is play status ")
+                    if (showgif(getVedioName(fd.fileUrl.toString())))
+                    {
+                        img.visible = false;
+                        bgimg_visible = false;
+                        bggif_visible = true;
+//                        img_gif.playing = true;
+                        console.log("is mp3 in play", bggif_visible);
+                    }
+                }
+                onPaused: {
+                    console.log("is pause status ")
+                    if (showgif(getVedioName(fd.fileUrl.toString())))
+                    {
+                        img.visible = false;
+                        bggif_visible = false;
+                        bgimg_visible = true;
+                        console.log("is mp3 in pause")
+                    }
                 }
             }
             VideoOutput {
@@ -119,7 +162,7 @@ ApplicationWindow{
                             playPos.sync = false;
                             if (1 === btn_play_pause.status)
                                 playtimers.text = currentTime(player.position)+"/"+currentTime(player.duration)
-                            console.log("onPositionChanged will update sth!")
+//                            console.log("onPositionChanged will update sth!")
                         }
                     }
                     Connections {
@@ -312,6 +355,15 @@ ApplicationWindow{
         else
             ss = seconds.toString();
         return hh+":"+mm+":"+ss
+    }
+
+    function showgif(filename)
+    {
+        var res = ShowGif.isShowGif(filename);
+        if (res === true)
+            return true;
+        else
+            return false;
     }
 }
 

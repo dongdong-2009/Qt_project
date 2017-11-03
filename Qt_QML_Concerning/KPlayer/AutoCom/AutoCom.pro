@@ -2,7 +2,8 @@ TEMPLATE = app
 
 QT += qml quick widgets core gui
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    showgifpicture.cpp
 
 RESOURCES += qml.qrc
 TARGET = KPLayer
@@ -15,3 +16,6 @@ include(deployment.pri)
 
 DISTFILES +=
 RC_FILE += icon.rc
+
+HEADERS += \
+    showgifpicture.h

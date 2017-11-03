@@ -12,5 +12,7 @@
         <file>Images/stop.png</file>
         <file>Images/voice.png</file>
         <file>Images/kplayer.png</file>
+        <file>Images/KPlayer_new.png</file>
+        <file>Images/Music.gif</file>
     </qresource>
 </RCC>
