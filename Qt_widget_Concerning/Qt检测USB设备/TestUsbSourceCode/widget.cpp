@@ -22,9 +22,11 @@ Widget::~Widget()
 void Widget::addusb(QString str)
 {
     ui->label->setText("add usb");
+    ui->label->setText(str);
 }
 
 void Widget::rmusb(QString str)
 {
     ui->label->setText("remove usb");
+    ui->label->setText(str);
 }
