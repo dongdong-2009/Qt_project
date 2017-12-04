@@ -8,8 +8,8 @@
 #include "log.h"
 #include <QStringList>
 
-#define MAXSIZE 10
-
+//#define MAXSIZE 10
+#define MAXSIZE 4
 typedef enum{
    COPY_START = 0,
    COPY_STOP,
@@ -49,7 +49,7 @@ public:
     void setFileStringList(QStringList m_list);
     void setFileTotalSize(qint64 size);
     void setEndFlag(bool flag);
-    bool sendBytesCopyed(qint64 cplen, qint64 comparenum);
+    bool sendBytesCopyed(qint64 cplen, qint64 totallen);
 
 public:
     volatile bool selfCopyEndFlag;

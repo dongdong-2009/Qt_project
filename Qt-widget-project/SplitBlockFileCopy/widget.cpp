@@ -106,6 +106,8 @@ void Widget::onClearFileList()
     m_filemodel = NULL;
     this->ui->listView->setModel(m_filemodel);
     m_listview = getFileList(m_filemodel);  // 将m_listview 置为空
+    ui->progressBar->setValue(0);
+    ui->progressBar->setVisible(false);
     emit btnEnabledChanged(m_listview);
 }
 
@@ -146,7 +148,7 @@ void UpdatePro::onCountPercentage(int id, qint64 fbytes)
     qint64 tmp = 0;
     int percent = 0;
     CopyedBytes[id] = fbytes;
-    for(int i = 0; i< MAXSIZE; i++){
+    for(int i = 0; i< MAXSIZE; i++) {
         tmp += CopyedBytes[i]; // 计算多线程总的拷贝长度
     }
     qDebug()<< "tmp = "<< tmp << "m_FileTotalsize = "<< m_FileTotalSize;
@@ -221,7 +223,7 @@ QStringListModel * Widget::onDeleteFileList(/*QStringList files*/)
 void Widget::onOpenmultifileDaliog()
 {
     QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open",
-    ".","Files you choice (*.png *.jpg *.mp4 *.flv *.rmvb *.sh *.txt *.doc *.pdf *.xlsx)");
+    ".","Files you choice (*.png *.jpg *.mp4 *.flv *.rmvb *.wmv *.sh *.txt *.doc *.pdf *.xlsx)");
     m_listview.clear();
     m_listview = files;
     qDebug()<< "m_listview = "<< m_listview;
@@ -267,7 +269,7 @@ void CopyThread::startWork()
     for(int i = 0; i < temp_list.length(); i++)
     {
         qDebug()<<"m_listview.at(i) = "<< temp_list.at(i);
-        QString desFilename = m_DestPath + "/" + getFileName(temp_list.at(i)); // 目标文件的文件名已经路径
+        QString desFilename = m_DestPath + "/" + getFileName(temp_list.at(i)); // 目标文件的文件名以及路径
         QMap<int, WorkThread *>::const_iterator it = wThreadMap.constBegin();  // 获取多线程对象的头结点
         WorkThread *beginThread;
         int j = 0;
@@ -331,6 +333,7 @@ void CopyThread::startWork()
                 break;
             }
             itstart1 = wThreadMap.begin();
+            QThread::msleep(10);
         }
     }
 }

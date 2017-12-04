@@ -52,7 +52,7 @@ void WorkThread::run()
     qint64 readLength = 0;
     copyedBytes = 0;
     this->selfCopyEndFlag = false;
-    while(copyedBytes < len /*&& runningFlag*/) {
+    while(copyedBytes < len && runningFlag) {
         if (this->jobId == 0)
         {
             qDebug()<< "copyBytes = "<< copyedBytes << "len = "<< len << "offset = "<< offset;
@@ -66,8 +66,9 @@ void WorkThread::run()
             dstfile.write(buf, len - copyedBytes);
             copyedBytes = len;
         }
-        if (copyedBytes == len || sendBytesCopyed(copyedBytes, len/MAXSIZE))
+        if (copyedBytes == len || sendBytesCopyed(copyedBytes, len))
             emit copyedbytes(jobId, copyedBytes);
+        msleep(10);
     }
     this->selfCopyEndFlag = true;
     copyedBytes = 0;
@@ -104,11 +105,14 @@ void WorkThread::setEndFlag(bool flag)
     selfCopyEndFlag = flag;
 }
 
-bool WorkThread::sendBytesCopyed(qint64 cplen, qint64 comparenum)
+bool WorkThread::sendBytesCopyed(qint64 cplen, /*qint64 comparenum,*/ qint64 totallen)
 {
-    if (cplen == comparenum || cplen == comparenum *2 || cplen == comparenum *3
-        || cplen == comparenum *4 || cplen == comparenum *5 || cplen == comparenum *6
-        || cplen == comparenum *7 || cplen == comparenum *8 || cplen == comparenum *9)
+    qint64 totaltemp = totallen / 1024;
+    qint64 copytemp = cplen / 1024;
+    qint64 tmp = totaltemp / copytemp ;
+    if (tmp == 1 || tmp == 2 || tmp == 3
+        || tmp == 4 || tmp == 5 || tmp == 6
+        || tmp == 7 || tmp == 8 || tmp == 9)
     {
         return true;
     }
