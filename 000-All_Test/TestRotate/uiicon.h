@@ -28,13 +28,13 @@ public:
     QLabel          *mBigTextLine2;
     QLabel          *mBigTextLine3;
     QLabel          *mBigTextLine4;
-
+    QLabel          *mBlackBack;
     QHash<int, QString>   mRcHash;  //  rcÐòºÅ->rcÂ·¾¶
 
     int             mIconNum;
 
     QDomElement    mDomElement;
-    QStackedWidget *tmpStackedWidget;
+//    QStackedWidget *tmpStackedWidget;
 };
 
 

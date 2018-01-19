@@ -6,7 +6,7 @@ ScreenSaver::ScreenSaver(QObject *parent) : QObject(parent)
   , mPreWidgetIndex(0)
   , mScreenSaverTime(1800000)
   , mChangeBackTime(5000)
-  , mIsStanyBy(true)
+  , mIsStanyBy(false)
 {
 }
 
@@ -48,8 +48,8 @@ void ScreenSaver::enterScreenSaver(int light)
 {
     if (mIsStanyBy)
     {
-        mLastLightGrades = mLightCtrl.getLightGrade();
-        IDE_TRACE_INT(mLastLightGrades);
+//        mLastLightGrades = mLightCtrl.getLightGrade();
+//        IDE_TRACE_INT(mLastLightGrades);
         mLightCtrl.setBacklightValue(light);
         remainStatus();
     }

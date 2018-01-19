@@ -14,7 +14,7 @@ UiIcon::UiIcon(QWidget* parent, Qt::WindowFlags f)
     mBigTextLine2 = 0;
     mBigTextLine3 = 0;
     mBigTextLine4 = 0;
-    tmpStackedWidget = qobject_cast<QStackedWidget*>(parentWidget()->parentWidget());
+//    tmpStackedWidget = qobject_cast<QStackedWidget*>(parentWidget()->parentWidget());
 
 }
 
@@ -33,6 +33,15 @@ void UiIcon::Init(QDomElement pElement)
         mBigTextLine2 = tmpBigPage->findChild<QLabel *>("label_bigtext_2");
         mBigTextLine3 = tmpBigPage->findChild<QLabel *>("label_bigtext_3");
         mBigTextLine4 = tmpBigPage->findChild<QLabel *>("label_bigtext_4");
+
+        QWidget *tmpBigPage2 = tmpStackedWidget->widget(2);
+        mBlackBack = tmpBigPage2->findChild<QLabel *>("label_blackground");
+        if (mBlackBack)
+        {
+            IDE_TRACE_STR(QString("mBlackBack is not null"));
+            QPixmap tmp("/usr/bst/usrfs/Theme/sodimas/desktop/bootBg.png");
+            mBlackBack->setPixmap(tmp);
+        }
     }
 
     QRect tmpRect = gUiLoader->m_themeParser->getComRect(gUiLoader->m_themeLayout, pElement, gUiLoader->m_themeDirection);
@@ -68,7 +77,7 @@ void UiIcon::updateIcon()
     mIcon->setPixmap(mRcHash.value(mIconNum));
 
     //如果是小屏文本，则需要同步显示功能图标对应的文本
-//    QStackedWidget *tmpStackedWidget = qobject_cast<QStackedWidget*>(parentWidget()->parentWidget());
+    QStackedWidget *tmpStackedWidget = qobject_cast<QStackedWidget*>(parentWidget()->parentWidget());
     if(tmpStackedWidget && tmpStackedWidget->currentIndex() == 0)
     {
         QDomElement tmpRcElement = mDomElement.firstChildElement("resource");
