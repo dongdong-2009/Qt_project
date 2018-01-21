@@ -17,7 +17,7 @@ UsbAction::UsbAction(QObject *parent) : QObject(parent)
 
 QStringList UsbAction::readFile()
 {
-    QString tmpPath = runPath + "/copyInfo.txt";
+    QString tmpPath = runPath + "/copyFile.txt";
     QFile file(tmpPath);
     mCpFileList.clear();
     if (file.open(QIODevice::ReadOnly))
@@ -33,10 +33,11 @@ QStringList UsbAction::readFile()
             if (spl != QString('\n') && spl != QString(" "))
             {
                 spl = spl.split("/").last();    // 取出文件的文件名
-                spl = spl.left(spl.length()-2); // 去掉最后一个字符’
-                mCpFileList.append(spl);
+                spl = spl.left(spl.length() - 2); // 去掉最后一个字符’
+                mCpFileList.append("Updating " + spl);
             }
         }
+        file.close();
         return mCpFileList;
     }
     else
@@ -54,7 +55,7 @@ quint64 UsbAction::dirFileSize(const QString &path)
     //dir.entryInfoList(QDir::Files)返回文件信息
     foreach(QFileInfo fileInfo, dir.entryInfoList(QDir::Files))
     {
-        fileLength += fileInfo.size()/1024; //计算文件大小
+        fileLength += fileInfo.size() / 1024; //计算文件大小
         ++fileNum;
         qDebug()<<"fileInfo.name = "<<path + "/" + fileInfo.fileName();
     }
@@ -85,10 +86,13 @@ int UsbAction::getFileLength()
 
 int UsbAction::copyFile(QString src, QString dest)
 {
-    dest = "/media/sodimas/";
-    src = "/usr/bst/";
-    QString cmd = "cp -vrf " + src + dest;
-//    system(cmd.toLatin1().data());
+//    dest = " /usr/bst/usrfs/ ";
+//    src = " /meida/sodimas/ ";
+    dest = " /home/libo/Desktop/emulation/ ";
+    src = " /home/libo/Desktop/1243/ ";
+    QString cmd = "cp -vrf " + src + dest + " > /home/libo/Desktop/test.txt";
+    system(cmd.toLatin1().data());
+    qDebug()<<"cmd.toLatin1().data()"<<cmd.toLatin1().data();
     this->moveToThread(&mProgressThread);
     mProgressThread.start();
     emit sigStartProgress();
@@ -105,13 +109,13 @@ void UsbAction::sendUpdateProgress()
             num = num + 100/getFileNum();
             if (num >= 100)
             {
-                emit sigUpdateProgress(num);
+                emit sigUpdateProgress(100);
                 break;
             }
             qDebug()<<"num = "<<num;
             emit sigUpdateProgress(num);
         }
-        QThread::msleep(500);
+        QThread::msleep(1000);
     }
 }
 

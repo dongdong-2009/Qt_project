@@ -2,9 +2,9 @@
 #define WIDGET_H
 
 #include <QWidget>
-#include "usbaction.h"
-#include <QStringListModel>
-#include <QPixmap>
+#include <QString>
+#include <QAbstractSlider>
+#include <QMatrix>
 
 namespace Ui {
 class Widget;
@@ -17,15 +17,13 @@ class Widget : public QWidget
 public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
-    void setCopyFileList(QStringList list);
-    void updateProgressBar(int num);
-
-signals:
+    void initScence();
+    void paintEvent(QPaintEvent *e);
 
 private:
     Ui::Widget *ui;
-    UsbAction mUsbAct;
-    QStringListModel model;
+    QString runPath;
+    QMatrix leftmatrix;
 };
 
 #endif // WIDGET_H

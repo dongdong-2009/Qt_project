@@ -1,4 +1,5 @@
 #include "ttipwidget.h"
+#include <QTimer>
 
 TTipWidget::TTipWidget()
     : mpParent(nullptr)
