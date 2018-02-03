@@ -12,11 +12,13 @@ UiDesktop::UiDesktop(QWidget* parent, Qt::WindowFlags f)
 void UiDesktop::Init(QDomElement pElement)
 {
     QRect tmpRect = gUiLoader->m_themeParser->getComRect(gUiLoader->m_themeLayout, pElement, gUiLoader->m_themeDirection);
-    this->setGeometry(tmpRect);
-    setFixedSize(tmpRect.size());
     gUiLoader->mView->scene()->setSceneRect(tmpRect);
-    gUiLoader->mView->setGeometry(-5,-5,tmpRect.width()+10,tmpRect.height()+10);
 
+//    if (gUiLoader->mView)
+//    {
+//        gUiLoader->mView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//        gUiLoader->mView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    }
     QString tmpThemePath = gUiLoader->m_themeParser->m_FileDir;
 
     QDomElement tmpRcElement = pElement.firstChildElement("resource");

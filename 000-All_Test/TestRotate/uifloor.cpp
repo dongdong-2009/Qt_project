@@ -12,8 +12,12 @@ UiFloor::UiFloor(QWidget* parent, Qt::WindowFlags f)
 
 void UiFloor::Init(QDomElement pElement)
 {
+    bool tmpFlag = isVisible();
     QRect tmpRect = gUiLoader->m_themeParser->getComRect(gUiLoader->m_themeLayout, pElement, gUiLoader->m_themeDirection);
     this->setGeometry(tmpRect);
+    IDE_DEBUG(QString("%1 %2 %3 %4").arg(tmpRect.x()).arg(tmpRect.y()).arg(tmpRect.width()).arg(tmpRect.height()));
+    if(!tmpFlag)
+        this->setVisible(false);
 
     mHundLabel = this->findChild<QLabel *>("Hundred");
     if(mHundLabel)
@@ -24,6 +28,16 @@ void UiFloor::Init(QDomElement pElement)
     mSingleLabel = this->findChild<QLabel *>("Single");
     if(mSingleLabel)
         mSingleLabel->setScaledContents(true);
+
+    mTimeText = this->findChild<QLabel *>("label_time");
+    mDestText = this->findChild<QLabel *>("label_dest");
+    mTimeText->setAlignment(Qt::AlignCenter);
+    mDestText->setAlignment(Qt::AlignCenter);
+
+    tmpRect.setHeight(tmpRect.height() + mTimeText->height() + mDestText->height());
+    this->setGeometry(tmpRect);
+    IDE_TRACE_INT(mTimeText->height());
+    IDE_TRACE_INT(mDestText->height());
 
     QString tmpThemePath = gUiLoader->m_themeParser->m_FileDir;
 
@@ -44,15 +58,6 @@ void UiFloor::Init(QDomElement pElement)
 
 void UiFloor::updateFloor()
 {
-//    if(mHundred == 48)
-//    {
-//        mHundLabel->setPixmap(QPixmap());
-//    }
-//    else
-//    {
-//        mHundLabel->setPixmap(mRcHash.value(mHundred));
-//    }
-
     if(mTen == 48)
     {
         mTenLabel->setPixmap(mRcHash.value(mSingle));
@@ -63,8 +68,6 @@ void UiFloor::updateFloor()
         mTenLabel->setPixmap(mRcHash.value(mTen));
         mSingleLabel->setPixmap(mRcHash.value(mSingle));
     }
-
-
     //mSingleLabel->setStyleSheet("font:bold larger\"Arial\"; font-size:100px;color:white");
 }
 
@@ -75,4 +78,10 @@ void UiFloor::setFloor(int pGe, int pShi, int pBai)
     mSingle = pGe+48;
 
     updateFloor();
+}
+
+void UiFloor::setTimeAndDest(QString dest, QString time)
+{
+    mTimeText->setText(time);
+    mDestText->setText(dest);
 }

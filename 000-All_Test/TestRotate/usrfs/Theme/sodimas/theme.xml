@@ -97,23 +97,23 @@
           <horizontal>0,206,280,80</horizontal>  
           <vertical>0,195,272,50</vertical> 
         </rect1>  
-        <resource parameter="row:2;rowspace:1;column:20;spaceext:1;font:dejavu sans  mono;weigth:normal;color:black;aligns:center;alignb:left;"/> 
+        <resource parameter="row:4;rowspace:1;column:50;spaceext:1;font:dejavu sans  mono;weigth:normal;color:white;aligns:center;alignb:left;"/> 
       </fulltext>  
       <realtimetext>
         <rect> 
-          <horizontal>100,200,200,20</horizontal>
+          <horizontal>258,200,198,40</horizontal>
           <vertical>37,418,198,40</vertical>
         </rect>  
         <rect1> 
           <horizontal>24,200,198,40</horizontal>  
           <vertical>15,195,198,40</vertical> 
         </rect1>  
-        <resource parameter="row:2;rowspace:1;column:20;spaceext:1;font:dejavu sans  mono;weigth:normal;color:red;aligns:center;alignb:left;"/> 
+        <resource parameter="row:4;rowspace:1;column:50;spaceext:1;font:dejavu sans  mono;weigth:normal;color:white;aligns:center;alignb:left;"/> 
       </realtimetext>	  
       <floor> 
         <rect> 
-          <horizontal>242,36,198,165</horizontal>  
-          <vertical>36,206,200,200</vertical> 
+          <horizontal>258,26,198,165</horizontal>  
+          <vertical>37,238,198,165</vertical> 
         </rect>  
         <rect1> 
           <horizontal>24,26,198,165</horizontal>  
@@ -167,7 +167,7 @@
       </floor>  
       <arrow> 
         <rect> 
-          <horizontal>36,36,200,200</horizontal>  
+          <horizontal>26,32,200,200</horizontal>  
           <vertical>31,20,200,200</vertical> 
         </rect>  
         <rect1> 
@@ -183,12 +183,12 @@
       </arrow>  
       <function> 
         <rect> 
-          <horizontal>242,36,200,154</horizontal>  
-          <vertical>31,235,200,154</vertical> 
+          <horizontal>257,15,200,182</horizontal>  
+          <vertical>31,235,200,182</vertical> 
         </rect>  
         <rect1> 
-          <horizontal>23,15,200,154</horizontal>  
-          <vertical>31,9,200,154</vertical> 
+          <horizontal>23,15,200,182</horizontal>  
+          <vertical>31,9,200,182</vertical> 
         </rect1>  
         <resource> 
           <rc0>mediafloor/T0.png</rc0>  

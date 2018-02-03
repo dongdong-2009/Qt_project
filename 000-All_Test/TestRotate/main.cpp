@@ -21,18 +21,18 @@ int main(int argc, char *argv[])
         tmpAppStr.append("/");
     tmpAppStr.replace("//","/");
 
-    CMySplashScreen *splash = new CMySplashScreen(3500);
-    splash->setDisabled(true); //禁用用户的输入事件响应
-    splash->show();
+//    CMySplashScreen *splash = new CMySplashScreen(3500);
+//    splash->setDisabled(true); //禁用用户的输入事件响应
+//    splash->show();
 
 #if 1
-    int delayTime = 10;
-    QElapsedTimer timer;
-    timer.start();
-    while(timer.elapsed() < (delayTime * 1000))
-    {
-         a.processEvents();
-    }
+//    int delayTime = 10;
+//    QElapsedTimer timer;
+//    timer.start();
+//    while(timer.elapsed() < (delayTime * 1000))
+//    {
+//         a.processEvents();
+//    }
 #endif
     tmpView.setScene(&tmpScene);
     tmpView.showMaximized();

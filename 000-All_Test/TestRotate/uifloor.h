@@ -14,11 +14,14 @@ public:
     void Init(QDomElement pElement);
     void setFloor(int pGe,int pShi,int pBai);
     void updateFloor();
+    void setTimeAndDest(QString time, QString dest);
 
 public:
     QLabel*     mHundLabel;
     QLabel*     mTenLabel;
     QLabel*     mSingleLabel;
+    QLabel*     mTimeText;
+    QLabel*     mDestText;
 
     int         mHundred;
     int         mTen;

@@ -6,13 +6,20 @@
 #include <QPainter>
 #include <QTransform>
 
+
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget),
     runPath(QCoreApplication::applicationDirPath())
 {
     ui->setupUi(this);
-    initScence();
+//    initScence();
+      scene.addText("rotated clockwise");
+      scene.setSceneRect(0, 0, 300, 300);
+      view.setScene(&scene);
+      view.translate(-100, -100);
+      view.rotate(90); // the text is rendered with a 90 degree clockwise rotation
+      view.show();
 }
 
 Widget::~Widget()
@@ -44,11 +51,20 @@ void Widget::initScence()
 
 void Widget::paintEvent(QPaintEvent *e)
 {
+//    QPainter painter(this);
+//    QFont font("Courier", 14);
+//    painter.setFont(font);
+//    QTransform transform;
+//    transform.rotate(90.0);//旋转90度
+//    painter.setWorldTransform(transform);
+//    painter.drawText(0, 0, "Hello world!");
+
     QPainter painter(this);
-    QFont font("Courier", 14);
-    painter.setFont(font);
-    QTransform transform;
-    transform.rotate(90.0);//旋转90度
-    painter.setWorldTransform(transform);
+    painter.save(); //保存坐标系状态
+    painter.translate(0, 272);
+    painter.drawLine(0, 0, 50, -50);
     painter.drawText(0, 0, "Hello world!");
+    painter.restore(); //恢复以前的坐标系状态
+    painter.drawLine(0, 0, 50, 50);
+
 }

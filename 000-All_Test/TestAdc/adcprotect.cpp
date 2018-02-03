@@ -40,9 +40,10 @@ AdcProtect::AdcProtect(QThread *parent) : QThread(parent)
   , runPath(QCoreApplication::applicationDirPath())
 {
     currentProtection();
-    initGpiosFd();
+//    initGpiosFd();
     msleep(1000);
-    start();
+//    start();
+    init();
 }
 
 void AdcProtect::init()

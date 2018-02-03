@@ -5,6 +5,8 @@
 #include <QString>
 #include <QAbstractSlider>
 #include <QMatrix>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 
 namespace Ui {
 class Widget;
@@ -24,6 +26,8 @@ private:
     Ui::Widget *ui;
     QString runPath;
     QMatrix leftmatrix;
+    QGraphicsScene scene;
+    QGraphicsView view;
 };
 
 #endif // WIDGET_H

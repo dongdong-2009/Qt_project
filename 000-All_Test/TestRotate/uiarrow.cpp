@@ -24,6 +24,9 @@ void UiArrow::Init(QDomElement pElement)
     QRect tmpRect = gUiLoader->m_themeParser->getComRect(gUiLoader->m_themeLayout, pElement, gUiLoader->m_themeDirection);
     this->setGeometry(tmpRect);
 
+    IDE_TRACE_INT(tmpRect.width());
+    IDE_TRACE_INT(tmpRect.height());
+
     QString tmpThemePath = gUiLoader->m_themeParser->m_FileDir;
 
     QDomElement tmpRcElement = pElement.firstChildElement("resource");

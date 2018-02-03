@@ -23,7 +23,7 @@ Uiloader::Uiloader(QObject *parent)
 
     mAutoTestCount = 20;
     connect(&mAutoTestTimer, SIGNAL(timeout()), this, SLOT(slot_AutoTest()));
-    mAutoTestTimer.setInterval(1000);
+    mAutoTestTimer.setInterval(600);
 }
 
 void Uiloader::slot_ShowFuncLogo(int pFuncLogoIndex, int pSoundNumber)
@@ -94,7 +94,6 @@ void Uiloader::slot_ArrowAction(bool pArrows_FLM, bool pArrows_FLD, bool pArrows
     }
 }
 
-
 void Uiloader::slot_Orient(int pOrientation) //sdo旋转横竖屏
 {
     IDE_TRACE_INT(pOrientation);
@@ -104,7 +103,7 @@ void Uiloader::slot_AutoTest()
 {
     mAutoTestCount++;
 
-    if(mAutoTestCount < 40)
+    if(mAutoTestCount < 5)
     {
         SetLayout(0);
         SetRotate(0);
@@ -121,7 +120,7 @@ void Uiloader::slot_AutoTest()
         if(mFloor)
         {
             mFloor->setVisible(true);
-            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0); //GE SHI BAI
+            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0);  //GE SHI BAI
         }
 
         //显示Arroow的代码
@@ -130,6 +129,26 @@ void Uiloader::slot_AutoTest()
             mArrow->show();
             mArrow->setArrowType(UiArrow::UpScrollArrow, 5);
         }
+    }
+    else if(mAutoTestCount < 10)
+    {
+        SetLayout(0);
+        SetRotate(270);
+    }
+    else if(mAutoTestCount < 20)
+    {
+        SetLayout(0);
+        SetRotate(90);
+    }
+    else if(mAutoTestCount < 30)
+    {
+        SetLayout(0);
+        SetRotate(180);
+    }
+    else if(mAutoTestCount < 40)
+    {
+        SetLayout(0);
+        SetRotate(270);
     }
     else if(mAutoTestCount < 49)
     {
@@ -208,7 +227,7 @@ void Uiloader::slot_AutoTest()
         if(mFloor)
         {
             mFloor->setVisible(true);
-            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0); //GE SHI BAI
+            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0);  //GE SHI BAI
         }
     }
     else if(mAutoTestCount < 70)
@@ -235,60 +254,80 @@ void Uiloader::slot_AutoTest()
         if(mFloor)
         {
             mFloor->setVisible(true);
-            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0); //GE SHI BAI
+            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0);  //GE SHI BAI
         }
     }
     else if(mAutoTestCount >= 70)
     {
         SetRotate(0);
         mAutoTestCount = 0;
-        mAutoTestTimer.stop();
     }
 }
 
 
 //void Uiloader::slot_AutoTest()
 //{
+//    mAutoTestCount ++;
+
+//    if(mFloor)
+//    {
+//        mFloor->setVisible(true);
+//        mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0); //GE SHI BAI
+//        mFloor->setTimeAndDest("01/01/10 10:41", "Destination: --");
+//    }
+//    if(mArrow)
+//    {
+//        mArrow->show();
+//        mArrow->setArrowType(UiArrow::UpScrollArrow, 3);
+//    }
+//    if (mAutoTestCount >= 10)
+//    {
+//        if (mAutoTestCount > 20)
+//        {
+//            mAutoTestCount = 0;
+//        }
+//        mView->resetCachedContent();
+//        SetRotate(90);
+//    }
+//}
+
+//void Uiloader::slot_AutoTest()
+//{
 //    mAutoTestCount++;
 
-////    if(mAutoTestCount < 10)
-////    {
-////        SetLayout(0);
-////        SetRotate(0);
-
-////        //小屏模式
-////        if(mIcon)
-////        {
-////            mIcon->setBigSrnMode(false);
-////        }
-
-////        //显示Floor的代码
-////        if(mIcon)
-////            mIcon->setVisible(false);
-////        if(mFloor)
-////        {
-////            mFloor->setVisible(true);
-////            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0); //GE SHI BAI
-////        }
-
-////        //显示Arroow的代码
-////        if(mArrow)
-////        {
-////            mArrow->show();
-////            mArrow->setArrowType(UiArrow::UpScrollArrow, 5);
-////        }
-////    }
-//    if(mAutoTestCount < 49)
+//    if(mAutoTestCount < 40)
 //    {
 //        SetLayout(0);
 //        SetRotate(0);
-
 //        //小屏模式
 //        if(mIcon)
 //        {
 //            mIcon->setBigSrnMode(false);
 //        }
-
+//        //显示Floor的代码
+//        if(mIcon)
+//            mIcon->setVisible(false);
+//        if(mFloor)
+//        {
+//            mFloor->setVisible(true);
+//            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0); //GE SHI BAI
+//        }
+//        //显示Arroow的代码
+//        if(mArrow)
+//        {
+//            mArrow->show();
+//            mArrow->setArrowType(UiArrow::UpScrollArrow, 5);
+//        }
+//    }
+//    else if(mAutoTestCount < 49)
+//    {
+//        SetLayout(0);
+//        SetRotate(0);
+//        //小屏模式
+//        if(mIcon)
+//        {
+//            mIcon->setBigSrnMode(false);
+//        }
 //        //显示ICON的代码
 //        if(mFloor)
 //            mFloor->setVisible(false);
@@ -297,7 +336,6 @@ void Uiloader::slot_AutoTest()
 //            mIcon->setVisible(true);
 //            mIcon->setIcon(mAutoTestCount);
 //        }
-
 //        //显示Arroow的代码
 //        if(mArrow)
 //        {
@@ -305,91 +343,83 @@ void Uiloader::slot_AutoTest()
 //            mArrow->setArrowType(UiArrow::DownScrollArrow, 2);
 //        }
 //    }
-////    else if(mAutoTestCount < 55)
-////    {
-////        SetLayout(0);
-////        SetRotate(0);
-
-////        //大屏模式
-////        if(mIcon)
-////        {
-////            mIcon->setBigSrnMode(true);
-////            QString tmpText = QString("%1 %1 %1 %1 %1 %1 %1").arg(mAutoTestCount);
-////            mIcon->setText(tmpText, tmpText, tmpText, tmpText);
-////        }
-////    }
-////    else if(mAutoTestCount < 60)
-////    {
-////        SetLayout(0);
-////        SetRotate(90);
-
-////        //大屏模式
-////        if(mIcon)
-////        {
-////            mIcon->setBigSrnMode(true);
-////            QString tmpText = QString("%1 %1 %1 %1 %1 %1 %1").arg(mAutoTestCount);
-////            mIcon->setText(tmpText, tmpText, tmpText, tmpText);
-////        }
-////    }
-////    else if(mAutoTestCount < 65)
-////    {
-////        SetLayout(0);
-////        SetRotate(90);
-
-////        //小屏模式
-////        if(mIcon)
-////        {
-////            mIcon->setBigSrnMode(false);
-////        }
-
-////        //显示Arroow的代码
-////        if(mArrow)
-////        {
-////            mArrow->show();
-////            mArrow->setArrowType(UiArrow::UpScrollArrow, 1);
-////        }
-
-////        //显示Floor的代码
-////        if(mIcon)
-////            mIcon->setVisible(false);
-////        if(mFloor)
-////        {
-////            mFloor->setVisible(true);
-////            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0); //GE SHI BAI
-////        }
-////    }
-////    else if(mAutoTestCount < 70)
-////    {
-////        SetLayout(1);
-////        SetRotate(90);
-
-////        //小屏模式
-////        if(mIcon)
-////        {
-////            mIcon->setBigSrnMode(false);
-////        }
-
-////        //显示Arroow的代码
-////        if(mArrow)
-////        {
-////            mArrow->show();
-////            mArrow->setArrowType(UiArrow::UpScrollArrow, 1);
-////        }
-
-////        //显示Floor的代码
-////        if(mIcon)
-////            mIcon->setVisible(false);
-////        if(mFloor)
-////        {
-////            mFloor->setVisible(true);
-////            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0); //GE SHI BAI
-////        }
-////    }
-//    else if(mAutoTestCount >= 49)
+//    else if(mAutoTestCount < 55)
 //    {
+//        SetLayout(0);
 //        SetRotate(0);
-//        mAutoTestCount = 40;
-////        mAutoTestTimer.stop();
+//        //大屏模式
+//        if(mIcon)
+//        {
+//            mIcon->setBigSrnMode(true);
+//            QString tmpText = QString("%1 %1 %1 %1 %1 %1 %1").arg(mAutoTestCount);
+//            mIcon->setText(tmpText, tmpText, tmpText, tmpText);
+//        }
+//    }
+//    else if(mAutoTestCount < 60)
+//    {
+//        SetLayout(0);
+//        SetRotate(90);
+//        //大屏模式
+//        if(mIcon)
+//        {
+//            mIcon->setBigSrnMode(true);
+//            QString tmpText = QString("%1 %1 %1 %1 %1 %1 %1").arg(mAutoTestCount);
+//            mIcon->setText(tmpText, tmpText, tmpText, tmpText);
+//        }
+//    }
+//    else if(mAutoTestCount < 65)
+//    {
+//        SetLayout(0);
+//        SetRotate(90);
+//        //小屏模式
+//        if(mIcon)
+//        {
+//            mIcon->setBigSrnMode(false);
+//        }
+//        //显示Arroow的代码
+//        if(mArrow)
+//        {
+//            mArrow->show();
+//            mArrow->setArrowType(UiArrow::UpScrollArrow, 1);
+//        }
+//        //显示Floor的代码
+//        if(mIcon)
+//            mIcon->setVisible(false);
+//        if(mFloor)
+//        {
+//            mFloor->setVisible(true);
+//            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0); //GE SHI BAI
+//        }
+//    }
+//    else if(mAutoTestCount < 70)
+//    {
+//        SetLayout(1);
+//        SetRotate(90);
+//        //小屏模式
+//        if(mIcon)
+//        {
+//            mIcon->setBigSrnMode(false);
+//        }
+//        //显示Arroow的代码
+//        if(mArrow)
+//        {
+//            mArrow->show();
+//            mArrow->setArrowType(UiArrow::UpScrollArrow, 1);
+//        }
+//        //显示Floor的代码
+//        if(mIcon)
+//            mIcon->setVisible(false);
+//        if(mFloor)
+//        {
+//            mFloor->setVisible(true);
+//            mFloor->setFloor(mAutoTestCount%10, mAutoTestCount/10, 0); //GE SHI BAI
+//        }
+//    }
+//    else if(mAutoTestCount >= 70)
+//    {
+//        SetLayout(0);
+//        SetRotate(0);
+//        mAutoTestCount = 0;
 //    }
 //}
 
@@ -488,7 +518,6 @@ void Uiloader::InitComponent(COM_TYPE pType, QDomElement pElement)
     else if(pType == COM_FUNCTION && mIcon)
     {
         mIcon->Init(pElement);
-        mIcon->setText("llllll", "bbbbb", "", "");
     }
     else if(pType == COM_ARROW && mArrow)
     {
@@ -554,7 +583,7 @@ QWidget *Uiloader::Init(QString pUiPath)
     QString tmpRccStr = pUiPath + "Theme.rcc";
     QResource::registerResource(tmpRccStr);
 
-    QString tmpUiStr = pUiPath + "vertical_Theme.ui";
+    QString tmpUiStr = pUiPath + "Test.ui";
     QFile tmpFile(tmpUiStr);
     if(!tmpFile.open(QFile::ReadOnly))
         return tmpWidget;
