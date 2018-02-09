@@ -72,6 +72,7 @@ void CMySplashScreen::setTextSysInfo(QString pSys)
     if (NULL != sysInfo)
     {
         sysInfo->setText(pSys);
+        sysInfo->setStyleSheet("QLabel {color: white}");
     }
 }
 
@@ -80,6 +81,7 @@ void CMySplashScreen::setTextAppInfo(QString pApp)
     if (NULL != appInfo)
     {
         appInfo->setText(pApp);
+        appInfo->setStyleSheet("QLabel {color: white}");
     }
 }
 
@@ -120,7 +122,14 @@ void CMySplashScreen::setProgress()
 void CMySplashScreen::slotUpdateProgress()
 {
     static int num=0;
-    ProgressBar->setValue(numbersList[num]);
+    if (num < 96)
+    {
+        ProgressBar->setValue(numbersList[num]);
+    }
+    else
+    {
+        ProgressBar->setValue(100);
+    }
     ++num;
 }
 

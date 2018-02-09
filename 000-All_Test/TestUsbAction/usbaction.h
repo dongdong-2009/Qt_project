@@ -20,6 +20,7 @@ public:
     int getFileNum();
     int getFileLength();
     int copyFile(QString src, QString dest);
+    QStringList getFileList();
 
 signals:
     void sigStartProgress();
@@ -29,6 +30,7 @@ public slots:
     void sendUpdateProgress();
 private:
     QStringList mCpFileList;
+    QStringList mFileList;
     QString runPath;
     quint64 fileLength;
     int fileNum;

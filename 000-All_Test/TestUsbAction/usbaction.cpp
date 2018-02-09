@@ -8,6 +8,7 @@
 #include <QDir>
 
 UsbAction::UsbAction(QObject *parent) : QObject(parent)
+  , mFileList(QStringList())
   , runPath(QCoreApplication::applicationDirPath())
   , fileLength(0)
   , fileNum(0)
@@ -57,7 +58,8 @@ quint64 UsbAction::dirFileSize(const QString &path)
     {
         fileLength += fileInfo.size() / 1024; //计算文件大小
         ++fileNum;
-        qDebug()<<"fileInfo.name = "<<path + "/" + fileInfo.fileName();
+        qDebug()<<"fileInfo.name = "<</*path + "/" + */fileInfo.fileName();
+        mFileList.append("Updating Disk " + fileInfo.fileName());
     }
     //dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot)返回所有子目录，并进行过滤
     foreach(QString subDir, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
@@ -97,6 +99,12 @@ int UsbAction::copyFile(QString src, QString dest)
     mProgressThread.start();
     emit sigStartProgress();
     return 0;
+}
+
+QStringList UsbAction::getFileList()
+{
+    qDebug()<< mFileList;
+    return mFileList;
 }
 
 void UsbAction::sendUpdateProgress()
