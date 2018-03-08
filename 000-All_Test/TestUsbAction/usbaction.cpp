@@ -93,12 +93,13 @@ int UsbAction::copyFile(QString src, QString dest)
     dest = " /home/libo/Desktop/emulation/ ";
     src = " /home/libo/Desktop/1243/ ";
     QString cmd = "cp -vrf " + src + dest + " > /home/libo/Desktop/test.txt";
-    system(cmd.toLatin1().data());
+    int flag = system(cmd.toLatin1().data());
     qDebug()<<"cmd.toLatin1().data()"<<cmd.toLatin1().data();
     this->moveToThread(&mProgressThread);
     mProgressThread.start();
     emit sigStartProgress();
-    return 0;
+    qDebug()<<__FUNCTION__<<"()"<<" flag = "<< flag;
+    return flag;
 }
 
 QStringList UsbAction::getFileList()
@@ -115,7 +116,7 @@ void UsbAction::sendUpdateProgress()
         if (num < 100)
         {
             num = num + 100/getFileNum();
-            if (num >= 100)
+            if (num >= 98)
             {
                 emit sigUpdateProgress(100);
                 break;

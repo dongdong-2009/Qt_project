@@ -21,7 +21,8 @@ Widget::Widget(QWidget *parent) :
     }
     else
     {
-        mUsbAct.copyFile("", "");  // 执行拷贝文件
+        int flag = mUsbAct.copyFile("", "");  // 执行拷贝文件
+        qDebug()<<__FUNCTION__<<"()"<<" flag = "<< flag;
 //        qDebug()<<"mUsbAct.readFile() = "<< mUsbAct.readFile();
         setCopyFileList(mUsbAct.getFileList());
         ui->label_waring->setVisible(false);
