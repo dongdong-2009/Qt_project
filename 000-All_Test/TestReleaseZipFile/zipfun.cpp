@@ -1,5 +1,11 @@
 #include "zipfun.h"
 #include <QString>
+#include "define.h"
+#include "global.h"
+#include "quazip.h"
+#include "quazipfile.h"
+
+ZipTask::ZipTask() { mContainDir = true; }
 
 bool ZipTask::Zip(QString pSrcPath, QString pDstPath)
 {
@@ -61,7 +67,7 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
             return false;
         }
         //>@打开文件准备开始压缩
-#ifdef GCC
+//#ifdef GCC
         QuaZip zip(pZipFile);
         if(!zip.open(QuaZip::mdCreate))
         {
@@ -90,15 +96,15 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
             QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
             return false;
         }
-#endif
+//#endif
         //>@发送开始信号
         emit start();
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
         //>@开始压缩
-#ifdef GCC
+//#ifdef GCC
         quint64 count = inFile.size();
-        quint64 i=0;
-        while(i<count)
+        quint64 i = 0;
+        while(i < count)
         {
             if(i)
             {
@@ -120,7 +126,7 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
             return false;
         }
         outFile.close();
-        if(outFile.getZipError()!=UNZ_OK)
+        if(outFile.getZipError() != UNZ_OK)
         {
             IDE_TRACE();
             inFile.close();
@@ -132,7 +138,7 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
         }
         inFile.close();
         zip.close();
-        if(zip.getZipError()!=UNZ_OK)
+        if(zip.getZipError() != UNZ_OK)
         {
             IDE_TRACE();
             emit message(QString("Zip %1 to %2 error!").arg(pSrcPath).arg(pZipFile));
@@ -140,7 +146,7 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
             QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
             return false;
         }
-#endif
+//#endif
         //>@发送结束信号
         emit end();
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
@@ -158,7 +164,7 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
         QStringList tmpFileList = ErgodicDirectory(pSrcPath);
         if (tmpFileList.size() > 0)
         {
-#ifdef GCC
+//#ifdef GCC
             QuaZip zip(pZipFile);
             if(!zip.open(QuaZip::mdCreate))
             {
@@ -168,12 +174,12 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
                 return false;
             }
             QuaZipFile outFile(&zip);
-#endif
+//#endif
             //>@发送开始信号
             emit start();
             QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
             //>@开始压缩
-#ifdef GCC
+//#ifdef GCC
             int totalf = tmpFileList.size();
             QString tmpParentSrcDir;
             if(mContainDir)
@@ -182,12 +188,12 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
                 tmpParentSrcDir = pSrcPath;
             if(tmpParentSrcDir.endsWith("/") == false)
                 tmpParentSrcDir.append("/");
-            for (int i=0; i<totalf; ++i)
+            for (int i = 0; i < totalf; ++i)
             {
                 QString tmpSrcPath = tmpFileList.at(i);
                 QString tmpString = tmpSrcPath;
                 //>@千万注意大小写，否则会在压缩时无法去除绝对路径，导致压缩包内不是相对路径。
-                QString tmpNameOfZip = tmpString.replace(tmpParentSrcDir,"", Qt::CaseInsensitive);//>@压缩包内的此文件的文件名
+                QString tmpNameOfZip = tmpString.replace(tmpParentSrcDir, "", Qt::CaseInsensitive);//>@压缩包内的此文件的文件名
                 QFile inFile(tmpSrcPath);
                 if(!inFile.open(QIODevice::ReadOnly))
                 {
@@ -204,8 +210,8 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
                     continue;
                 }
                 quint64 count = inFile.size();
-                quint64 j=0;
-                while(j<count)
+                quint64 j = 0;
+                while(j < count)
                 {
                     if(j && !pIngore)
                     {
@@ -223,7 +229,7 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
                     continue;
                 }
                 outFile.close();
-                if(outFile.getZipError()!=UNZ_OK)
+                if(outFile.getZipError() != UNZ_OK)
                 {
                     IDE_TRACE();
                     emit message(QString("Zip %1 error!").arg(tmpNameOfZip));
@@ -243,7 +249,7 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
                 }
             }
             zip.close();
-            if(zip.getZipError()!=UNZ_OK)
+            if(zip.getZipError() != UNZ_OK)
             {
                 IDE_TRACE();
                 emit message(QString("Zip %1 to %2 error!").arg(pSrcPath).arg(pZipFile));
@@ -251,7 +257,7 @@ bool ZipTask::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
                 QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
                 return false;
             }
-#endif
+//#endif
             //>@发送结束信号
             emit end();
             QtSleep(1);
@@ -285,7 +291,7 @@ bool ZipTask::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pIngor
         return false;
     }
 
-#ifdef GCC
+//#ifdef GCC
     QuaZip zip(pZipFile);
     if(!zip.open(QuaZip::mdUnzip))
     {
@@ -294,20 +300,20 @@ bool ZipTask::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pIngor
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
         return false;
     }
-#endif
+//#endif
     //>@发送开始信号
     emit start();
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
-#ifdef GCC
+//#ifdef GCC
     //>@计算压缩文件中的总文件数
-    int total=0;
-    for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile())
+    int total = 0;
+    for(bool more = zip.goToFirstFile(); more; more = zip.goToNextFile())
     {
-        total++;
+        ++total;
     }
-    int i=0;
+    int i = 0;
     QuaZipFile infile(&zip);
-    for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile())
+    for(bool more = zip.goToFirstFile(); more; more = zip.goToNextFile())
     {
         QString tmpFileName = zip.getCurrentFileName();
         QString tmpString = pDstPath + tmpFileName;
@@ -352,8 +358,8 @@ bool ZipTask::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pIngor
             continue;
         }
         quint64 count = infile.size();
-        quint64 j=0;
-        while(j<count)
+        quint64 j = 0;
+        while(j < count)
         {
             if(j && !pIngore)
             {
@@ -382,12 +388,12 @@ bool ZipTask::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pIngor
             continue;
         }
         //>@计算传输的百分比
-        emit progress(++i*100/total);
+        emit progress(++i*100/total); IDE_TRACE_INT(i*100/total);
         emit message(QString("Unzip %1 success!").arg(tmpFileName));
         QtSleep(1);
     }
     zip.close();
-    if(zip.getZipError()!=UNZ_OK)
+    if(zip.getZipError() != UNZ_OK)
     {
         IDE_TRACE();
         emit message(QString("Unzip %1 to %2 error!").arg(pZipFile).arg(pDstPath));
@@ -395,7 +401,7 @@ bool ZipTask::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pIngor
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
         return false;
     }
-#endif
+//#endif
 #if (defined(UBUNTU) || defined(LINUX))
     system("sync");
 #endif
@@ -409,6 +415,8 @@ bool ZipTask::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pIngor
 ZipTaskThread::ZipTaskThread(QObject *parent) :
     QThread(parent)
 {
+    connect(this, &ZipTaskThread::startZip, this, &ZipTaskThread::Zip, Qt::QueuedConnection);
+    connect(this, &ZipTaskThread::startUnZip, this, &ZipTaskThread::Unzip, Qt::QueuedConnection);
     m_ZipTask.moveToThread(this);
 }
 
