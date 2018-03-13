@@ -17,3 +17,4 @@ moc*.*
 /bin*
 /lib*
 /000-All_Test/build-*
+*build-*
