@@ -10,7 +10,7 @@ class TcpClientSocket : public QTcpSocket
 public:
     TcpClientSocket(QObject *parent = 0);
 signals:
-    void updateClients(QString,int);
+    void updateClients(QString, int);
     void disconnected(int);
 protected slots:
     void dataReceived();

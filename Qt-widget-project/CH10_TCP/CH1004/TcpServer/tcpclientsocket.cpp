@@ -2,8 +2,8 @@
 
 TcpClientSocket::TcpClientSocket(QObject *parent)
 {
-    connect(this,SIGNAL(readyRead()),this,SLOT(dataReceived()));
-    connect(this,SIGNAL(disconnected()),this,SLOT(slotDisconnected()));
+    connect(this, SIGNAL(readyRead()), this, SLOT(dataReceived()));
+    connect(this, SIGNAL(disconnected()), this, SLOT(slotDisconnected()));
 }
 
 void TcpClientSocket::dataReceived()
@@ -12,10 +12,10 @@ void TcpClientSocket::dataReceived()
     {
         int length = bytesAvailable();
         char buf[1024];
-        read(buf,length);
+        read(buf, length);
 
-        QString msg=buf;
-        emit updateClients(msg,length);
+        QString msg = buf;
+        emit updateClients(msg, length);
     }
 }
 

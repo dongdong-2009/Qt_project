@@ -2,8 +2,8 @@
 #include <QMessageBox>
 #include <QHostInfo>
 
-TcpClient::TcpClient(QWidget *parent,Qt::WindowFlags f)
-    : QDialog(parent,f)
+TcpClient::TcpClient(QWidget *parent, Qt::WindowFlags f)
+    : QDialog(parent, f)
 {
     setWindowTitle(tr("TCP Client"));
 
@@ -24,16 +24,16 @@ TcpClient::TcpClient(QWidget *parent,Qt::WindowFlags f)
     enterBtn= new QPushButton(tr("进入聊天室"));
 
     mainLayout = new QGridLayout(this);
-    mainLayout->addWidget(contentListWidget,0,0,1,2);
-    mainLayout->addWidget(sendLineEdit,1,0);
-    mainLayout->addWidget(sendBtn,1,1);
-    mainLayout->addWidget(userNameLabel,2,0);
-    mainLayout->addWidget(userNameLineEdit,2,1);
-    mainLayout->addWidget(serverIPLabel,3,0);
-    mainLayout->addWidget(serverIPLineEdit,3,1);
-    mainLayout->addWidget(portLabel,4,0);
-    mainLayout->addWidget(portLineEdit,4,1);
-    mainLayout->addWidget(enterBtn,5,0,1,2);
+    mainLayout->addWidget(contentListWidget, 0, 0, 1, 2);
+    mainLayout->addWidget(sendLineEdit, 1, 0);
+    mainLayout->addWidget(sendBtn, 1, 1);
+    mainLayout->addWidget(userNameLabel, 2, 0);
+    mainLayout->addWidget(userNameLineEdit, 2, 1);
+    mainLayout->addWidget(serverIPLabel, 3, 0);
+    mainLayout->addWidget(serverIPLineEdit, 3, 1);
+    mainLayout->addWidget(portLabel, 4, 0);
+    mainLayout->addWidget(portLineEdit, 4, 1);
+    mainLayout->addWidget(enterBtn, 5, 0, 1, 2);
 
     status = false;
 
@@ -42,8 +42,8 @@ TcpClient::TcpClient(QWidget *parent,Qt::WindowFlags f)
 
     serverIP =new QHostAddress();
 
-    connect(enterBtn,SIGNAL(clicked()),this,SLOT(slotEnter()));
-    connect(sendBtn,SIGNAL(clicked()),this,SLOT(slotSend()));
+    connect(enterBtn, SIGNAL(clicked()), this, SLOT(slotEnter()));
+    connect(sendBtn, SIGNAL(clicked()), this, SLOT(slotSend()));
 
     sendBtn->setEnabled(false);
 }
@@ -60,24 +60,24 @@ void TcpClient::slotEnter()
         QString ip = serverIPLineEdit->text();
         if(!serverIP->setAddress(ip))
         {
-            QMessageBox::information(this,tr("error"),tr("server ip address error!"));
+            QMessageBox::information(this, tr("error"), tr("server ip address error!"));
             return;
         }
 
         if(userNameLineEdit->text()=="")
         {
-            QMessageBox::information(this,tr("error"),tr("User name error!"));
+            QMessageBox::information(this, tr("error"), tr("User name error!"));
             return;
         }
 
         userName=userNameLineEdit->text();
 
         tcpSocket = new QTcpSocket(this);
-        connect(tcpSocket,SIGNAL(connected()),this,SLOT(slotConnected()));
-        connect(tcpSocket,SIGNAL(disconnected()),this,SLOT(slotDisconnected()));
-        connect(tcpSocket,SIGNAL(readyRead()),this,SLOT(dataReceived()));
+        connect(tcpSocket, SIGNAL(connected()), this, SLOT(slotConnected()));
+        connect(tcpSocket, SIGNAL(disconnected()), this, SLOT(slotDisconnected()));
+        connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(dataReceived()));
 
-        tcpSocket->connectToHost(*serverIP,port);
+        tcpSocket->connectToHost(*serverIP, port);
 
         status=true;
     }
@@ -85,7 +85,7 @@ void TcpClient::slotEnter()
     {
         int length=0;
         QString msg=userName+tr(":Leave Chat Room");
-        if((length=tcpSocket->write(msg.toLatin1(),msg.length()))!=msg. length())
+        if((length=tcpSocket->write(msg.toLatin1(), msg.length()))!=msg. length())
         {
             return;
         }
@@ -102,8 +102,8 @@ void TcpClient::slotConnected()
     enterBtn->setText(tr("离开"));
 
     int length=0;
-    QString msg=userName+tr(":Enter Chat Room");
-    if((length=tcpSocket->write(msg.toLatin1(),msg.length()))!=msg.length())
+    QString msg=userName + tr(":Enter Chat Room");
+    if((length=tcpSocket->write(msg.toLatin1(), msg.length()))!=msg.length())
     {
         return;
     }
@@ -118,7 +118,7 @@ void TcpClient::slotSend()
 
     QString msg=userName+":"+sendLineEdit->text();
 
-    tcpSocket->write(msg.toLatin1(),msg.length());
+    tcpSocket->write(msg.toLatin1(), msg.length());
     sendLineEdit->clear();
 }
 
@@ -135,7 +135,7 @@ void TcpClient::dataReceived()
         QByteArray datagram;
         datagram.resize(tcpSocket->bytesAvailable());
 
-        tcpSocket->read(datagram.data(),datagram.size());
+        tcpSocket->read(datagram.data(), datagram.size());
 
         QString msg=datagram.data();
         contentListWidget->addItem(msg.left(datagram.size()));

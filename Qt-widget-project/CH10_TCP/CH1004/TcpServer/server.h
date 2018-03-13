@@ -12,12 +12,12 @@ public:
     Server(QObject *parent = 0, int port = 0);
     QList<TcpClientSocket*> tcpClientSocketList;
 signals:
-    void updateServer(QString,int);
+    void updateServer(QString, int);
 public slots:
-    void updateClients(QString,int);
+    void updateClients(QString, int);
     void slotDisconnected(int);
 protected:
-    void incomingConnection(int socketDescriptor);
+    void incomingConnection(qintptr socketDescriptor);
 };
 
 #endif // SERVER_H

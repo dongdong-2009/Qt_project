@@ -15,7 +15,7 @@ class TcpClient : public QDialog
     Q_OBJECT
     
 public:
-    TcpClient(QWidget *parent = 0,Qt::WindowFlags f=0);
+    TcpClient(QWidget *parent = 0, Qt::WindowFlags f=0);
     ~TcpClient();
 private:
     QListWidget *contentListWidget;

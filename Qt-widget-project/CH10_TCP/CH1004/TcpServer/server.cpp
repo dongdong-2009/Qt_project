@@ -6,7 +6,7 @@ Server::Server(QObject *parent,int port)
     listen(QHostAddress::Any, port);
 }
 
-void Server::incomingConnection(int socketDescriptor)
+void Server::incomingConnection(qintptr socketDescriptor)
 {
     TcpClientSocket *tcpClientSocket = new TcpClientSocket(this);
     connect(tcpClientSocket, SIGNAL(updateClients(QString, int)), this, SLOT(updateClients(QString, int)));
@@ -17,7 +17,7 @@ void Server::incomingConnection(int socketDescriptor)
     tcpClientSocketList.append(tcpClientSocket);
 }
 
-void Server::updateClients(QString msg,int length)
+void Server::updateClients(QString msg, int length)
 {
     emit updateServer(msg, length);
     for(int i = 0; i < tcpClientSocketList.count(); i++)
