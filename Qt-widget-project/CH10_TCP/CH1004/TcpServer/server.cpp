@@ -38,6 +38,7 @@ void Server::slotDisconnected(int descriptor)
         if(item->socketDescriptor() == descriptor)
         {
             tcpClientSocketList.removeAt(i);
+            item->deleteLater();
             return;
         }
     }

@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     manager = new QNetworkAccessManager(this);
-    connect(manager,SIGNAL(finished(QNetworkReply*)),this,SLOT(replyFinished(QNetworkReply*)));
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     manager->get(QNetworkRequest(QUrl("http://www.baidu.com")));
 
     ui->progressBar->hide();
@@ -31,17 +31,20 @@ void MainWindow::replyFinished(QNetworkReply *reply)
 void MainWindow::startRequest(QUrl url)
 {
     reply = manager->get(QNetworkRequest(url));
-    connect(reply,SIGNAL(readyRead()),this,SLOT(httpReadyRead()));
-    connect(reply,SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(updateDataReadProgress(qint64,qint64)));
-    connect(reply,SIGNAL(finished()),this,SLOT(httpFinished()));
+    connect(reply, SIGNAL(readyRead()), this, SLOT(httpReadyRead()));
+    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(updateDataReadProgress(qint64, qint64)));
+    connect(reply, SIGNAL(finished()), this, SLOT(httpFinished()));
 }
 
 void MainWindow::httpReadyRead()
 {
-    if(file)file->write(reply->readAll());
+    if(file)
+    {
+        file->write(reply->readAll());
+    }
 }
 
-void MainWindow::updateDataReadProgress(qint64 bytesRead, qint64 totalBytes)
+void MainWindow::updateDataReadProgress(qint64 bytesRead,  qint64 totalBytes)
 {
     ui->progressBar->setMaximum(totalBytes);
     ui->progressBar->setValue(bytesRead);

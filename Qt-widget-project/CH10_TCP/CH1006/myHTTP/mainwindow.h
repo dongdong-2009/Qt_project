@@ -29,7 +29,7 @@ private slots:
     void replyFinished(QNetworkReply *);
     void httpFinished();
     void httpReadyRead();
-    void updateDataReadProgress(qint64,qint64);
+    void updateDataReadProgress(qint64, qint64);
     void on_pushButton_clicked();
 };
 
