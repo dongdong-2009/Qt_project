@@ -24,8 +24,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        widget.cpp
+        widget.cpp \
+    wifiprotocol.cpp
 
-HEADERS  += widget.h
+HEADERS  += widget.h \
+    wifiprotocol.h
 
 FORMS    += widget.ui
