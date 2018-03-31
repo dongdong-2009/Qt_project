@@ -50,11 +50,12 @@ TcpClient::TcpClient(QWidget *parent, Qt::WindowFlags f)
 
 TcpClient::~TcpClient()
 {
-    
+    qDebug()<<__PRETTY_FUNCTION__<<"is call";
 }
 
 void TcpClient::slotEnter()
 {
+    qDebug()<<__PRETTY_FUNCTION__<<"is call";
     if(!status)
     {
         QString ip = serverIPLineEdit->text();
@@ -64,7 +65,7 @@ void TcpClient::slotEnter()
             return;
         }
 
-        if(userNameLineEdit->text()=="")
+        if(userNameLineEdit->text() == "")
         {
             QMessageBox::information(this, tr("error"), tr("User name error!"));
             return;
@@ -79,13 +80,13 @@ void TcpClient::slotEnter()
 
         tcpSocket->connectToHost(*serverIP, port);
 
-        status=true;
+        status = true;
     }
     else
     {
         int length=0;
         QString msg=userName+tr(":Leave Chat Room");
-        if((length=tcpSocket->write(msg.toLatin1(), msg.length()))!=msg. length())
+        if((length = tcpSocket->write(msg.toLatin1(), msg.length())) != msg. length())
         {
             return;
         }
@@ -98,12 +99,13 @@ void TcpClient::slotEnter()
 
 void TcpClient::slotConnected()
 {
+    qDebug()<<__PRETTY_FUNCTION__<<"is call";
     sendBtn->setEnabled(true);
     enterBtn->setText(tr("离开"));
 
-    int length=0;
+    int length = 0;
     QString msg=userName + tr(":Enter Chat Room");
-    if((length=tcpSocket->write(msg.toLatin1(), msg.length()))!=msg.length())
+    if((length=tcpSocket->write(msg.toLatin1(), msg.length())) != msg.length())
     {
         return;
     }
@@ -111,6 +113,7 @@ void TcpClient::slotConnected()
 
 void TcpClient::slotSend()
 {
+    qDebug()<<__PRETTY_FUNCTION__<<"is call";
     if(sendLineEdit->text()=="")
     {
         return ;
