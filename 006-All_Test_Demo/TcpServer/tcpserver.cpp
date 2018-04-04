@@ -1,5 +1,5 @@
 #include "tcpserver.h"
-
+#include <QDebug>
 TcpServer::TcpServer(QWidget *parent, Qt::WindowFlags f)
     : QDialog(parent, f)
 {
@@ -33,11 +33,12 @@ void TcpServer::slotCreateServer()
 {
     server = new Server(this, port);
     connect(server, SIGNAL(updateServer(QString, int)), this, SLOT(updateServer(QString, int)));
-
+    qDebug()<<__PRETTY_FUNCTION__<<" server pointer = "<< server;
     CreateBtn->setEnabled(false);
 }
 
 void TcpServer::updateServer(QString msg, int length)
 {
+    qDebug()<<__PRETTY_FUNCTION__<<" msg = "<<msg<<"length = "<< length;
     ContentListWidget->addItem(msg.left(length));
 }

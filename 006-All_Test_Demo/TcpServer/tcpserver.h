@@ -14,8 +14,9 @@ class TcpServer : public QDialog
     Q_OBJECT
     
 public:
-    TcpServer(QWidget *parent = 0, Qt::WindowFlags f=0);
+    TcpServer(QWidget *parent = 0, Qt::WindowFlags f = 0);
     ~TcpServer();    
+
 private:
     QListWidget *ContentListWidget;
     QLabel *PortLabel;
@@ -24,6 +25,7 @@ private:
     QGridLayout *mainLayout;
     int port;
     Server *server;
+
 public slots:
     void slotCreateServer();
     void updateServer(QString, int);
