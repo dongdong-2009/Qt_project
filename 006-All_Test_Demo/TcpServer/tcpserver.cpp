@@ -26,7 +26,10 @@ TcpServer::TcpServer(QWidget *parent, Qt::WindowFlags f)
 
 TcpServer::~TcpServer()
 {
-    
+    ContentListWidget->deleteLater();
+    PortLabel->deleteLater();
+    CreateBtn->deleteLater();
+    mainLayout->deleteLater();
 }
 
 void TcpServer::slotCreateServer()

@@ -4,16 +4,28 @@
 #include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QByteArray>
+class MyTcpSocket;
 
 class MyTcpServer : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit MyTcpServer(QObject *parent = 0);
+    explicit MyTcpServer(QObject *parent = 0, int port = 0);
+    ~MyTcpServer();
 
 signals:
+    void myTcpServerSendMsgToScreen(QByteArray msg, int length);
 
 public slots:
+    void slotMyTcpServerDealWithMsg(QByteArray msg, int length);
+    void slotMyTcpServerDisconnected(int);
+
+protected:
+    void incomingConnection(qintptr socketDescriptor);
+private:
+    bool mHasConnectFlag;
+    MyTcpSocket* mMyTcpSocket;
 };
 
 class MyTcpSocket : public QTcpSocket
@@ -23,8 +35,12 @@ public:
     explicit MyTcpSocket(QObject *parent = 0);
 
 signals:
+    void myTcpSocketRecvMsg(QByteArray msg, int length);
+    void myTcpSocketDisconnected(int);
 
-public slots:
+protected slots:
+    void slotMyTcpSocketDataReceived();
+    void slotMyTcpSocketDisconnected();
 };
 
 #endif // TCPMODULE_H

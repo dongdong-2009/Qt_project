@@ -25,9 +25,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         widget.cpp \
-    tcpmodule.cpp
+    tcpmodule.cpp \
+    jsonparse.cpp
 
 HEADERS  += widget.h \
-    tcpmodule.h
+    tcpmodule.h \
+    jsonparse.h
 
 FORMS    += widget.ui

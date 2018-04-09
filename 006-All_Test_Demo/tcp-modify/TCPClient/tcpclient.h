@@ -2,44 +2,56 @@
 #define TCPCLIENT_H
 
 #include <QDialog>
-#include <QListWidget>
+#include <QTextBrowser>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
 #include <QGridLayout>
+
 #include <QHostAddress>
 #include <QTcpSocket>
+#include <QTextCodec>
 
-class TcpClient : public QDialog
+class TCPClient : public QDialog
 {
     Q_OBJECT
-    
+
 public:
-    TcpClient(QWidget *parent = 0, Qt::WindowFlags f = 0);
-    ~TcpClient();
+    TCPClient(QWidget *parent = 0);
+    ~TCPClient();
+
 private:
-    QListWidget *contentListWidget;
+    QTextBrowser *textBrowser;
     QLineEdit *sendLineEdit;
     QPushButton *sendBtn;
+
     QLabel *userNameLabel;
     QLineEdit *userNameLineEdit;
+
     QLabel *serverIPLabel;
     QLineEdit *serverIPLineEdit;
+
     QLabel *portLabel;
     QLineEdit *portLineEdit;
+
     QPushButton *enterBtn;
     QGridLayout *mainLayout;
+
     bool status;
     int port;
     QHostAddress *serverIP;
     QString userName;
     QTcpSocket *tcpSocket;
+    QTextCodec *codec;
 public slots:
     void slotEnter();
     void slotConnected();
     void slotDisconnected();
     void dataReceived();
     void slotSend();
+
+    void autoScroll();
+
 };
 
 #endif // TCPCLIENT_H

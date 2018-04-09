@@ -10,13 +10,13 @@ TcpClientSocket::TcpClientSocket(QObject *parent)
 
 void TcpClientSocket::dataReceived()
 {
-    while(bytesAvailable()>0)
+    while(bytesAvailable() > 0)
     {
         int length = bytesAvailable();
         char buf[1024];
         read(buf, length);
 
-        QString msg = buf;
+        QString msg(buf);
         emit updateClients(msg, length);
         qDebug()<<__PRETTY_FUNCTION__<<msg;
     }

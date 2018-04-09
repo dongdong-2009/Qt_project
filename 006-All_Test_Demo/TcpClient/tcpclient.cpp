@@ -21,7 +21,7 @@ TcpClient::TcpClient(QWidget *parent, Qt::WindowFlags f)
     portLabel = new QLabel(tr("端口："));
     portLineEdit = new QLineEdit;
 
-    enterBtn= new QPushButton(tr("进入聊天室"));
+    enterBtn = new QPushButton(tr("进入聊天室"));
 
     mainLayout = new QGridLayout(this);
     mainLayout->addWidget(contentListWidget, 0, 0, 1, 2);
@@ -40,7 +40,7 @@ TcpClient::TcpClient(QWidget *parent, Qt::WindowFlags f)
     port = 8010;
     portLineEdit->setText(QString::number(port));
 
-    serverIP =new QHostAddress();
+    serverIP = new QHostAddress();
 
     connect(enterBtn, SIGNAL(clicked()), this, SLOT(slotEnter()));
     connect(sendBtn, SIGNAL(clicked()), this, SLOT(slotSend()));
@@ -51,6 +51,19 @@ TcpClient::TcpClient(QWidget *parent, Qt::WindowFlags f)
 TcpClient::~TcpClient()
 {
     qDebug()<<__PRETTY_FUNCTION__<<"is call";
+    contentListWidget->deleteLater();
+    sendLineEdit->deleteLater();
+    sendBtn->deleteLater();
+    userNameLabel->deleteLater();
+    userNameLineEdit->deleteLater();
+    serverIPLabel->deleteLater();
+    serverIPLineEdit->deleteLater();
+    portLabel->deleteLater();
+    portLineEdit->deleteLater();
+    enterBtn->deleteLater();
+    mainLayout->deleteLater();
+    delete serverIP;
+    serverIP = 0;
 }
 
 void TcpClient::slotEnter()
@@ -71,7 +84,7 @@ void TcpClient::slotEnter()
             return;
         }
 
-        userName=userNameLineEdit->text();
+        userName = userNameLineEdit->text();
 
         tcpSocket = new QTcpSocket(this);
         connect(tcpSocket, SIGNAL(connected()), this, SLOT(slotConnected()));
@@ -79,21 +92,19 @@ void TcpClient::slotEnter()
         connect(tcpSocket, SIGNAL(readyRead()), this, SLOT(dataReceived()));
 
         tcpSocket->connectToHost(*serverIP, port);
-
         status = true;
     }
     else
     {
-        int length=0;
-        QString msg=userName+tr(":Leave Chat Room");
-        if((length = tcpSocket->write(msg.toLatin1(), msg.length())) != msg. length())
+        int length = 0;
+        QString msg = userName + QString(":Leave Chat Room");
+        if((length = tcpSocket->write(msg.toLatin1(), msg.length())) != msg.length())
         {
             return;
         }
 
         tcpSocket->disconnectFromHost();
-
-        status=false;
+        status = false;
     }
 }
 
@@ -104,8 +115,8 @@ void TcpClient::slotConnected()
     enterBtn->setText(tr("离开"));
 
     int length = 0;
-    QString msg=userName + tr(":Enter Chat Room");
-    if((length=tcpSocket->write(msg.toLatin1(), msg.length())) != msg.length())
+    QString msg = userName + QString(":Enter Chat Room");
+    if((length = tcpSocket->write(msg.toLatin1(), msg.length())) != msg.length())
     {
         return;
     }
@@ -113,13 +124,13 @@ void TcpClient::slotConnected()
 
 void TcpClient::slotSend()
 {
-    qDebug()<<__PRETTY_FUNCTION__<<"is call";
-    if(sendLineEdit->text()=="")
+    qDebug()<<__PRETTY_FUNCTION__<< "is call";
+    if(sendLineEdit->text() == "")
     {
         return ;
     }
 
-    QString msg=userName+":"+sendLineEdit->text();
+    QString msg = userName + ":" + sendLineEdit->text();
 
     tcpSocket->write(msg.toLatin1(), msg.length());
     sendLineEdit->clear();
@@ -133,14 +144,14 @@ void TcpClient::slotDisconnected()
 
 void TcpClient::dataReceived()
 {
-    while(tcpSocket->bytesAvailable()>0)
+    while(tcpSocket->bytesAvailable() > 0)
     {
         QByteArray datagram;
         datagram.resize(tcpSocket->bytesAvailable());
 
         tcpSocket->read(datagram.data(), datagram.size());
 
-        QString msg=datagram.data();
+        QString msg = datagram.data();
         contentListWidget->addItem(msg.left(datagram.size()));
     }
 }

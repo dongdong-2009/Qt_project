@@ -94,6 +94,7 @@ bool JsonParse::jsonFormatIsRight(const QByteArray& byteArray)
         flag = false;
     }
     qDebug()<<__PRETTY_FUNCTION__<<"flag = "<<flag;
+    return flag;
 }
 
 void JsonParse::createJsonStr()
@@ -140,10 +141,10 @@ void JsonParse::parserJsonFormat(const QByteArray &byteArray)
         return;
     }
     QJsonDocument qdoc = QJsonDocument::fromJson(byteArray);
-    QJsonObject qjo = qdoc.object();
-    QJsonValue value0 = qjo.value(QString("type"));
+    QJsonObject cmdqobj = qdoc.object();
+    QJsonValue value0 = cmdqobj.value(QString("type"));
     QString type = value0.toString();
-    qWarning() << type<<"\n";
+    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<< type<<"\n";
     if (!QString::compare(type, "login", Qt::CaseInsensitive))
     {
         qWarning() << type <<" login\n";
@@ -164,6 +165,11 @@ void JsonParse::parserJsonFormat(const QByteArray &byteArray)
 //            QVariantMap para = cmdObj["info"].toMap();
 //            setparameter(para);
 //        }
+        if (cmdqobj.contains("info"))
+        {
+            QJsonValue valueStr = cmdqobj.value(QString("info"));
+            QVariantMap map = cmdqobj.toVariantMap();
+        }
     }
     else if(!QString::compare(type, "appupdateFinished", Qt::CaseInsensitive))
     {
@@ -220,8 +226,9 @@ quint32 JsonParse::ParseBuffer(QByteArray &buffer)
 {
     if (!judgeArrayIsEmpty(buffer))
     {
-
+        return false;
     }
+    return true;
 }
 
 // 判断QByteArray的数据是否为空
