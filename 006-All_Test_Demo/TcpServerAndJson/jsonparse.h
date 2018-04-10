@@ -21,7 +21,7 @@ public:
     explicit JsonParse(QObject *parent = 0);
 //    void readJson();
     bool jsonFormatIsRight(const QByteArray& byteArray);
-    void createJsonStr();
+//    void createJsonStr();
 //    void parserJsonFormat();
     WIFICMDS parserJsonFormat(const QByteArray& byteArray);
 //    void sendJsonFrame();
@@ -40,6 +40,7 @@ public:
     QByteArray replyLoginResult(bool res);
     QByteArray replyGetAllParameter();
     QByteArray sendHeartBeat();
+    QByteArray sendJsonFrame(QJsonObject msg);
 
 signals:
 

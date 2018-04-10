@@ -24,6 +24,8 @@
         }
 }
 
+{"type":"login","info":{"ssid":"sodimas","password":"1234"}}
+
 {	
     "type":"login",
     "info":
@@ -31,11 +33,16 @@
             "result":true
         }
 }
-		
+
+{"type":"login","info":{"result":true}}	
+
+
 {
     "type":"getallparameter",
     "info":"get"
 }
+
+{"type":"getallparameter","info":"get"}
 		
 {
     "type":"sendallparameter",
@@ -52,21 +59,19 @@
         "layout":0         
     }
 }
+
+{"type":"sendallparameter","info":{"autotest":false,"liftflrvol":50,"liftarvvol":50,"admusicvol":100,"luminance":75,   "darklevel":30,"standby":230765,"rotation": 90,"layout":0}}
 		
-{
-    "type":"setparameter",
-    "info":
-    {
-        "autotest":false
-    }
-}
+{"type":"setparameter","info":{"autotest":false}}
 		
-{
-    "type":"appupdateFinished",
-    "info":"true"
-}
+{"type":"appupdateFinished","info":"true"}
 		
 {
     "type":"reboot",
     "info":true
 }
+
+{"type":"reboot","info":true}
+
+
+

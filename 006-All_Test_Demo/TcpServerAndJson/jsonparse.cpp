@@ -1,6 +1,6 @@
 #include "jsonparse.h"
 #include <QJsonArray>
-#include <QFile>
+//#include <QFile>
 #include <QJsonValue>
 #include <QDebug>
 #include <QJsonDocument>
@@ -50,10 +50,10 @@ bool JsonParse::jsonFormatIsRight(const QByteArray& byteArray)
     return flag;
 }
 
-void JsonParse::createJsonStr()
-{
+//void JsonParse::createJsonStr()
+//{
 
-}
+//}
 
 //https://www.cnblogs.com/senior-engineer/p/5608985.html
 WIFICMDS JsonParse::parserJsonFormat(const QByteArray &byteArray)
@@ -69,8 +69,8 @@ WIFICMDS JsonParse::parserJsonFormat(const QByteArray &byteArray)
         return ERROR;
     }
     QJsonDocument qdoc = QJsonDocument::fromJson(byteArray);
-    QJsonObject qjo = qdoc.object();
-    QJsonValue value0 = qjo.value(QString("type"));
+    QJsonObject cmdqobj = qdoc.object();
+    QJsonValue value0 = cmdqobj.value(QString("type"));
     QString type = value0.toString();
     qWarning() << type<<"\n";
     if (!QString::compare(type, "login", Qt::CaseInsensitive))
@@ -128,6 +128,10 @@ WIFICMDS JsonParse::parserJsonFormat(const QByteArray &byteArray)
             return ERROR;
         }
     }
+    else
+    {
+        return ERROR;
+    }
 }
 
 // 解析读取到的QByteArray的数据，需要对帧头和帧尾进行处理
@@ -154,12 +158,6 @@ bool JsonParse::judgeArrayIsEmpty(const QByteArray &buffer)
     }
     qDebug()<<__PRETTY_FUNCTION__<<"flag = "<< flag;
     return flag;
-}
-
-
-void JsonParse::setLayout(int playout)
-{
-    mLayout = playout;
 }
 
 QByteArray JsonParse::replyLoginResult(bool res)
@@ -219,6 +217,21 @@ QByteArray JsonParse::sendHeartBeat()
     qDebug()<<__PRETTY_FUNCTION__<<"heartBeat = "<<heartBeat;
     qDebug()<<__PRETTY_FUNCTION__<<"the format is " <<jsonFormatIsRight(heartBeat);
     return heartBeat;
+}
+
+QByteArray JsonParse::sendJsonFrame(QJsonObject msg)
+{
+    QJsonDocument document;
+    document.setObject(msg);
+    QByteArray allPara = document.toJson(QJsonDocument::Compact);
+    qDebug()<<__PRETTY_FUNCTION__<<"allPara = "<<allPara;
+    qDebug()<<__PRETTY_FUNCTION__<<"the format is " <<jsonFormatIsRight(allPara);
+    return allPara;
+}
+
+void JsonParse::setLayout(int playout)
+{
+    mLayout = playout;
 }
 
 void JsonParse::setLiftFlrVol(int pVol)

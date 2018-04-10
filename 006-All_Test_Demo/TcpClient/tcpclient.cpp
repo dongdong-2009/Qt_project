@@ -130,8 +130,8 @@ void TcpClient::slotSend()
         return ;
     }
 
-    QString msg = userName + ":" + sendLineEdit->text();
-
+//    QString msg = userName + ":" + sendLineEdit->text();
+    QString msg =/* userName + ":" + */sendLineEdit->text();
     tcpSocket->write(msg.toLatin1(), msg.length());
     sendLineEdit->clear();
 }

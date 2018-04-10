@@ -4,7 +4,7 @@ MyTcpServer::MyTcpServer(QObject *parent, int port)
     : QTcpServer(parent)
     , mHasConnectFlag(false)
 {
-    listen(QHostAddress::Any, port);
+    listen(QHostAddress::Any, port); 
     qDebug()<<__PRETTY_FUNCTION__<<" lines = " << __LINE__<< "will listening";
 }
 
@@ -17,35 +17,42 @@ MyTcpServer::~MyTcpServer()
     }
 }
 
-void MyTcpServer::writeMsgToClient(QByteArray msg, int length)
+int MyTcpServer::writeMsgToClient(QByteArray msg, int length)
 {
     if (mMyTcpSocket && mHasConnectFlag)
     {
         int tmplen = mMyTcpSocket->write(msg.data(), length);
         qDebug()<<__PRETTY_FUNCTION__<<"length = "<<length<< "tmplen = "<<tmplen;
+        return tmplen;
+    }
+    else
+    {
+        qDebug()<<__PRETTY_FUNCTION__<<"mMyTcpSocket or mHasConnectFlag write wrong";
+        return -1;
     }
 }
 
-/*
- * 当MyTcpSocket数据到达时，MyTcpSocket通知MyTcpServer服务器对数据进行处理，例如检查json格式是否正确等
- * 组合生成需要回复的QJson字符串，调用MyTcpSocket write数据给Client
-*/
 void MyTcpServer::slotMyTcpServerDealWithMsg(QByteArray msg, int length)
 {
     qDebug()<<__PRETTY_FUNCTION__<<" lines = " << __LINE__;
     // 处理QJson数据
-    int ret = mJsonParse.parserJsonFormat(msg);
-//    writeMsgToClient(json, json.length());
-    emit myTcpServerSendMsgToScreen(msg, length);  // TcpServer 发送信号到主界面用于通知显示
+    emit myTcpServerRecvMsg(msg, length);  // TcpServer 发送信号到主界面用于通知显示
 }
 
-void MyTcpServer::slotMyTcpServerDisconnected(int)
+void MyTcpServer::slotMyTcpServerDisconnected(int descriptor)
 {
     qDebug()<<__PRETTY_FUNCTION__<<" lines = " << __LINE__;
-    mHasConnectFlag = false;
-    mMyTcpSocket->close();
-    mMyTcpSocket->deleteLater();
-    mMyTcpSocket = 0;
+    if (mMyTcpSocket)
+    {
+        if (mMyTcpSocket->socketDescriptor() == descriptor)
+        {
+            qDebug()<<__PRETTY_FUNCTION__<<" lines = " << __LINE__<<"descriptor = "<<descriptor;
+            mHasConnectFlag = false;
+            mMyTcpSocket->close();
+            mMyTcpSocket->deleteLater();
+            mMyTcpSocket = 0;
+        }
+    }
 }
 
 void MyTcpServer::incomingConnection(qintptr socketDescriptor)
@@ -58,9 +65,11 @@ void MyTcpServer::incomingConnection(qintptr socketDescriptor)
         if (mMyTcpSocket)
         {
             connect(mMyTcpSocket, SIGNAL(myTcpSocketRecvMsg(QByteArray, int)),
-                    this, SLOT(slotMyTcpServerDealWithMsg(QByteArray,int)));
+                    this, SLOT(slotMyTcpServerDealWithMsg(QByteArray, int)));
             connect(mMyTcpSocket, SIGNAL(myTcpSocketDisconnected(int)),
                     this, SLOT(slotMyTcpServerDisconnected(int)));
+
+            mMyTcpSocket->setSocketDescriptor(socketDescriptor);
         }
     }
     else
@@ -69,25 +78,31 @@ void MyTcpServer::incomingConnection(qintptr socketDescriptor)
     }
 }
 
-// TcpSocket 模块
+/******************TcpSocket 模块 satrt **********************/
 MyTcpSocket::MyTcpSocket(QObject *parent)
 {
+    Q_UNUSED(parent);
     qDebug()<<__PRETTY_FUNCTION__<<" lines = " << __LINE__;
     connect(this, SIGNAL(readyRead()), this, SLOT(slotMyTcpSocketDataReceived()));
     connect(this, SIGNAL(disconnected()), this, SLOT(slotMyTcpSocketDisconnected()));
+}
+
+MyTcpSocket::~MyTcpSocket()
+{
+    qDebug()<<__PRETTY_FUNCTION__<<" lines = " << __LINE__<<"MyTcpSocket deletelater";
 }
 
 void MyTcpSocket::slotMyTcpSocketDataReceived()
 {
     qDebug()<<__PRETTY_FUNCTION__<<" lines = " << __LINE__;
     int length = bytesAvailable();
-    while (length > 0)
+    if (length > 0)
     {
         QByteArray recvMsg = read(length);
         qDebug()<<__PRETTY_FUNCTION__<<recvMsg;
         emit myTcpSocketRecvMsg(recvMsg, length);
     }
-    qDebug()<<__PRETTY_FUNCTION__;
+    qDebug()<<__PRETTY_FUNCTION__<<" lines = " << __LINE__;
 }
 
 void MyTcpSocket::slotMyTcpSocketDisconnected()
@@ -96,5 +111,5 @@ void MyTcpSocket::slotMyTcpSocketDisconnected()
     qDebug()<<__PRETTY_FUNCTION__<<"tmpSocketDesp = "<< tmpSocketDesp;
     emit myTcpSocketDisconnected(tmpSocketDesp);
 }
-
+/******************TcpSocket 模块 end **********************/
 

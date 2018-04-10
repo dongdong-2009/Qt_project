@@ -5,7 +5,6 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QByteArray>
-#include "jsonparse.h"
 
 class MyTcpSocket;
 
@@ -13,23 +12,23 @@ class MyTcpServer : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit MyTcpServer(QObject *parent = 0, int port = 0);
+    explicit MyTcpServer(QObject *parent = 0, int port = 8010);
     ~MyTcpServer();
-    void writeMsgToClient(QByteArray msg, int length);
+    int writeMsgToClient(QByteArray msg, int length);
 
 signals:
-    void myTcpServerSendMsgToScreen(QByteArray msg, int length);
+    void myTcpServerRecvMsg(QByteArray msg, int length);
 
 public slots:
     void slotMyTcpServerDealWithMsg(QByteArray msg, int length);
-    void slotMyTcpServerDisconnected(int);
+    void slotMyTcpServerDisconnected(int descriptor);
 
 protected:
     void incomingConnection(qintptr socketDescriptor);
+
 private:
     bool mHasConnectFlag;
     MyTcpSocket* mMyTcpSocket;
-    JsonParse mJsonParse;
 };
 
 class MyTcpSocket : public QTcpSocket
@@ -37,7 +36,7 @@ class MyTcpSocket : public QTcpSocket
     Q_OBJECT
 public:
     explicit MyTcpSocket(QObject *parent = 0);
-
+    ~MyTcpSocket();
 signals:
     void myTcpSocketRecvMsg(QByteArray msg, int length);
     void myTcpSocketDisconnected(int);
