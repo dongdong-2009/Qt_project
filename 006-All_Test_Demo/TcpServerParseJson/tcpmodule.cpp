@@ -14,6 +14,7 @@ MyTcpServer::~MyTcpServer()
     {
         qDebug()<<__PRETTY_FUNCTION__<<" lines = " << __LINE__;
         mMyTcpSocket->deleteLater();
+        mMyTcpSocket = 0;
     }
 }
 
