@@ -21,6 +21,8 @@ public:
     void put(const QString &fileName, const QString &path);
     // 下载文件
     void get(const QString &path, const QString &fileName);
+    // 获取本机的IP地址
+    QString getIp();
 
 signals:
     void error(QNetworkReply::NetworkError);

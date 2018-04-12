@@ -18,6 +18,7 @@ public:
 
 signals:
     void myTcpServerRecvMsg(QByteArray msg, int length);
+    void myTcpServerDeviceDisConnect();
 
 public slots:
     void slotMyTcpServerDealWithMsg(QByteArray msg, int length);

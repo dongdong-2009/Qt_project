@@ -156,7 +156,9 @@ quint32 AppClient::ParseFrame()
             QVariantMap para = cmdObj["info"].toMap();
             appupdateFinished(para);
         }
-    }else {
+    }
+    else 
+	{
 
     }
     return 0;

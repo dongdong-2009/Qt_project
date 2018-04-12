@@ -53,6 +53,7 @@ QByteArray Widget::replyLoginResult(bool res)
     loginRes = document.toJson(QJsonDocument::Compact);
     qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"loginRes = "<<loginRes;
 //    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"the format is " <<jsonFormatIsRight(loginRes);
+    loginRes.insert(0, (char)ID_LOGIN);
     return loginRes;
 }
 
@@ -81,6 +82,7 @@ QByteArray Widget::replyGetAllParameter()
     allPara = document.toJson(QJsonDocument::Compact);
     qDebug()<<__PRETTY_FUNCTION__<<"allPara = "<<allPara;
 //    qDebug()<<__PRETTY_FUNCTION__<<"the format is " <<jsonFormatIsRight(allPara);
+    allPara.insert(0, (char)ID_SENDPARA);
     return allPara;
 }
 
@@ -93,6 +95,7 @@ QByteArray Widget::sendHeartBeat()
     QByteArray heartBeat = document.toJson(QJsonDocument::Compact);
     qDebug()<<__PRETTY_FUNCTION__<<"heartBeat = "<<heartBeat;
 //    qDebug()<<__PRETTY_FUNCTION__<<"the format is " <<jsonFormatIsRight(heartBeat);
+    heartBeat.insert(0, (char)ID_HEART);
     return heartBeat;
 }
 

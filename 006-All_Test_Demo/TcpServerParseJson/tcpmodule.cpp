@@ -49,6 +49,7 @@ void MyTcpServer::slotMyTcpServerDisconnected(int descriptor)
         {
             qDebug()<<__PRETTY_FUNCTION__<<" lines = " << __LINE__<<"descriptor = "<<descriptor;
             mHasConnectFlag = false;
+            emit myTcpServerDeviceDisConnect();
             mMyTcpSocket->close();
             mMyTcpSocket->deleteLater();
             mMyTcpSocket = 0;

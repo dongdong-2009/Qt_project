@@ -26,6 +26,17 @@ typedef enum
     UPDATE
 }WIFICMDS;
 
+typedef enum ID_FRAME
+{
+    ID_HEART        =     0x01,        /* heartBeat */
+    ID_LOGIN        =     0x02,       /* login */
+    ID_GETPARA      =     0x03,    /* getallparameter */
+    ID_SENDPARA     =     0x04,    /* sendallparameter */
+    ID_UPDATEFINISH =     0x05,/* appupdateFinished */
+    ID_SENDFILE     =     0x06,  /* sendFile */
+    ID_REBOOT       =     0x07,   /* reboot */
+}ID_FRAME;
+
 class WifiCommunication : public QObject
 {
     Q_OBJECT
@@ -34,12 +45,15 @@ public:
     /******************JSON start***************************/
     bool jsonFormatIsRight(const QByteArray& byteArray);
     void parserJsonFormat(const QByteArray& byteArray);
-    quint32 ParseBuffer(QByteArray& buffer);
+    bool parseBuffer(QByteArray& buffer);
+    bool generateBuffer(QByteArray& buffer, char pID);
+    char getCrcVerify(QByteArray msg, int length);
     bool judgeArrayIsEmpty(const QByteArray& buffer);
 
     QByteArray sendJsonFrame(QJsonObject& msg);
     void sltloginResult(bool flag);
     int writeMsgToClient(QByteArray msg, int length);
+
     /******************JSON ended**************************/
 
     /******************TcpSocket start***************************/
@@ -73,6 +87,8 @@ public slots:
 private:
     MyTcpServer* mMyTcpServer;
     QTimer mHeartBeatTimer;
+    QByteArray mSendBufferFrame;
+    QByteArray mRecvBufferFrame;
 };
 
 #endif // WIFICOMMUNICATION_H

@@ -1,14 +1,14 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2018-04-11T17:22:12
+# Project created by QtCreator 2018-04-12T20:48:41
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = FtpTest
+TARGET = QByteArrayTest
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -16,6 +16,7 @@ TEMPLATE = app
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -23,10 +24,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        widget.cpp \
-    ftpmanager.cpp
+        widget.cpp
 
-HEADERS  += widget.h \
-    ftpmanager.h
+HEADERS  += widget.h
 
 FORMS    += widget.ui
