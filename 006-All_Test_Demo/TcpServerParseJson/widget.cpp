@@ -151,8 +151,52 @@ void Widget::sltUpdateFinished()
     qDebug()<<__PRETTY_FUNCTION__<<"update is finished";
 }
 
-void Widget::sltParameterSetUp()
+void Widget::sltParameterSetUp(QString key, QVariant value)
 {
-    QByteArray tmp = replyGetAllParameter();
-    mWiFi.writeMsgToClient(tmp, tmp.length());
+    int va = 0;
+
+    if(!QString::compare(key, "liftflrvol"))
+    {
+        va = value.toInt();
+    }
+    else if(!QString::compare(key, "liftarvvol"))
+    {
+        va = value.toInt();
+    }
+    else if(!QString::compare(key, "admusicvol"))
+    {
+        va = value.toInt();
+    }
+    else if(!QString::compare(key, "luminance"))
+    {
+        va = value.toInt();
+    }
+    else if(!QString::compare(key, "darklevel"))
+    {
+        va = value.toInt();
+    }
+    else if(!QString::compare(key, "standby"))
+    {
+        va = value.toInt();
+    }
+    else if(!QString::compare(key, "rotation"))
+    {
+        va = value.toInt();
+    }
+    else if(!QString::compare(key, "layout"))
+    {
+        va = value.toInt();
+    }
+    else if(!QString::compare(key, "autotest"))
+    {
+        bool pAutoTest = value.toBool();
+        qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"pAutoTest = "<<pAutoTest;
+    }
+    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"va = "<<va;
 }
+
+//void Widget::sltParameterSetUp()
+//{
+//    QByteArray tmp = replyGetAllParameter();
+//    mWiFi.writeMsgToClient(tmp, tmp.length());
+//}

@@ -45,8 +45,8 @@ public:
     /******************JSON start***************************/
     bool jsonFormatIsRight(const QByteArray& byteArray);
     void parserJsonFormat(const QByteArray& byteArray);
-    bool parseBuffer(QByteArray& buffer);
-    bool generateBuffer(QByteArray& buffer, char pID);
+    void parseBuffer(QByteArray& buffer);
+    QByteArray& generateBuffer(QByteArray& buffer);
     char getCrcVerify(QByteArray msg, int length);
     bool judgeArrayIsEmpty(const QByteArray& buffer);
 

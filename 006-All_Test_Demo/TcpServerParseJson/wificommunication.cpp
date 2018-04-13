@@ -134,24 +134,24 @@ void WifiCommunication::parserJsonFormat(const QByteArray &byteArray)
 }
 
 // 解析读取到的QByteArray的数据，需要对帧头和帧尾进行处理
-bool WifiCommunication::parseBuffer(QByteArray &buffer)
+void WifiCommunication::parseBuffer(QByteArray &buffer)
 {
     mRecvBufferFrame.clear();
     if (!judgeArrayIsEmpty(buffer))
     {
-        return false;
+        return;
     }  
     char ch = buffer.at(0);
-    if ((quint8)ch != BVT_STX)
+    if ((quint8)ch != BVT_STX) // 帧头
     {
-        return false;
+        return;
     }
     ch = buffer.at(buffer.length() - 1);
-    if ((quint8)ch != BVT_ETX)
+    if ((quint8)ch != BVT_ETX) // 帧尾
     {
-        return false;
+        return;
     }
-    int i = buffer.length() - 3; // 去掉帧头，帧尾，校验位
+    int i = buffer.length() - 2; // 去掉帧头，帧尾
     int j = 1;
     while (j < i)
     {
@@ -178,7 +178,7 @@ bool WifiCommunication::parseBuffer(QByteArray &buffer)
             {
                 mRecvBufferFrame.clear();
                 qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"BVT_ESC the after char is error";
-                return false;
+                return ;
             }
         }
         else
@@ -187,41 +187,45 @@ bool WifiCommunication::parseBuffer(QByteArray &buffer)
             j = j + 1;
         }
     }
-    char recvCrc = buffer.at(buffer.length() - 2);
+    int len = mRecvBufferFrame.length();
+    char recvCrc = mRecvBufferFrame.at(len - 1);
     // 文件传送前后crc值校验相同
-    if (recvCrc == getCrcVerify(mRecvBufferFrame, mRecvBufferFrame.length()))
+    if (recvCrc == getCrcVerify(mRecvBufferFrame, len - 1))
     {
         qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"mRecvBufferFrame ="<< mRecvBufferFrame;
-        return true;
+        mRecvBufferFrame.remove(len - 1, 1); // 去掉最后一个crc校验位
+        return;
     }
     else
     {
         mRecvBufferFrame.clear();
-        return false;
+        return ;
     }
+    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"mRecvBufferFrame ="<< mRecvBufferFrame;
+    parserJsonFormat(mRecvBufferFrame);
 }
 
 // 生成包含帧头帧尾和crc校验位的一帧数据
-bool WifiCommunication::generateBuffer(QByteArray &buffer, char pID)
+// QByteArray &buffer 为ID + json格式字符串转化后字符串
+// char pID 为数据帧的ID标志
+QByteArray& WifiCommunication::generateBuffer(QByteArray &buffer)
 {
     mSendBufferFrame.clear();
+    int j = 0;
     if (!judgeArrayIsEmpty(buffer))
     {
-        return false;
+        return mSendBufferFrame;
     }
     if (j < buffer.length()) // 满足条件先加入帧头
     {
         mSendBufferFrame.append(BVT_STX);
-        mSendBufferFrame.append(pID); // 加入ID
     }
 
-    // 校验位是本数据中不包含帧头和帧尾的时候计算出来的
+    // 校验位是本数据中不包含帧头和帧尾 但包含ID 的时候计算出来的
     char crc = getCrcVerify(buffer, buffer.length());
     QByteArray addCrcBuffer = buffer.append(crc);
     int i = addCrcBuffer.length();
-    int j = 0;
     char tmp;
-
     while (j < i)
     {
         tmp = addCrcBuffer.at(j);
@@ -249,7 +253,7 @@ bool WifiCommunication::generateBuffer(QByteArray &buffer, char pID)
 
     mSendBufferFrame.append((char)BVT_ETX); // 加入帧尾
     qDebug()<<__PRETTY_FUNCTION__<<" mSendBufferFrame = "<<mSendBufferFrame;
-    return true;
+    return mSendBufferFrame;
 }
 
 char WifiCommunication::getCrcVerify(QByteArray msg, int length)
@@ -353,12 +357,17 @@ void WifiCommunication::getAllParameter()
 
 void WifiCommunication::setParameter(QJsonObject &map)
 {
-    QVariantMap tmpMap =  map.toVariantMap();
+    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"map = "<<map;
+    QJsonValue infoVal = map["info"];
+//    QJsonValue infoVal = cmdqobj.value(QString("info"));
+    QJsonObject obj = infoVal.toObject();
+    QVariantMap tmpMap =  obj.toVariantMap();
     QMapIterator<QString, QVariant> it(tmpMap);
     while (it.hasNext())
     {
         it.next();
         emit sigParameterSetUp(it.key(), it.value());
+        qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"it.key() = "<<it.key()<<"it.value() = "<<it.value();
     }
 }
 

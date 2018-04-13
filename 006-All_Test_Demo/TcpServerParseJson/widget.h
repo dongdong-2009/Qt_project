@@ -45,7 +45,7 @@ public slots:
     void sltDeviceDisConnected();
     void sltGetAllParameter();
     void sltUpdateFinished();
-    void sltParameterSetUp();
+    void sltParameterSetUp(QString key, QVariant value);
 };
 
 #endif // WIDGET_H
