@@ -73,7 +73,9 @@ QStringList ErgodicDirectory(QString d)
         return QStringList();
     }
     if(!d.endsWith('/'))
+    {
         d.append('/');
+    }
 
     QStringList tmpFileList;
     QDir dir(d);
@@ -81,7 +83,7 @@ QStringList ErgodicDirectory(QString d)
     {
         const QFileInfoList list = dir.entryInfoList();
         QFileInfo fi;
-        for (int l = 0; l < list.size(); l++)
+        for (int l = 0; l < list.size(); ++l)
         {
             fi = list.at(l);
             if (fi.isDir() && fi.fileName() != "." && fi.fileName() != "..")

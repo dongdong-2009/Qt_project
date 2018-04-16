@@ -9,9 +9,12 @@ TestZip::TestZip(QObject *parent) : QObject(parent)
 
 bool TestZip::UnZip(QString pSrc, QString pDst, qint64 pTimeout, bool isLocal)
 {
+    Q_UNUSED(pTimeout);
+    Q_UNUSED(isLocal);
     IDE_DEBUG(QString("is call3"));
 //    ztt.startZip();
     ztt.startUnZip(pSrc, pDst, true);
+    return true;
 }
 
 void TestZip::init()

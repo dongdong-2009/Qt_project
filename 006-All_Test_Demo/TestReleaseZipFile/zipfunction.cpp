@@ -24,6 +24,7 @@ ZipFunction::ZipFunction(QObject *parent) : QObject(parent)
 
 bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore)
 {
+    qDebug()<<__PRETTY_FUNCTION__<<pSrcPath<<pZipFile;
     quint32 tmpProgress = 0;
     if(pZipFile.isEmpty())
     {
@@ -34,8 +35,11 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
     }
     pSrcPath.replace('\\', '/');
     pZipFile.replace('\\', '/');
+    qDebug()<<__PRETTY_FUNCTION__<<pSrcPath<<pZipFile;
     if(pZipFile.endsWith(".zip", Qt::CaseInsensitive) == false)
+    {
         pZipFile.append(".zip");
+    }
     QFile tmpFile(pZipFile);
     if(tmpFile.exists())
     {
@@ -55,11 +59,15 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
 
     //>@确保目的路径存在。
     QString tmpDstPath = getFileDirectory(pZipFile);
+    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"tmpDstPath = "<<tmpDstPath;
     CreatPath(tmpDstPath);
-
+    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"after CreatPath(tmpDstPath) = ";
     QFileInfo tmpInfo(pSrcPath);
+    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"tmpInfo";
+    qDebug()<<tmpInfo.isFile()<<tmpInfo.isDir()<<"lines = "<<__LINE__;
     if(tmpInfo.isFile())
     {
+        qDebug()<<__PRETTY_FUNCTION__<<"is file";
         if(!tmpInfo.exists())
         {
             IDE_TRACE_STR(pSrcPath);
@@ -74,7 +82,7 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
             QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
             return false;
         }
-
+    qDebug()<<__PRETTY_FUNCTION__<<"start zip";
         //>@打开文件准备开始压缩
         QuaZip zip(pZipFile);
         if(!zip.open(QuaZip::mdCreate))
@@ -86,6 +94,7 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
         }
         QuaZipFile outFile(&zip);
         QString tmpNameOfZip = getFileName(pSrcPath);//>@压缩包内的此文件的文件名
+        IDE_TRACE_STR(tmpNameOfZip);
         QFile inFile(pSrcPath);
         if(!inFile.open(QIODevice::ReadOnly))
         {
@@ -111,6 +120,7 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
 
         //>@开始压缩
         quint64 count = inFile.size();
+        qDebug()<<__PRETTY_FUNCTION__<<"count = "<<count;
         quint64 i = 0;
         while(i < count)
         {
@@ -162,6 +172,7 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
     }
     else if(tmpInfo.isDir())
     {
+        qDebug()<<__PRETTY_FUNCTION__<<"is dir";
         if(!tmpInfo.exists())
         {
             IDE_TRACE_STR(pSrcPath);
@@ -170,6 +181,7 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
             return false;
         }
         QStringList tmpFileList = ErgodicDirectory(pSrcPath);
+        qDebug()<<__PRETTY_FUNCTION__<<"tmpFileList = "<<tmpFileList;
         if (tmpFileList.size() > 0)
         {
 
@@ -191,11 +203,17 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
             int totalf = tmpFileList.size();
             QString tmpParentSrcDir;
             if(mContainDir)
+            {
                 tmpParentSrcDir = getParentDirectory(pSrcPath);//>@计算pSrcDir的父路径
+            }
             else
+            {
                 tmpParentSrcDir = pSrcPath;
+            }
             if(tmpParentSrcDir.endsWith("/") == false)
+            {
                 tmpParentSrcDir.append("/");
+            }
             for (int i = 0; i < totalf; ++i)
             {
                 QString tmpSrcPath = tmpFileList.at(i);
@@ -250,7 +268,7 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
                 quint32 tmpPrg = i*100/totalf;
                 if(tmpProgress != tmpPrg)
                 {
-                    tmpProgress = tmpPrg;
+                    tmpProgress = tmpPrg;                   
                     emit progress(tmpProgress);
                     emit message(QString("Zip %1 %%2 success").arg(tmpNameOfZip)
                                  .arg(BiteorMega(inFile.size())));
@@ -267,6 +285,10 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
                 return false;
             }
 
+            if (tmpInfo.isDir() && tmpProgress != 100 &&tmpProgress != 0)
+            {
+                emit progress(100);
+            }
             //>@发送结束信号
             emit end();
             QtSleep(1);
@@ -280,6 +302,7 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
         return false;
     }
     emit error();
+    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"after emit error";
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
     return false;
 }
@@ -287,7 +310,9 @@ bool ZipFunction::Zip(QString pSrcPath, QString pZipFile, bool pCover, bool pIng
 bool ZipFunction::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pIngore)
 {
     if(pDstPath.endsWith("/") == false)
+    {
         pDstPath.append("/");
+    }
     pDstPath.replace('\\', '/');
     pZipFile.replace('\\', '/');
     CreatPath(pDstPath);

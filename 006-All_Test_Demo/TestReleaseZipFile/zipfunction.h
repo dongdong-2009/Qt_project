@@ -29,7 +29,7 @@ signals:
     void message(QString pInfo);
     void end();
 
-    void startZip(QString pZipFile, QString pDstPath, bool pCover, bool pIngore = false);
+    void startZip(QString pSrcPath, QString pZipFile, bool pCover, bool pIngore = false);
     void startUnZip(QString pZipFile, QString pDstPath, bool pCover, bool pIngore = false);
 
 public slots:
