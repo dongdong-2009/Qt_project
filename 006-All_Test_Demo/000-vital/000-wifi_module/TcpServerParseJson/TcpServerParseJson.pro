@@ -1,14 +1,14 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2018-03-14T09:22:44
+# Project created by QtCreator 2018-04-10T09:23:30
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = WifiFunctionTest
+TARGET = TcpServerParseJson
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -25,9 +25,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         widget.cpp \
-    wifiprotocol.cpp
+    wificommunication.cpp \
+    tcpmodule.cpp
 
 HEADERS  += widget.h \
-    wifiprotocol.h
+    wificommunication.h \
+    tcpmodule.h
 
 FORMS    += widget.ui

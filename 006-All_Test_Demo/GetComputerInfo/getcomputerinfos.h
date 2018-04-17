@@ -10,6 +10,7 @@ class GetComputerInfos : public QObject
 public:
     explicit GetComputerInfos(QObject *parent = 0);
     QString getIp();
+    QString getIp2();
     QString getMachineIp();
 signals:
 
