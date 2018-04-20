@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick xml
+QT += qml quick xml gui
 CONFIG += c++11
 
 SOURCES += main.cpp \
@@ -9,6 +9,12 @@ SOURCES += main.cpp \
     configureholder.cpp
 
 RESOURCES += qml.qrc
+RC_FILE = icon.rc
+
+DISTFILES += \
+    icon.ico \
+    icon.rc
+
 include($$PWD/Common/Common.pri)
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

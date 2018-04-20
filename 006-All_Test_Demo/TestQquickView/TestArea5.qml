@@ -55,42 +55,58 @@ Item {
         }
     }
 
-    Button {
+    ButtonSelfDefine {
         id: btn_make
         x: 330
         y: 28
-        width: 66
-        height: 36
-        text: qsTr("制作")
+        bwidth: 66
+        bheight: 36
+        btext: qsTr("制作")
         enabled: id_driverModel.count > 0 && id_currentUsbDriver.currentText != ""
-        onClicked: {
+        onButtonClick: {
             if("" != id_currentUsbDriver.currentText){
                 console.log("will call makeDisk()");
                 makeDisk();
             }
         }
-        style: ButtonStyle {
-            background: BorderImage {
-                source: btn_make.pressed ? "qrc:///image/Brown.png":"qrc:///image/blue.png"
-                width: btn_make.width; height: btn_make.height
-                border.left: 5; border.top: 5
-                border.right: 5; border.bottom: 5
-            }
-            label:Rectangle {
-                color: "transparent"
-                Text {
-                    text: btn_make.text
-                    color:"white"
-                    anchors.centerIn: parent
-                    font.family: "KONE Information_v12"
-//                    font.pixelSize: 15
-//                    maximumLineCount:1   //设置最大最行数
-//                    elide:Text.ElideLeft
-//                    wrapMode:Text.Wrap
-                }
-            }
-        }
     }
+
+//    Button {
+//        id: btn_make
+//        x: 330
+//        y: 28
+//        width: 66
+//        height: 36
+//        text: qsTr("制作")
+//        enabled: id_driverModel.count > 0 && id_currentUsbDriver.currentText != ""
+//        onClicked: {
+//            if("" != id_currentUsbDriver.currentText){
+//                console.log("will call makeDisk()");
+//                makeDisk();
+//            }
+//        }
+//        style: ButtonStyle {
+//            background: BorderImage {
+//                source: btn_make.pressed ? "qrc:///image/Brown.png":"qrc:///image/blue.png"
+//                width: btn_make.width; height: btn_make.height
+//                border.left: 5; border.top: 5
+//                border.right: 5; border.bottom: 5
+//            }
+//            label:Rectangle {
+//                color: "transparent"
+//                Text {
+//                    text: btn_make.text
+//                    color:"white"
+//                    anchors.centerIn: parent
+//                    font.family: "KONE Information_v12"
+////                    font.pixelSize: 15
+////                    maximumLineCount:1   //设置最大最行数
+////                    elide:Text.ElideLeft
+////                    wrapMode:Text.Wrap
+//                }
+//            }
+//        }
+//    }
 
     function makeDisk()
     {
@@ -213,7 +229,7 @@ Item {
     }
 
     Connections {
-        target: UsbHelper
+        target:UsbHelper
         onSigDeviceAdd: {
             id_driverModel.append({"key": dir});
             MediaScreen.setUdiskIsInsertFlag(true, dir);
@@ -222,7 +238,8 @@ Item {
             for(var i = 0; i< id_driverModel.count; ++i) {
                 console.log(id_driverModel.get(i).key);
                 if(id_driverModel.get(i).key === dir) {
-                    id_driverModel.remove(i)
+                    id_driverModel.remove(i);
+                    MediaScreen.setUdiskIsInsertFlag(false, dir);
                 }
             }
         }

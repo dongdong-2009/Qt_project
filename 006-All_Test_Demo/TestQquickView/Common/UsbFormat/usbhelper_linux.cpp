@@ -153,7 +153,7 @@ void UsbHelper::slot_DeviceRemoved(QString pName)
 
 void UsbHelper::setMountPath(QString pPath)
 {
-
+    Q_UNUSED(pPath);
 }
 
 void UsbHelper::onDeviceAdded()

@@ -3,7 +3,11 @@
 
 #include <QQuickItem>
 #include <QColor>
-
+#include <QTimer>
+/*
+ * Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+ *
+*/
 class QmlScreenA : public QQuickItem
 {
     Q_OBJECT
@@ -37,11 +41,14 @@ signals:
     void currentTime(const QString &strTime);
 
 public slots:
+    void changeColor();
+    void slotColorChanged();
 
 private:
     GenerateAlgorithm m_algorithm;
     QColor m_currentColor;
     int m_nColorTimer;
+    QTimer mtimer;
 };
 
 #endif // QMLSCREENA_H

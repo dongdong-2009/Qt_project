@@ -14,12 +14,12 @@ Rectangle {
     property bool isAudio: false
     property bool isPicture: false
     property string videoPath: ""
-    property var picList: ""
+    property variant picList: ""
     property int curImageindex: 0
     property int picIntertime: 3000
 
     width: 530
-    height: 375 + 20
+    height: 395
     color: "black"
 
     Item {
@@ -46,11 +46,11 @@ Rectangle {
             id: name
             width: parent.width
             height: parent.height
-            source: "qrc:///image/Layout_img.png"
+            source: "qrc:///image/Horizontal_img.png"
         }
     }
     Item {
-        x: 439 + 13
+        x: 452
         y: 17
         width: 74
         height: 26
@@ -64,8 +64,8 @@ Rectangle {
     }
 
     Item {
-        x: 439 + 13
-        y: 47 + 3
+        x: 452
+        y: 50
         width: 74
         height: 20
         Text {
@@ -81,9 +81,9 @@ Rectangle {
     Item {
         id: showImage
         x: 175
-        y: 70 + 3
+        y: 73
         width: /*337*/ 354
-        height: 255 - 3 + 20
+        height: 272
         visible: isPicture
         Image {
             id: image_back
@@ -106,9 +106,9 @@ Rectangle {
     Item {
         id: showVideo
         x: 175
-        y: 70 + 3
+        y: 73
         width: /*337*/ 354
-        height: 255 - 3 + 20
+        height: 272
         visible: (isVideo ||isAudio)
 //        Image {
 //            id: playlogo
@@ -152,7 +152,7 @@ Rectangle {
     Item {
         id: scroll_item   //x: 290 y: 684
         x: 175
-        y: 325 + 20
+        y: 345
         width: 354
         height: 50
         clip: true
@@ -296,9 +296,13 @@ Rectangle {
     function stopVideo()
     {
         if (isVideo)
+        {
             playStatus = 1;
+        }
         else if (isAudio)
+        {
             playStatus = 0;
+        }
         player.stop();
         cycleImage.stop();
         anima_scroll.stop();
@@ -356,13 +360,17 @@ Rectangle {
         if (isAudio)
         {
             if (player.PlayingState !== player.playbackState)
+            {
                 player.play();
+            }
             console.log("functiong in autoplay in layout_horizontal in normal languange")
         }
         else if (isVideo)
         {
             if (player.PlayingState !== player.playbackState)
+            {
                 player.play();
+            }
             console.log("video functiong in autoplay in layout_horizontal in normal languange")
         }
     }

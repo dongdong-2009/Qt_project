@@ -138,34 +138,48 @@ Item {
                 verticalAlignment: Text.AlignVCenter
             }
         }
-        Button {
+        ButtonSelfDefine {
             x: 0
             y: 20
             id: select_btn_video
             anchors.centerIn: parent
-            text: qsTr("选择视频")
-            onClicked: {
+            btext: qsTr("选择视频")
+            bwidth: 92
+            bheight: 36
+            onButtonClick: {
+                console.log("选择视频")
                 addVideo();
             }
-            style: ButtonStyle {
-                background: BorderImage {
-                    source: select_btn_video.pressed ? "qrc:///image/brown_92.png":"qrc:///image/blue_92.png"
-                    width: select_btn_video.width; height: select_btn_video.height
-                    border.left: 5; border.top: 5
-                    border.right: 5; border.bottom: 5
-                }
-                label:Rectangle {
-                    color: "transparent"
-                    Text{
-                        id: select_btn_video_text
-                        text: select_btn_video.text
-                        color:"white"
-                        anchors.centerIn: parent
-                        font.family: "KONE Information_v12"
-                    }
-                }
-            }
         }
+
+//        Button {
+//            x: 0
+//            y: 20
+//            id: select_btn_video
+//            anchors.centerIn: parent
+//            text: qsTr("选择视频")
+//            onClicked: {
+//                addVideo();
+//            }
+//            style: ButtonStyle {
+//                background: BorderImage {
+//                    source: select_btn_video.pressed ? "qrc:///image/brown_92.png":"qrc:///image/blue_92.png"
+//                    width: select_btn_video.width; height: select_btn_video.height
+//                    border.left: 5; border.top: 5
+//                    border.right: 5; border.bottom: 5
+//                }
+//                label:Rectangle {
+//                    color: "transparent"
+//                    Text{
+//                        id: select_btn_video_text
+//                        text: select_btn_video.text
+//                        color:"white"
+//                        anchors.centerIn: parent
+//                        font.family: "KONE Information_v12"
+//                    }
+//                }
+//            }
+//        }
     }
     Item {
         id: id_audioArea
@@ -190,34 +204,48 @@ Item {
                 verticalAlignment: Text.AlignVCenter
             }
         }
-        Button {
+        ButtonSelfDefine {
             x: 0
             y: 20
             id: select_btn_audio
             anchors.centerIn: parent
-            text: qsTr("选择音频")
-            onClicked: {
+            btext: qsTr("选择音频")
+            bwidth: 92
+            bheight: 36
+            onButtonClick:  {
+                console.log("选择音频");
                 addAudio();
             }
-            style: ButtonStyle {
-                background: BorderImage {
-                    source: select_btn_audio.pressed ? "qrc:///image/brown_92.png":"qrc:///image/blue_92.png"
-                    width: select_btn_audio.width; height: select_btn_audio.height
-                    border.left: 5; border.top: 5
-                    border.right: 5; border.bottom: 5
-                }
-                label:Rectangle {
-                    color: "transparent"
-                    Text{
-                        id: select_btn_audio_text
-                        text: select_btn_audio.text
-                        color: "white"
-                        anchors.centerIn: parent
-                        font.family: "KONE Information_v12"
-                    }
-                }
-            }
         }
+
+//        Button {
+//            x: 0
+//            y: 20
+//            id: select_btn_audio
+//            anchors.centerIn: parent
+//            text: qsTr("选择音频")
+//            onClicked: {
+//                addAudio();
+//            }
+//            style: ButtonStyle {
+//                background: BorderImage {
+//                    source: select_btn_audio.pressed ? "qrc:///image/brown_92.png":"qrc:///image/blue_92.png"
+//                    width: select_btn_audio.width; height: select_btn_audio.height
+//                    border.left: 5; border.top: 5
+//                    border.right: 5; border.bottom: 5
+//                }
+//                label:Rectangle {
+//                    color: "transparent"
+//                    Text{
+//                        id: select_btn_audio_text
+//                        text: select_btn_audio.text
+//                        color: "white"
+//                        anchors.centerIn: parent
+//                        font.family: "KONE Information_v12"
+//                    }
+//                }
+//            }
+//        }
     }
 
     Item {
@@ -226,32 +254,44 @@ Item {
         width: parent.width
         height: 100
         y: 200 + 30
-        Button {
+        ButtonSelfDefine {
             id: select_picture_btn
-            text: qsTr("选择图片")
+            btext: qsTr("选择图片")
+            bwidth: 92
+            bheight: 36
             anchors.centerIn: parent
             visible: id_pickedPictureModel.count === 0
-            onClicked: {
+            onButtonClick:  {
                 addPictures();
             }
-            style: ButtonStyle {
-                background: BorderImage {
-                    source: select_picture_btn.pressed ? "qrc:///image/brown_92.png":"qrc:///image/blue_92.png"
-                    width: select_picture_btn.width; height: select_picture_btn.height
-                    border.left: 5; border.top: 5
-                    border.right: 5; border.bottom: 5
-                }
-                label:Rectangle {
-                    color: "transparent"
-                    Text{
-                        text: select_picture_btn.text
-                        color:"white"
-                        anchors.centerIn: parent
-                        font.family: "KONE Information_v12"
-                    }
-                }
-            }
         }
+
+//        Button {
+//            id: select_picture_btn
+//            text: qsTr("选择图片")
+//            anchors.centerIn: parent
+//            visible: id_pickedPictureModel.count === 0
+//            onClicked: {
+//                addPictures();
+//            }
+//            style: ButtonStyle {
+//                background: BorderImage {
+//                    source: select_picture_btn.pressed ? "qrc:///image/brown_92.png":"qrc:///image/blue_92.png"
+//                    width: select_picture_btn.width; height: select_picture_btn.height
+//                    border.left: 5; border.top: 5
+//                    border.right: 5; border.bottom: 5
+//                }
+//                label:Rectangle {
+//                    color: "transparent"
+//                    Text{
+//                        text: select_picture_btn.text
+//                        color:"white"
+//                        anchors.centerIn: parent
+//                        font.family: "KONE Information_v12"
+//                    }
+//                }
+//            }
+//        }
     }
 
     Item {
@@ -333,24 +373,38 @@ Item {
             }
             RowLayout {
                 id: btn_group
-                ButtonSelfDefine {
-                    id: btn_Add
-                    text:qsTr("添加")
-                    onClicked: {
-                        addPictures();
-                        var res = updateMediaSetting();
-                        console.log("res = ", res);
+                Item {
+                    ButtonSelfDefine {
+                        id: btn_Add
+                        btext: qsTr("添加")
+                        x: 0
+                        bwidth: 66
+                        bheight: 36
+                        onButtonClick:  {
+                            addPictures();
+                            var res = updateMediaSetting();
+                            console.log("res = ", res);
+                        }
                     }
-                }
-                ButtonSelfDefine {
-                    id: btn_Delete
-                    text: qsTr("删除")
-                    onClicked: deletePicture(id_pictureListView.currentIndex);
-                }
-                ButtonSelfDefine {
-                    id: btn_Clear
-                    text: qsTr("清空")
-                    onClicked: clearPictures();
+                    ButtonSelfDefine {
+                        id: btn_Delete
+                        x: btn_Add.width + 5
+                        btext: qsTr("删除")
+                        bwidth: 66
+                        bheight: 36
+                        onButtonClick:
+                        {
+                            deletePicture(id_pictureListView.currentIndex);
+                        }
+                    }
+                    ButtonSelfDefine {
+                        id: btn_Clear
+                        x: btn_Add.width + btn_Delete.width + 10
+                        btext: qsTr("清空")
+                        bwidth: 66
+                        bheight: 36
+                        onButtonClick: clearPictures();
+                    }
                 }
             }
         }
@@ -361,36 +415,51 @@ Item {
         y: parent.height - btn_screenPreview.height - 25
         height: 40
         width: parent.width
-        Button {
+        ButtonSelfDefine {
             id: btn_screenPreview
             x: 0
             anchors.centerIn: parent
-            text: qsTr("界面预览")
-            onClicked: {
+            btext: qsTr("界面预览")
+            bwidth: 120
+            bheight: 36
+            onButtonClick: {
                 console.log("checkIsShowPreview() is called");
                 checkIsShowPreview();
                 MediaScreen.getScrollTextLength();
                 ConfigureSerialer.sendPlayAfterClose(multiMediaView.isCheckedFullScreen());
             }
-            style: ButtonStyle {
-                background: BorderImage {
-                    source: btn_screenPreview.pressed ? "qrc:///image/Brown_120.png":"qrc:///image/Blue_120.png"
-                    width: btn_screenPreview.width; height: btn_screenPreview.height
-                    border.left: 5; border.top: 5
-                    border.right: 5; border.bottom: 5
-                }
-                label:Rectangle {
-                    color: "transparent"
-                    Text{
-                        id: btn_screenPreview_text
-                        text: btn_screenPreview.text
-                        color:"white"
-                        anchors.centerIn: parent
-                        font.family: "KONE Information_v12"
-                    }
-                }
-            }
         }
+
+//        Button {
+//            id: btn_screenPreview
+//            x: 0
+//            anchors.centerIn: parent
+//            text: qsTr("界面预览")
+//            onClicked: {
+//                console.log("checkIsShowPreview() is called");
+//                checkIsShowPreview();
+//                MediaScreen.getScrollTextLength();
+//                ConfigureSerialer.sendPlayAfterClose(multiMediaView.isCheckedFullScreen());
+//            }
+//            style: ButtonStyle {
+//                background: BorderImage {
+//                    source: btn_screenPreview.pressed ? "qrc:///image/Brown_120.png":"qrc:///image/Blue_120.png"
+//                    width: btn_screenPreview.width; height: btn_screenPreview.height
+//                    border.left: 5; border.top: 5
+//                    border.right: 5; border.bottom: 5
+//                }
+//                label:Rectangle {
+//                    color: "transparent"
+//                    Text{
+//                        id: btn_screenPreview_text
+//                        text: btn_screenPreview.text
+//                        color:"white"
+//                        anchors.centerIn: parent
+//                        font.family: "KONE Information_v12"
+//                    }
+//                }
+//            }
+//        }
     }
 
     function updateMediaSetting()
@@ -580,7 +649,8 @@ Item {
     function pictureCounts()
     {
         var num = 0;
-        for(var i = 0; i < id_pickedPictureModel.count; i++){
+        for(var i = 0; i < id_pickedPictureModel.count; ++i)
+	{
 
         }
         num = i;
@@ -757,7 +827,8 @@ Item {
 
         ret = multiMediaView.checkMediaSetting();
         console.log("before ret = ", ret);
-        if(ret !== "" && !informationWarning.visible){
+        if(ret !== "" && !informationWarning.visible)
+        {
             console.log("area3 checked!");
             informationContent.text = ret;
             if (resetAndMaking.getResetDefault())

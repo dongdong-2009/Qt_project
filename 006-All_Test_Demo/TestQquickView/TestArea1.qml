@@ -28,7 +28,7 @@ Item {
         x: 0
         y: 0
         text: qsTr("屏幕设定")
-        //        font.pixelSize: 12
+//        font.pixelSize: 12
     }
 
     Text {
@@ -36,14 +36,12 @@ Item {
         x: 33
         y: 27
         text: qsTr("亮度")
-        //        font.pixelSize: 12
     }
 
     Slider {
         id: slider_bright
         x: 136
         y: 28
-//        width: 50
         minimumValue: 0
         maximumValue: 100
         value: 0
@@ -60,7 +58,7 @@ Item {
                 radius: 3
                 BorderImage {
                     anchors.verticalCenter: parent.verticalCenter
-                    source: "image/greenslider.png"
+                    source: "qrc:/image/greenslider.png"
                     border.left: 5; border.top: 1
                     border.right: 5; border.bottom: 1
                     width: styleData.handlePosition
@@ -72,7 +70,7 @@ Item {
                 height: 13
                 Image {
                     anchors.centerIn: parent
-                    source: "image/handle.png"
+                    source: "qrc:/image/handle.png"
                 }
             }
         }
@@ -83,14 +81,12 @@ Item {
         x: 33
         y: 60
         text: qsTr("音量")
-        //        font.pixelSize: 12
     }
 
     Slider {
         id: slider_volume
         x: 136
         y: 61
-//        width: 50
         minimumValue: 0
         maximumValue: 100
         value: 0
@@ -107,7 +103,7 @@ Item {
                 radius: 3
                 BorderImage {
                     anchors.verticalCenter: parent.verticalCenter
-                    source: "image/greenslider.png"
+                    source: "qrc:/image/greenslider.png"
                     border.left: 5; border.top: 1
                     border.right: 5; border.bottom: 1
                     width: styleData.handlePosition
@@ -119,7 +115,7 @@ Item {
                 height: 13
                 Image {
                     anchors.centerIn: parent
-                    source: "image/handle.png"
+                    source: "qrc:/image/handle.png"
                 }
             }
         }
@@ -160,7 +156,6 @@ Item {
         x: 0
         y: 96
         text: qsTr("音频")
-        //        font.pixelSize: 12
     }
 
     CheckBox {
@@ -190,7 +185,6 @@ Item {
         x: 0
         y: 158
         text: qsTr("设置滚动文字")
-        //        font.pixelSize: 12
     }
 
     TextField {
@@ -228,7 +222,6 @@ Item {
         x: 0
         y: 257
         text: qsTr("设置标题")
-        //        font.pixelSize: 12
     }
 
     TextField {
@@ -241,7 +234,7 @@ Item {
         style: TextFieldStyle {
             background: Rectangle {
                 radius: 1
-                implicitWidth: 260 + 45
+                implicitWidth: 305
                 implicitHeight: 24
                 border.color: "green"
                 border.width: 1
@@ -266,7 +259,6 @@ Item {
         x: 0
         y: 363
         text: qsTr("系统时间设置")
-        //        font.pixelSize: 12
     }
 
     Self_TextField {
@@ -336,7 +328,8 @@ Item {
         id_systimeSwitch.text = qsTr("隐藏系统时间")
     }
 
-    function checkParameterSetting(){
+    function checkParameterSetting()
+    {
         if (!isScrollText && !isTitle)
         {
             return ""
@@ -347,7 +340,8 @@ Item {
             return qsTr("请输入滚动字幕文字")
         }
 
-        if(isTitle && vTitle == ""){
+        if(isTitle && vTitle == "")
+        {
             return qsTr("请输入标题文字")
         }
         return "";
@@ -356,12 +350,17 @@ Item {
     function paraChecked()
     {
         if (!isBrightnessVolume && isScrollText && isTitle)
+        {
             return "false";
+        }
         else
+        {
             return "true";
+        }
     }
 
-    function updateParameterSetting1(){
+    function updateParameterSetting1()
+    {
         console.log("updateParameterSetting1 is call")
         if (isBrightnessVolume && isScrollText && isTitle)
         {

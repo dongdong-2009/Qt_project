@@ -8,6 +8,7 @@ QmlScreenA {
     width: 500
     height: 500
     rotation: 0
+//    color: "green"
     Rectangle {
         id: redRect
         objectName: "QmlScreenARedRect"

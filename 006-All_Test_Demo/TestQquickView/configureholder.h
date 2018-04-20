@@ -17,7 +17,7 @@ class ConfigureHolder : public QObject
     Q_OBJECT
 public:
     explicit ConfigureHolder(QObject *parent = 0);
-
+    QString toWindwosPath(QString path);
     void InitDoc();
 
 signals:
@@ -40,20 +40,14 @@ signals:
 public slots:
     bool createXml(QString dir);
     void clearParameters();    
-//    void startJobs();
 
     void setDelDirPath(const QString path);
     bool delDir(const QString path);
     void startDelDir();
     void orderFile(QString dir);
     bool copyReourceFile(QString src, QString dst);
-//    bool copyFileMulti(QString src, QString dst);
 
     QString GetFilePath(QString pFilePath);
-
-//    void copyProgressMult(int id, qint64 copyBytes);
-//    void jobFinished(int id);
-
 
     bool resetScreen(bool isReset); //是否重置设备默认资源配置
     void sendCheckedSignal();
@@ -68,6 +62,7 @@ public slots:
     void sendStopAudioPlay();
     void sendPlayAfterClose(bool isfull);
     void setBrightOrVolumeChanged(int para);
+
     bool updateMultiMedia(bool isMediaContentEnabled,//true更新多媒体,false不更新多媒体
                           bool videoOrPicture, //true视频,false图片
                           bool isAudio,
@@ -128,6 +123,7 @@ public slots:
                          QString papnUNameText, QString papnPasswdText);
     void setIpParameter(bool pIsAutoSettingFlag, QString pIpAddressText, QString psubnetText,
                         QString pdefaultGateWay, QString pdnsService);
+    void setArea2ParameterAllFlag(bool pHidetimeFlag, bool pHideApnFlag, bool pIpSettingAutoFlag);
 
 public:
     ///是否重置设备默认资源配置
@@ -156,48 +152,28 @@ public:
     int audioHasSelect;
     int timeHasSelect;
 
-    //bool bBrightnessVolume;
     bool isScrollText;
     bool isTitle;
     bool isDateTime;
     int scrollHasSelect;
     int titleHasSelect;
-    //bool bStandby;
 
-    //bool isBrightnessVolume;
     quint8 vVolume;
     quint8 vBrightness;
 
-    //bool isScrollText;
     QString vScrollText;
 
-    //bool isTitle;
     QString vTitle;
 
-    //bool isDateTime;
     QString vTimeFormat;
     QString vDateFormat;
 
-    //bool isStandby;
     quint32 vStage1Interval;
     quint8 vStage1Brightness;
     quint32 vStage2Interval;
     quint8 vStage2Brightness;    
     qint32 vPicInterval;
-//    QMap<int,CopyJob*> jobsMap;
-    quint32 appropriateJobNumber;
 
-    bool isMultiThreadCopying;
-    qint64 fileTotalBytes;
-    qint64 copyedBytes;
-    qreal copyPercent;
-    qint64 *perJobCopyedBytes;
-
-    qint64 perJobLoad;
-    qint64 lastJobLoad;
-
-
-    QString toWindwosPath(QString path);
     QString usbPath;
     qreal pro;
 

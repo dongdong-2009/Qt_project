@@ -5,7 +5,12 @@ import QtQuick.Layouts 1.0
 import QtQuick.Controls.Styles 1.3
 
 Button {
+    property alias btext: rBtn.text
+    property alias bwidth: rBtn.width
+    property alias bheight: rBtn.height
     id: rBtn
+    clip: true
+    signal buttonClick();
     style: ButtonStyle {
         background: BorderImage {
             source: rBtn.pressed ? "qrc:///image/Grey_238_41.png":"qrc:///image/greyBg.png"
@@ -15,11 +20,14 @@ Button {
         }
         label:Rectangle {
             color: "transparent"
-            Text{
+            Text {
                 text: rBtn.text
                 anchors.centerIn: parent
                 font.family: "KONE Information_v12"
             }
         }
+    }
+    onClicked: {
+        buttonClick();
     }
 }

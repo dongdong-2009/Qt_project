@@ -99,6 +99,11 @@ Item {
         x: 0
         y: 98
         text: qsTr("隐藏时间和日期")
+        onClicked: {
+            console.log("before hasChoiceTimeAreaFlag is ", hasChoiceTimeAreaFlag);
+            hasChoiceTimeAreaFlag = 1;
+            console.log("after hasChoiceTimeAreaFlag is ", hasChoiceTimeAreaFlag);
+        }
     }
 
     ApnInformation {
@@ -255,6 +260,7 @@ Item {
         dnsTextId.text = qsTr("首选DNS服务器:")
         apnInformation.translateText();
     }
+
     function area2_parameter_timeDate()
     {
         if (!isDateTime)
@@ -272,30 +278,10 @@ Item {
         }
     }
 
-    function updateParameterSetting2() {
-        var res = area1_briVolume.paraChecked();
-        console.log(" updateParameterSetting2 res = ", res)
-        if ("false" === res)
-        {
-            console.log(" updateParameterSetting2 res = ", res)
-            if (!isDateTime && !isStandby)
-            {
-                console.log(" isDateTime = ", isDateTime, isStandby)
-                ConfigureSerialer.updateParameterBasic2(false, !isDateTime,  isStandby, !isDateTime, isAudioSel, isAudioOff, hasChoiceTimeAreaFlag, hasChoiceAudioSwitchFlag)
-            }
-            else
-            {
-                console.log("false isDateTime = ", isDateTime, isStandby)
-                ConfigureSerialer.updateParameterBasic2(true, !isDateTime,  isStandby, !isDateTime, isAudioSel, isAudioOff, hasChoiceTimeAreaFlag, hasChoiceAudioSwitchFlag)
-            }
-        }
-        else
-        {
-            ConfigureSerialer.updateParameterBasic2(true, !isDateTime,  isStandby, !isDateTime, isAudioSel, isAudioOff, hasChoiceTimeAreaFlag, hasChoiceAudioSwitchFlag)
-        }
+    function updateParameterSetting2()
+    {
+        area2_parameter_FlagSetting()
         area2_parameter_timeDate();
-        area2_parameter_screenSaver();
-        ConfigureSerialer.setApnFlag(!id_ApnSwitch.checked);
         apnInformation.getAPNInformation();
         getIpInformation();
     }
@@ -326,7 +312,11 @@ Item {
         var pSubnetMask = netTextEdit.getAddress();
         var pDefaultGateWay = routeTextEdit.getAddress();
         var pDnsService = dnsTextEdit.getAddress();
-
         ConfigureSerialer.setIpParameter(autoSelect.checked, pIpAddress, pSubnetMask, pDefaultGateWay, pDnsService)
+    }
+
+    function area2_parameter_FlagSetting()
+    {
+        ConfigureSerialer.setArea2ParameterAllFlag(!isDateTime, !id_ApnSwitch.checked, autoSelect.checked)
     }
 }

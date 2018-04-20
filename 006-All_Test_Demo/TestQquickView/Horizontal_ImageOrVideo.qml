@@ -57,15 +57,29 @@ Popup {
         height: btn_horizatal.height + 4
 //        border.color: hborder_Color
 //        border.width: 1
-        Button_Self {
+//        Button_Self {
+//            id: btn_horizatal
+//            anchors.centerIn: parent
+//            checkable: true
+//            enabled: false
+//            visible: !isFullScreen
+//            text: qsTr("横屏显示")
+//            onClicked:
+//            {
+//                open_vertical_view.close();
+//                open_horizontal_view.open();
+//            }
+//        }
+        ButtonSelfDefine {
             id: btn_horizatal
             anchors.centerIn: parent
             checkable: true
             enabled: false
             visible: !isFullScreen
-            text: qsTr("横屏显示")
-            onClicked:
-            {
+            btext: qsTr("横屏显示")
+            bwidth: 238
+            bheight: 41
+            onButtonClick: {
                 open_vertical_view.close();
                 open_horizontal_view.open();
             }
@@ -84,9 +98,10 @@ Popup {
             anchors.centerIn: parent
             checkable: true;
             checked: true;
-            text: qsTr("竖屏显示")
+            btext: qsTr("竖屏显示")
+            bwidth: 238
             visible: !isFullScreen
-            onClicked:
+            onButtonClick:
             {
                 horizon_layout.stopVideo();
                 horizon_layout_fullscreen.stopVideo();

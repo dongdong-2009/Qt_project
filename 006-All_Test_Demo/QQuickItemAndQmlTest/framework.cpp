@@ -49,7 +49,7 @@ void FrameWork::getObject()
         QQuickItem* tmpItem = mview->rootObject();
         if (tmpItem)
         {
-            qDebug()<<"tmpItem = "<<tmpItem;
+            qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"tmpItem = "<<tmpItem;
         }
     }
 }
@@ -83,6 +83,7 @@ void FrameWork::changeUi(int index)
         mview->setSource(QStringLiteral("qrc:/QmlTestC.qml"));
         mview->show();
     }
+    getObject();
 }
 
 

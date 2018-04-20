@@ -57,7 +57,7 @@ private:
     int index;
     int preIndex;
     QQmlContext *content;
-    QQmlApplicationEngine engine;
+    QQmlApplicationEngine* engine;
     ConfigureHolder *configureSerialer;
     QString ipString;
     bool isInsertUdiskFlag;

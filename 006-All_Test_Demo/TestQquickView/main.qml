@@ -6,6 +6,7 @@ import QtQuick.Controls.Material 2.0
 
 ApplicationWindow {
     id: id_mediaScreenHelper
+    objectName: "normalScreen"
     visible: true
     property alias parameterView1: area1_briVolume    //將Id在main.qml中当做全局变量使用
     property alias parameterView2: area2_timeandcycle
@@ -34,6 +35,7 @@ ApplicationWindow {
     title: qsTr("MediaScreen Content management") + qsTr("  V2.2.0")
 
     Rectangle {
+        objectName: "parameterSetting"
         width: parent.width
         height: 30
         color: "transparent"
@@ -187,20 +189,30 @@ ApplicationWindow {
                 anchors.bottomMargin: 10
                 height: 50
                 spacing: 50
-                ButtonSelfDefine {
-                    id: main_btn_OK
-                    text:qsTr("确认")
-                    onClicked: {
-                        id_resetWarnningBox.close();
+                Item {
+                    width: parent.width
+                    ButtonSelfDefine {
+                        id: main_btn_OK
+                        btext:qsTr("确认")
+                        x: 50
+                        bwidth: 66
+                        bheight: 36
+                        onButtonClick:  {
+                            id_resetWarnningBox.close();
+                        }
                     }
-                }
-                ButtonSelfDefine {
-                    id: main_btn_Cancel
-                    text:qsTr("取消")
-                    onClicked: {
-                        ConfigureSerialer.sendCanceledSignal();
-                        id_resetWarnningBox.close();
+                    ButtonSelfDefine {
+                        id: main_btn_Cancel
+                        btext:qsTr("取消")
+                        x: parent.width - 50 - bwidth
+                        bwidth: 66
+                        bheight: 36
+                        onButtonClick:  {
+                            ConfigureSerialer.sendCanceledSignal();
+                            id_resetWarnningBox.close();
+                        }
                     }
+
                 }
             }
         }
@@ -229,12 +241,18 @@ ApplicationWindow {
                 anchors.bottomMargin: 10
                 height: 50
                 spacing: 50
-                ButtonSelfDefine {
-                    id: btn_confirm_OK
-                    text: qsTr("确定")
-                    onClicked: {
-                        id_informationWindow.close();
-                        ConfigureSerialer.sendPreviewCheckedFalse();
+                Item {
+                    width: parent.width
+                    ButtonSelfDefine {
+                        id: btn_confirm_OK
+                        anchors.centerIn: parent
+                        btext: qsTr("确定")
+                        bwidth: 66
+                        bheight: 36
+                        onButtonClick:  {
+                            id_informationWindow.close();
+                            ConfigureSerialer.sendPreviewCheckedFalse();
+                        }
                     }
                 }
             }
@@ -285,14 +303,29 @@ ApplicationWindow {
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode:Text.WrapAnywhere
             }
-            ButtonSelfDefineLong {
-                id: btn_EndMakeDisk
-                text: qsTr("点击以结束制作")
-                width: 300
-                visible: showFinishedButton
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: {
-                    makeDiskFinished()
+//            ButtonSelfDefineLong {
+//                id: btn_EndMakeDisk
+//                text: qsTr("点击以结束制作")
+//                width: 300
+//                visible: showFinishedButton
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                onClicked: {
+//                    makeDiskFinished()
+//                }
+//            }
+            Item {
+                width: parent.width
+                ButtonSelfDefine {
+                    id: btn_EndMakeDisk
+                    anchors.centerIn: parent
+                    btext: qsTr("点击以结束制作")
+                    bwidth: 300
+                    bheight: 36
+                    visible: showFinishedButton
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    onClicked: {
+                        makeDiskFinished()
+                    }
                 }
             }
         }
@@ -354,12 +387,17 @@ ApplicationWindow {
                 anchors.bottomMargin: 10
                 height: 50
                 spacing: 50
-                ButtonSelfDefine {
-                    id: btn_CheckFullScreenOK
-                    text: qsTr("确定")
-                    onClicked: {
-                        id_CheckFullScreen.close();
-
+                Item {
+                    width: parent.width
+                    ButtonSelfDefine {
+                        id: btn_CheckFullScreenOK
+                        anchors.centerIn: parent
+                        btext: qsTr("确定")
+                        bwidth: 66
+                        bheight: 36
+                        onButtonClick: {
+                            id_CheckFullScreen.close();
+                        }
                     }
                 }
             }
@@ -392,8 +430,6 @@ ApplicationWindow {
         target: ConfigureSerialer
         onCopyFileProgress: {
             fileProgress = pro;
-            //            console.log("fileProgress = ", fileProgress)
-            //            console.log("pro= ", pro)
             if(pro == 100 && enterFlag == false)
             {
                 console.log("enterFlag = ", enterFlag)
@@ -435,25 +471,35 @@ ApplicationWindow {
                 anchors.bottomMargin: 10
                 height: 50
                 spacing: 50
-                ButtonSelfDefine {
-                    id: mainColse_btn_OK
-                    text: qsTr("确认")
-                    onClicked: {
-                        id_resetWarnningBox.close();
-                        id_mediaScreenHelper.close();
-                        MediaScreen.setIndex(3) // 设置切换布局的索引值
-                        MediaScreen.changeUi(); // 切换俄语布局界面
-                        MediaScreen.sendUdiskInformation(); // 切换界面显示Usb
+                Item {
+                    width: parent.width
+                    ButtonSelfDefine {
+                        id: mainColse_btn_OK
+                        btext: qsTr("确认")
+                        x: 50
+                        bwidth: 66
+                        bheight: 36
+                        onButtonClick: {
+                            id_resetWarnningBox.close();
+                            id_mediaScreenHelper.close();
+                            MediaScreen.setIndex(3) // 设置切换布局的索引值
+                            MediaScreen.changeUi(); // 切换俄语布局界面
+                            MediaScreen.sendUdiskInformation(); // 切换界面显示Usb
+                        }
                     }
-                }
-                ButtonSelfDefine {
-                    id: mainColse_btn_Cancel
-                    text: qsTr("取消")
-                    onClicked: {
-                        //                        MediaScreen.setIndex(-1);
-                        are4_languageChanges.ischeckedchange();
-                        id_ColseWarnningBox.close();
+                    ButtonSelfDefine {
+                        id: mainColse_btn_Cancel
+                        x: parent.width - 50 - bwidth
+                        btext: qsTr("取消")
+                        bwidth: 66
+                        bheight: 36
+                        onButtonClick: {
+                            //                        MediaScreen.setIndex(-1);
+                            are4_languageChanges.ischeckedchange();
+                            id_ColseWarnningBox.close();
+                        }
                     }
+
                 }
             }
         }

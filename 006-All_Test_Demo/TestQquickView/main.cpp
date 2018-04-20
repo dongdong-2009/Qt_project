@@ -5,6 +5,7 @@
 #include <QFontDatabase>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QIcon>
 
 #if defined(Q_OS_WIN32)
 #include <windows.h>
@@ -20,7 +21,7 @@ int main(int argc, char *argv[])
     QFontDatabase::addApplicationFont(fontDir);
     QFont font("KONE Information_v12");
     app.setFont(font);
-
+    app.setWindowIcon(QIcon("icon.ico"));
     MediaScreen *mediascreen = new MediaScreen();
     mediascreen->init();
 #if defined(Q_OS_WIN32)

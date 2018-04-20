@@ -6,6 +6,8 @@
 #include <QNetworkInterface>
 #include <QDateTime>
 #include "define.h"
+#include <QQmlComponent>
+#include <QQuickItem>
 
 MediaScreen::MediaScreen(QObject *parent) : QObject(parent)
   , index(-1)
@@ -13,24 +15,106 @@ MediaScreen::MediaScreen(QObject *parent) : QObject(parent)
   , isInsertUdiskFlag(false)
 {
     getLocalIp();
+#if defined(Q_OS_WIN32)
+    nativeFilter = 0;
+#endif
 }
+
+//void MediaScreen::changeUi()
+//{
+//    ConfigureHolder* tmpconfigure = configureSerialer;
+//    QQmlApplicationEngine* tmpEngine = engine;
+
+//    engine = new QQmlApplicationEngine();
+//    configureSerialer = new ConfigureHolder(engine);
+//    content = engine->rootContext();
+
+//    tmpconfigure->deleteLater();
+//    tmpEngine->deleteLater();
+
+//#if defined(Q_OS_WIN32)
+//    content->setContextProperty("UsbHelper", nativeFilter->usbHelper); // 设置Qml的上下文属性，可以直接在qml中引用
+//#elif defined(Q_OS_LINUX)
+//    content->setContextProperty("UsbHelper", &mUsbHelper);
+//#endif
+//    content->setContextProperty("ConfigureSerialer", configureSerialer);
+//    content->setContextProperty("Ctranslator", CTranslator::instance());
+//    content->setContextProperty("MediaScreen", this);
+
+//    if(0 == index || 1 == index || 2 == index)
+//    {
+//        CTranslator::instance()->load(index);
+//        emit clearAudioParament(index);
+//        engine->load(QUrl(QLatin1String("qrc:/main.qml")));
+//    }
+//    else if (3 == index)
+//    {
+//        emit clearAudioParament(index);
+//        engine->load(QUrl(QLatin1String("qrc:///russian/RussianMain.qml")));
+//    }
+//}
 
 void MediaScreen::changeUi()
 {
-    switch (index) {
-    case 0: case 1: case 2:
+    ConfigureHolder* tmpconfigure = configureSerialer;
+    QQmlApplicationEngine* tmpEngine = engine;
+
+    engine = new QQmlApplicationEngine();
+    if (engine)
+    {
+        configureSerialer = new ConfigureHolder(engine);
+        content = engine->rootContext();
+    }
+
+    tmpconfigure->deleteLater();
+    tmpEngine->deleteLater();
+
+#if defined(Q_OS_WIN32)
+    if (content)
+    {
+       content->setContextProperty("UsbHelper", nativeFilter->usbHelper); // 设置Qml的上下文属性，可以直接在qml中引用
+    }
+
+#elif defined(Q_OS_LINUX)
+    if (content)
+    {
+        content->setContextProperty("UsbHelper", &mUsbHelper);
+    }
+#endif
+    if (content)
+    {
+        content->setContextProperty("ConfigureSerialer", configureSerialer);
+        content->setContextProperty("Ctranslator", CTranslator::instance());
+        content->setContextProperty("MediaScreen", this);
+    }
+    if(0 == index || 1 == index || 2 == index)
+    {
         CTranslator::instance()->load(index);
         emit clearAudioParament(index);
-        engine.destroyed();
-        engine.load(QUrl(QLatin1String("qrc:/main.qml")));
-        break;
-    case 3:
+        if (engine)
+        {
+            engine->load(QUrl(QLatin1String("qrc:/main.qml")));
+        }
+    }
+    else if (3 == index)
+    {
         emit clearAudioParament(index);
-        engine.destroyed();
-        engine.load(QUrl(QLatin1String("qrc:///russian/RussianMain.qml")));
-        break;
-    default:
-        break;
+        if (engine)
+        {
+            engine->load(QUrl(QLatin1String("qrc:///russian/RussianMain.qml")));
+        }
+    }
+    QObject* tmpobj =  engine->rootObjects().value(0);
+    if (tmpobj)
+    {
+        qDebug()<<__PRETTY_FUNCTION__<<"tmpobj = "<<tmpobj;
+        QQuickItem* tmpQuick = tmpobj->findChild<QQuickItem *>("parameterSetting");
+        if (tmpQuick)
+        {
+            qDebug()<<__PRETTY_FUNCTION__<<"tmpQuick = "<<tmpQuick;
+            qDebug()<<"tmpQuick.width = "<<tmpQuick->width();
+            qDebug()<<"tmpQuick.height = "<<tmpQuick->height();
+        }
     }
 }
 
@@ -75,9 +159,11 @@ int MediaScreen::getSystemLanguage()
 #if defined(Q_OS_WIN32)
 UsbEventFilter *MediaScreen::getPoint()
 {
-    if (NULL != nativeFilter)
+    if (0 != nativeFilter)
+    {
         return nativeFilter;
-    return NULL;
+    }
+    return 0;
 }
 
 #elif defined(Q_OS_LINUX)
@@ -280,17 +366,53 @@ void MediaScreen::sendUdiskInformation()
 
 void MediaScreen::init()
 {
-    configureSerialer = new ConfigureHolder(&engine);
-    content = engine.rootContext();
+    engine = new QQmlApplicationEngine();
+    if (engine)
+    {
+        configureSerialer = new ConfigureHolder(engine);
+        content = engine->rootContext();
+    }
     // 设置Qml的上下文属性，可以直接在qml中引用
 #if defined(Q_OS_WIN32)
     nativeFilter = new UsbEventFilter();
-    content->setContextProperty("UsbHelper", nativeFilter->usbHelper);
+    if (nativeFilter)
+    {
+        if (content)
+        {
+            content->setContextProperty("UsbHelper", nativeFilter->usbHelper);
+            content->setContextProperty("UsbHelper", &mUsbHelper);
+            content->setContextProperty("ConfigureSerialer", configureSerialer);
+            content->setContextProperty("Ctranslator", CTranslator::instance());
+            content->setContextProperty("MediaScreen", this);
+            if (engine)
+            {
+                engine->load(QUrl(QLatin1String("qrc:/main.qml")));
+            }
+        }
+    }
 #elif defined(Q_OS_LINUX)
-    content->setContextProperty("UsbHelper", &mUsbHelper);
+    if (content)
+    {
+        content->setContextProperty("UsbHelper", &mUsbHelper);
+        content->setContextProperty("ConfigureSerialer", configureSerialer);
+        content->setContextProperty("Ctranslator", CTranslator::instance());
+        content->setContextProperty("MediaScreen", this);
+        if (engine)
+        {
+            engine->load(QUrl(QLatin1String("qrc:/main.qml")));
+        }
+    }
 #endif
-    content->setContextProperty("ConfigureSerialer", configureSerialer);
-    content->setContextProperty("Ctranslator", CTranslator::instance());
-    content->setContextProperty("MediaScreen", this);
-    engine.load(QUrl(QLatin1String("qrc:/main.qml")));
+    QObject* tmpobj =  engine->rootObjects().value(0);
+    if (tmpobj)
+    {
+        qDebug()<<__PRETTY_FUNCTION__<<"tmpobj = "<<tmpobj;
+        QQuickItem* tmpQuick = tmpobj->findChild<QQuickItem *>("parameterSetting");
+        if (tmpQuick)
+        {
+            qDebug()<<__PRETTY_FUNCTION__<<"tmpQuick = "<<tmpQuick;
+            qDebug()<<"tmpQuick.width = "<<tmpQuick->width();
+            qDebug()<<"tmpQuick.height = "<<tmpQuick->height();
+        }
+    }
 }

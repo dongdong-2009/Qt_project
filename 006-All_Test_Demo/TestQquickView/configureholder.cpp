@@ -13,10 +13,10 @@ QString yysArrays[3][3] = {QString("China Mobile"), QString("China Unicom"), QSt
 ConfigureHolder::ConfigureHolder(QObject *parent) : QObject(parent)
 {
     clearParameters();
-    appropriateJobNumber = 2;
-    isMultiThreadCopying = false;
-    fileTotalBytes = 0;
-    copyedBytes = 0;
+//    appropriateJobNumber = 2;
+//    isMultiThreadCopying = false;
+//    fileTotalBytes = 0;
+//    copyedBytes = 0;
 }
 
 void ConfigureHolder::InitDoc()
@@ -208,7 +208,7 @@ bool ConfigureHolder::createXml(QString dir)
         //        if (1 == titleHasSelect)
         //        {
         int tret = judgeString(this->vTitle);
-        qDebug()<<"xml vTitle = "<< tret;
+        qDebug()<<" xml vTitle = "<< tret;
         if(isTitle)
         {
             QDomElement titleareaElement = cfgXml.createElement("titlearea");
@@ -410,7 +410,7 @@ void ConfigureHolder::orderFile(QString dir)
     else
     {
         //qDebug()<<pictureList;
-        for(int i = 0; i < pictureList.count(); i++)
+        for(int i = 0; i < pictureList.count(); ++i)
         {
             QString pa = pictureList.at(i);
             QFileInfo imageInfo(pa);
@@ -422,8 +422,10 @@ void ConfigureHolder::orderFile(QString dir)
 
 bool ConfigureHolder::copyReourceFile(QString src, QString dst)
 {
-    if(src.compare(dst, Qt::CaseInsensitive) == 0)
+    if(0 == src.compare(dst, Qt::CaseInsensitive))
+    {
         return true;
+    }
 
     QFileInfo tmpSrcFileInfo(src);
     if(!tmpSrcFileInfo.isFile())
@@ -501,8 +503,9 @@ bool ConfigureHolder::copyReourceFile(QString src, QString dst)
 QString ConfigureHolder::toWindwosPath(QString pFilePath)
 {
     if (pFilePath.isEmpty())
+    {
         return QString();
-
+    }
     return pFilePath.replace("/", "\\");
 }
 
@@ -954,5 +957,12 @@ void ConfigureHolder::setIpParameter(bool pIsAutoSettingFlag, QString pIpAddress
         qDebug()<<"IpAddressText = "<<IpAddressText<<"subnetText = "<<subnetText;
         qDebug()<<"defaultGateWay = "<<defaultGateWay<<"dnsService = "<<dnsService;
     }
+}
+
+void ConfigureHolder::setArea2ParameterAllFlag(bool pHidetimeFlag, bool pHideApnFlag, bool pIpSettingAutoFlag)
+{
+    isDateTime = pHidetimeFlag;
+    apnOn = pHideApnFlag;
+    isAutoSettingFlag = pIpSettingAutoFlag;
 }
 

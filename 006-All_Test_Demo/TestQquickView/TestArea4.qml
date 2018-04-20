@@ -192,7 +192,6 @@ Item {
         {
             language_english.checked = true;
         }
-
     }
 
     Connections {
