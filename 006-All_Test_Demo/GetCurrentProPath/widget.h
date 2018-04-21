@@ -10,6 +10,7 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = 0);
     ~Widget();
+    QString getCurrenFileAbsolutePath(QString appPath, QString curFileRelativePath);
 };
 
 #endif // WIDGET_H
