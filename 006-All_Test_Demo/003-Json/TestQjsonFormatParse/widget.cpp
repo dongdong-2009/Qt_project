@@ -6,8 +6,10 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    mjson.readJson();
-    mjson.parserJsonFormat();
+//    mjson.readJson();
+//    mjson.parserJsonFormat();
+//    mjson.readHeartJson();
+
 }
 
 Widget::~Widget()

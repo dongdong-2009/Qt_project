@@ -87,6 +87,7 @@ public:
     bool clrMdp();
     bool clrDomCldNodes(QDomElement pElement);
     bool delDom(QDomElement pElement);
+    QString getProtocolType();
 
 public:
     static const QString MdpSuffix;
@@ -100,6 +101,7 @@ public:
     DIRECTION                   m_DirectionPermisson;
 
     QString                   m_password;
+    QString                   m_protocolType;
 };
 
 #endif // DEVICEMDP_H

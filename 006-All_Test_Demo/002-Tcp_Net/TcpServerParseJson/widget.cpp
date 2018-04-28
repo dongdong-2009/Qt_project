@@ -22,14 +22,15 @@ Widget::Widget(QWidget *parent) :
     QPixmap tmpmap(mRunPath + "/wifi.png");
     mWifiPicture = tmpmap;
     ui->label_usb->setText("hello");
-    connect(&mWiFi, &WifiCommunication::sigMsgArrive, this, &Widget::sltMsgArrive);
+    mWiFi = new WifiCommunication(60001);
+    connect(mWiFi, &WifiCommunication::sigMsgArrive, this, &Widget::sltMsgArrive);
 
-    connect(&mWiFi, &WifiCommunication::sigLogin, this, &Widget::sltAppLogin);
-    connect(&mWiFi, &WifiCommunication::sigDeviceConnected, this, &Widget::sltDeviceConnected);
-    connect(&mWiFi, &WifiCommunication::sigDeviceDisconnected, this, &Widget::sltDeviceDisConnected);
-    connect(&mWiFi, &WifiCommunication::sigGetAllParametere, this, &Widget::sltGetAllParameter);
-    connect(&mWiFi, &WifiCommunication::sigUpdateFinished, this, &Widget::sltUpdateFinished);
-    connect(&mWiFi, &WifiCommunication::sigParameterSetUp, this, &Widget::sltParameterSetUp);
+    connect(mWiFi, &WifiCommunication::sigLogin, this, &Widget::sltAppLogin);
+    connect(mWiFi, &WifiCommunication::sigDeviceConnected, this, &Widget::sltDeviceConnected);
+    connect(mWiFi, &WifiCommunication::sigDeviceDisconnected, this, &Widget::sltDeviceDisConnected);
+    connect(mWiFi, &WifiCommunication::sigGetAllParametere, this, &Widget::sltGetAllParameter);
+    connect(mWiFi, &WifiCommunication::sigUpdateFinished, this, &Widget::sltUpdateFinished);
+    connect(mWiFi, &WifiCommunication::sigParameterSetUp, this, &Widget::sltParameterSetUp);
 }
 
 Widget::~Widget()
@@ -53,7 +54,7 @@ QByteArray Widget::replyLoginResult(bool res)
     loginRes = document.toJson(QJsonDocument::Compact);
     qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"loginRes = "<<loginRes;
 //    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"the format is " <<jsonFormatIsRight(loginRes);
-    loginRes.insert(0, (char)ID_LOGIN);
+//    loginRes.insert(0, (char)ID_LOGIN);
     return loginRes;
 }
 
@@ -82,7 +83,7 @@ QByteArray Widget::replyGetAllParameter()
     allPara = document.toJson(QJsonDocument::Compact);
     qDebug()<<__PRETTY_FUNCTION__<<"allPara = "<<allPara;
 //    qDebug()<<__PRETTY_FUNCTION__<<"the format is " <<jsonFormatIsRight(allPara);
-    allPara.insert(0, (char)ID_SENDPARA);
+//    allPara.insert(0, (char)ID_SENDPARA);
     return allPara;
 }
 
@@ -95,7 +96,7 @@ QByteArray Widget::sendHeartBeat()
     QByteArray heartBeat = document.toJson(QJsonDocument::Compact);
     qDebug()<<__PRETTY_FUNCTION__<<"heartBeat = "<<heartBeat;
 //    qDebug()<<__PRETTY_FUNCTION__<<"the format is " <<jsonFormatIsRight(heartBeat);
-    heartBeat.insert(0, (char)ID_HEART);
+//    heartBeat.insert(0, (char)ID_HEART);
     return heartBeat;
 }
 
@@ -111,11 +112,11 @@ void Widget::sltAppLogin(QString ssid, QString passwd)
         if(!QString::compare("1234", passwd, Qt::CaseSensitive))
         {
             qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"is check ok";
-            mWiFi.sltloginResult(true);
+            mWiFi->sltloginResult(true);
         }
         else
         {
-            mWiFi.sltloginResult(false);
+            mWiFi->sltloginResult(false);
             qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"is check false";
         }
     }
@@ -143,7 +144,7 @@ void Widget::sltDeviceDisConnected()
 void Widget::sltGetAllParameter()
 {
     QByteArray tmp = replyGetAllParameter();
-    mWiFi.writeMsgToClient(tmp, tmp.length());
+    mWiFi->writeMsgToClient(tmp, tmp.length());
 }
 
 void Widget::sltUpdateFinished()
@@ -198,5 +199,5 @@ void Widget::sltParameterSetUp(QString key, QVariant value)
 //void Widget::sltParameterSetUp()
 //{
 //    QByteArray tmp = replyGetAllParameter();
-//    mWiFi.writeMsgToClient(tmp, tmp.length());
+//    mWiFi->writeMsgToClient(tmp, tmp.length());
 //}

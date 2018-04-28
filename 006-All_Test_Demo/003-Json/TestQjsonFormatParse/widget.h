@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "jsonparse.h"
+#include "newjsonparse.h"
 
 namespace Ui {
 class Widget;
@@ -19,6 +20,7 @@ public:
 private:
     Ui::Widget *ui;
     JsonParse mjson;
+    NewJsonParse newJson;
 };
 
 #endif // WIDGET_H

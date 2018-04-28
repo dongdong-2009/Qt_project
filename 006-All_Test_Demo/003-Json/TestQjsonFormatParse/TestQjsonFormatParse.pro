@@ -25,9 +25,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         widget.cpp \
-    jsonparse.cpp
+    jsonparse.cpp \
+    newjsonparse.cpp
 
 HEADERS  += widget.h \
-    jsonparse.h
+    jsonparse.h \
+    newjsonparse.h
 
 FORMS    += widget.ui

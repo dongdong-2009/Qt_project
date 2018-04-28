@@ -474,3 +474,18 @@ bool MdpParser::delDom(QDomElement pElement)
     m_CfgparaElementGroup.remove(key);
     return true;
 }
+
+
+QString MdpParser::getProtocolType()
+{
+    if(!m_Valid)
+    {
+        return QString();
+    }
+    bool flag = getItemElement("/protocol");
+    if(flag == false)
+    {
+        return QString();
+    }
+    return itemElement.text();
+}

@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.0
 ApplicationWindow {
     visible: true
     width: 640
-    height: 480
+    height: 640
     title: qsTr("Hello World")
 
     Image {
@@ -14,8 +14,9 @@ ApplicationWindow {
     }
 
     Item {
-        x: 40
-        y: 40
+//        rotation: 90
+        x: 320
+        y: 320
         width: parent.width
         height: 30
         ExclusiveGroup {id: radioGroup}

@@ -34,7 +34,7 @@ private:
     static int mStandBy;     //  设置  delay before standby
     static int mRotation;    //  0;90;180;270
     static int mLayout;      //  0;1;2;3
-    WifiCommunication mWiFi;
+    WifiCommunication* mWiFi;
     QPixmap mWifiPicture;
 
 public slots:

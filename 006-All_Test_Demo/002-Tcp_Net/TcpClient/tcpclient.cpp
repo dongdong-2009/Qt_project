@@ -37,7 +37,7 @@ TcpClient::TcpClient(QWidget *parent, Qt::WindowFlags f)
 
     status = false;
 
-    port = 8010;
+    port = 60001/*8010*/;
     portLineEdit->setText(QString::number(port));
 
     serverIP = new QHostAddress();

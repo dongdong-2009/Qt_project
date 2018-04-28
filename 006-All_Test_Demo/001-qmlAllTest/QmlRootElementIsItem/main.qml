@@ -4,7 +4,8 @@ import QtQuick.Controls 1.4
 
 Item {
     width: 640
-    height: 480
+    height: 640
+    rotation: 90
     Image {
         anchors.fill: parent
         source:"qrc:/image/background.png"

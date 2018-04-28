@@ -1,5 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
+#include <QDebug>
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -7,10 +8,45 @@ Widget::Widget(QWidget *parent) :
 {
     ui->setupUi(this);
     init();
-    m_mdpParser->modifyItemElement("/configure/physical/lcd/rotation", "180");
+    m_mdpParser->modifyItemElement("/configure/physical/lcd/rotation", "123");
     m_themeParser->saveXmlAs(mRunPath + "theme2.xml");
 //    m_mdpParser->saveMdp();
+    QString mProtocolType = m_mdpParser->getProtocolType();
+    qDebug()<<m_mdpParser->getPassword();
+    qDebug()<<mProtocolType;
+    m_mdpParser->modifyItemElement("/protocol", "saf");
     m_mdpParser->saveXmlAs(mRunPath + "device.xml");
+
+    if (!QString::compare("canopen", mProtocolType, Qt::CaseInsensitive))
+    {
+        qDebug()<<"mProtocolType = "<<mProtocolType;
+    }
+    else if (!QString::compare("saf", mProtocolType, Qt::CaseInsensitive))
+    {
+        qDebug()<<"mProtocolType = "<<mProtocolType;
+    }
+    else
+    {
+        IDE_TRACE_STR(QString("protocolType is not legal"));
+    }
+
+    // get ip
+    if (m_mdpParser)
+    {
+        QDomElement tmpLancElement = m_mdpParser->m_PHElementGroup.value(P_LANC);
+        qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"mTcpPort = "/*<<mTcpPort*/;
+        if(!tmpLancElement.isNull())
+        {
+            QDomElement tmpElement = tmpLancElement.firstChildElement("tcp");
+            if(!tmpElement.isNull())
+            {
+                int mTcpPort = tmpElement.text().toInt();
+                qDebug()<<"mTcpPort = "<<"lines = "<<__LINE__<<mTcpPort;
+//                mWiFi = new WifiCommunication(mTcpPort);
+//                initWifi();
+            }
+        }
+    }
 }
 
 Widget::~Widget()

@@ -247,6 +247,41 @@ bool JsonParse::judgeArrayIsEmpty(const QByteArray &buffer)
     return flag;
 }
 
+void JsonParse::readHeartJson()
+{
+//    QByteArray tmpArray("\{\"type\"\:\"heartbeat\"\,\"info\"\:\"1\"\}");
+    QByteArray tmpArray("\{\"type\"\:\"heartbeat\"\}");
+    mJsonString = tmpArray;
+    QJsonDocument qjdoc = QJsonDocument::fromJson(mJsonString);
+
+    QJsonObject qjobj = qjdoc.object();
+    qDebug()<<"qjobj = "<<qjobj;
+
+    QJsonValue jsonType = qjobj.value(QString("type"));
+    QString tpyeString = jsonType.toString();
+    qDebug()<<"tpyeString = "<<tpyeString;
+
+    QJsonValue jsonInfo = qjobj.value(QString("info"));
+    qWarning() << jsonInfo;
+    if (jsonInfo.isUndefined())
+    {
+        qDebug()<<"jsonInfo is isUndefined";
+    }
+    QString infoString = jsonInfo.toString();
+    qDebug()<<"infoString = "<<infoString;
+    qDebug()<<"infoString.toint() = "<<infoString.toInt();
+    if (!QString::compare("1", infoString, Qt::CaseInsensitive))
+    {
+        qDebug()<<"is 1";
+    }
+//    if (QString("1") == value0.toString())
+
+    else
+    {
+        qDebug()<<"is not 1";
+    }
+}
+
 void JsonParse::setLiftFlrVol(int pVol)
 {
     mLiftFlrVol = pVol;

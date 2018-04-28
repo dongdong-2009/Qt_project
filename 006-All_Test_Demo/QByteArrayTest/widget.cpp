@@ -32,7 +32,21 @@ Widget::Widget(QWidget *parent) :
         qDebug()<<"byteArray.at(0) != 0x80";
     }
     getByteArrayReference(byteArray);
+    qDebug()<<__PRETTY_FUNCTION__<<"byteArray.length = "<<byteArray.length()<<byteArray;
     getByteArrayReference2(byteArray);
+    qDebug()<<__PRETTY_FUNCTION__<<"byteArray.length = "<<byteArray.length()<<byteArray;
+    mByteArray = QByteArray("this is just test global QByteArray");
+    qDebug()<<"mByteArray = "<<mByteArray<<"mByteArray.length() = "<<mByteArray.length();
+    QByteArray tmp = mByteArray;
+    mByteArray.clear();
+    qDebug()<<"tmp = "<<tmp<<"tmp.length() = "<<tmp.length();
+
+    qDebug()<<"mByteArray = "<<mByteArray<<"mByteArray.length() = "<<mByteArray.length();
+    tmp.append("123456");
+    qDebug()<<"tmp = "<<tmp<<"\n";
+
+    tmp = getByteArrayReference(tmp);
+    qDebug()<<"tmp = "<<tmp<<"\n";
 }
 
 Widget::~Widget()
@@ -53,4 +67,5 @@ QByteArray& Widget::getByteArrayReference2(QByteArray &pArray)
     tmp = pArray;
     tmp.append("lb2616 is coming!");
     qDebug()<<__PRETTY_FUNCTION__<<"pArray.length = "<<tmp.length()<<tmp;
+    return pArray;
 }

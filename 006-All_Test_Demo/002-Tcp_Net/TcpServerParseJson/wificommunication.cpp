@@ -26,9 +26,11 @@
 //#define ID_SENDFILE         (0x06)        /* sendFile */
 //#define ID_REBOOT           (0x07)        /* reboot */
 
-WifiCommunication::WifiCommunication(QObject *parent) : QObject(parent)
+WifiCommunication::WifiCommunication(int port, QObject *parent) : QObject(parent)
+  , mPort(port)
 {
-    mMyTcpServer = new MyTcpServer();
+    mMyTcpServer = new MyTcpServer(parent, port);
+    qDebug()<<"mPort = "<<mPort;
     if (mMyTcpServer)
     {
         connect(mMyTcpServer, &MyTcpServer::myTcpServerRecvMsg, this, &WifiCommunication::parserJsonFormat);
@@ -36,6 +38,11 @@ WifiCommunication::WifiCommunication(QObject *parent) : QObject(parent)
         connect(mMyTcpServer, &MyTcpServer::myTcpServerDeviceDisConnect, this, &WifiCommunication::sigDeviceDisconnected);
     }
 }
+
+//WifiCommunication::WifiCommunication(int port)
+//{
+
+//}
 
 bool WifiCommunication::jsonFormatIsRight(const QByteArray &byteArray)
 {
@@ -137,7 +144,7 @@ void WifiCommunication::parserJsonFormat(const QByteArray &byteArray)
 void WifiCommunication::parseBuffer(QByteArray &buffer)
 {
     mRecvBufferFrame.clear();
-    if (!judgeArrayIsEmpty(buffer))
+    if (judgeArrayIsEmpty(buffer))
     {
         return;
     }  
@@ -282,14 +289,15 @@ bool WifiCommunication::judgeArrayIsEmpty(const QByteArray &buffer)
     return flag;
 }
 
-QByteArray WifiCommunication::sendJsonFrame(QJsonObject& msg)
+QByteArray& WifiCommunication::sendJsonFrame(QJsonObject& msg)
 {
+    mJson.clear();
     QJsonDocument document;
     document.setObject(msg);
-    QByteArray allPara = document.toJson(QJsonDocument::Compact);
-    qDebug()<<__PRETTY_FUNCTION__<<"allPara = "<<allPara;
-    qDebug()<<__PRETTY_FUNCTION__<<"the format is " <<jsonFormatIsRight(allPara);
-    return allPara;
+    mJson = document.toJson(QJsonDocument::Compact);
+    qDebug()<<__PRETTY_FUNCTION__<<"allPara = "<<mJson;
+    qDebug()<<__PRETTY_FUNCTION__<<"the format is " <<jsonFormatIsRight(mJson);
+    return mJson;
 }
 
 void WifiCommunication::sltloginResult(bool flag)
@@ -307,7 +315,7 @@ void WifiCommunication::sltloginResult(bool flag)
     }
     loginObj.insert("info", QJsonValue(info));
     QByteArray tmp =  sendJsonFrame(loginObj);
-    tmp.insert(0, (char)ID_LOGIN);
+//    tmp.insert(0, (char)ID_LOGIN);
     writeMsgToClient(tmp, tmp.length());
     if (flag)
     {

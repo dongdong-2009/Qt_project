@@ -18,6 +18,7 @@ public:
     quint32 ParseBuffer(QByteArray& buffer);
     bool judgeArrayIsEmpty(const QByteArray& buffer);
 
+    void readHeartJson();
     static void setLiftFlrVol(int pVol);
     static void setLiftArvVol(int pVol);
     static void setAdMusicVol(int pVol);

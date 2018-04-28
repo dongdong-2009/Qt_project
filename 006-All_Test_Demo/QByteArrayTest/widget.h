@@ -20,6 +20,7 @@ public:
 
 private:
     Ui::Widget *ui;
+    QByteArray mByteArray;
 };
 
 #endif // WIDGET_H

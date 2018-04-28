@@ -41,7 +41,8 @@ class WifiCommunication : public QObject
 {
     Q_OBJECT
 public:
-    explicit WifiCommunication(QObject *parent = 0);
+    explicit WifiCommunication(int port = 8010, QObject *parent = 0);
+//    WifiCommunication(int port = 8010);
     /******************JSON start***************************/
     bool jsonFormatIsRight(const QByteArray& byteArray);
     void parserJsonFormat(const QByteArray& byteArray);
@@ -50,7 +51,7 @@ public:
     char getCrcVerify(QByteArray msg, int length);
     bool judgeArrayIsEmpty(const QByteArray& buffer);
 
-    QByteArray sendJsonFrame(QJsonObject& msg);
+    QByteArray& sendJsonFrame(QJsonObject& msg);
     void sltloginResult(bool flag);
     int writeMsgToClient(QByteArray msg, int length);
 
@@ -89,6 +90,8 @@ private:
     QTimer mHeartBeatTimer;
     QByteArray mSendBufferFrame;
     QByteArray mRecvBufferFrame;
+    QByteArray mJson;
+    int mPort;
 };
 
 #endif // WIFICOMMUNICATION_H
