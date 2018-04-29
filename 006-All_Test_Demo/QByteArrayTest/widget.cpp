@@ -47,6 +47,9 @@ Widget::Widget(QWidget *parent) :
 
     tmp = getByteArrayReference(tmp);
     qDebug()<<"tmp = "<<tmp<<"\n";
+
+    tmp.clear();
+    qDebug()<<"tmp.length() = "<<tmp.length();
 }
 
 Widget::~Widget()
