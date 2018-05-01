@@ -16,7 +16,7 @@ WorkThread::WorkThread()
     len = 0;
     copyedBytes = 0;
     jobId = -1;
-    for(int i = 0; i < MAXSIZE; i++)
+    for(int i = 0; i < MAXSIZE; ++i)
     {
         cpThreadFileLen[i].id = -1;
         cpThreadFileLen[i].size = 0;
@@ -26,7 +26,7 @@ WorkThread::WorkThread()
 
 WorkThread::~WorkThread()
 {
-    qDebug()<< __PRETTY_FUNCTION__;
+    qDebug()<< __PRETTY_FUNCTION__<<"is xigou";
 }
 
 void WorkThread::run()
@@ -54,11 +54,11 @@ void WorkThread::run()
     this->selfCopyEndFlag = false;
     while(copyedBytes < len && runningFlag)
     {
-        if (this->jobId == 0)
-        {
-            qDebug()<< "copyBytes = "<< copyedBytes << "len = "<< len << "offset = "<< offset;
+//        if (this->jobId == 0)
+//        {
+//            qDebug()<< "copyBytes = "<< copyedBytes << "len = "<< len << "offset = "<< offset;
 
-        }
+//        }
         readLength = srcfile.read(buf, bufferLength);
         if((copyedBytes + readLength) <= len)
         {// 当已经拷贝的文件长度加上当前读到的文件长度小于等于需要拷贝的长度的时候
@@ -73,6 +73,7 @@ void WorkThread::run()
         if (copyedBytes == len || sendBytesCopyed(copyedBytes, len))
         {
             emit hasCopyedBytes(jobId, copyedBytes);
+//            qDebug()<<__PRETTY_FUNCTION__<<"emit hasCopyedBytes(jobId, copyedBytes)";
         }
         QtSleep(2);
     }
@@ -83,7 +84,7 @@ void WorkThread::run()
     qDebug()<< "run ended!";
 }
 
-void WorkThread::setJob(int jobId, QString src, QString dst/*, qint64 offset, qint64 len*/)
+void WorkThread::setJob(int jobId, QString src, QString dst)
 {
     this->jobId = jobId;
     this->src = src;
@@ -113,10 +114,10 @@ void WorkThread::setEndFlag(bool flag)
 
 bool WorkThread::sendBytesCopyed(qint64 cplen, qint64 totallen)
 {
-//    static int lastPercent = 0;
     qint64 totaltemp = totallen / 1024;
     qint64 copytemp = cplen / 1024;
     qint64 tmp = totaltemp / copytemp/10 ;
+    // 每1%更新一次进度
     if (tmp == 1 || tmp == 2 || tmp == 3
         || tmp == 4 || tmp == 5 || tmp == 6
         || tmp == 7 || tmp == 8 || tmp == 9 || 10 == tmp)
@@ -141,7 +142,6 @@ bool WorkThread::sendBytesCopyed(qint64 cplen, qint64 totallen)
     {
         return false;
     }
-
 }
 
 
@@ -154,7 +154,7 @@ void WorkThread::splitFileLength(const QString &filename, int Max)
     if (0 == flen - blocksize * Max) // 刚好能整除
     {
         int i = 0;
-        for(i = 0; i < Max; i++)
+        for(i = 0; i < Max; ++i)
         {
             cpThreadFileLen[i].id = i;
             cpThreadFileLen[i].size = blocksize;
@@ -176,9 +176,4 @@ void WorkThread::splitFileLength(const QString &filename, int Max)
         cpThreadFileLen[i].offset_filehead = cpThreadFileLen[i].id * cpThreadFileLen[i-1].size;
         m_IsAverage = false;
     }
-}
-
-void WorkThread::fileCopyStar()
-{
-
 }

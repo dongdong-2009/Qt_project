@@ -30,7 +30,6 @@ typedef enum{
 typedef struct _THREADCOPY
 {
     int id;                // 线程的id
-//    WorkThread *wThread;   // 线程
     int size;              // 文件大小
     int offset_filehead;   // 文件偏移的位置
 }THREADCOPY;
@@ -38,14 +37,13 @@ typedef struct _THREADCOPY
 class WorkThread : public QThread
 {
     Q_OBJECT
+
 public:
-//    static THREADCOPY copyThreadLength[MAXSIZE];
     explicit WorkThread();
     void run();
     void splitFileLength(const QString & filename, int Max);
-    void fileCopyStar();
     ~WorkThread();
-    void setJob(int jobId, QString src, QString dst/*, qint64 offset, qint64 len*/);
+    void setJob(int jobId, QString src, QString dst);
     void setFileStringList(QStringList m_list);
     void setFileTotalSize(qint64 size);
     void setEndFlag(bool flag);

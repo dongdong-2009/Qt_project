@@ -1,6 +1,7 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include "define.h"
+
 qint64 CopyedBytes[MAXSIZE];
 QMap<int, WorkThread*> wThreadMap;
 QStringList m_listview = QStringList();
@@ -10,10 +11,10 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    m_filemodel = NULL;
+    m_filemodel = 0;
 
-    cpthread = NULL;
-    qthread = NULL;
+    cpthread = 0;
+    qthread = 0;
     initUi();
 }
 
@@ -30,20 +31,43 @@ void Widget::initUi()
     connect(ui->btn_clear, &QPushButton::clicked, this, &Widget::onClearFileList);
     connect(ui->btn_delete, &QPushButton::clicked, this, &Widget::onDeleteFileList);
     connect(this, &Widget::btnEnabledChanged, this, &Widget::onSetBtnEnabled);
-//    connect(this, SIGNAL(copyPercentages(int)), this, SLOT(onUpdateProgressBar(int)));
 
     initCopyThread();
 }
 
 Widget::~Widget()
 {
+    qDebug()<<__PRETTY_FUNCTION__<<"is call";
     delete ui;
+    QMap<int, WorkThread*>::Iterator itw = wThreadMap.begin();
+    WorkThread *wjob;
+    while (itw != wThreadMap.end())
+    {
+        wjob = itw.value();
+        delete wjob;
+        wjob = 0;
+        ++ itw;
+    }
+    updatethread->deleteLater();
+    cpthread->deleteLater();
+    if (qthread->isRunning())
+    {
+        qDebug()<<__PRETTY_FUNCTION__<<"qthread is running";
+        qthread->requestInterruption();//        qthread1->wait();
+        qthread->quit();
+    }
+    if (qthread1->isRunning())
+    {
+        qDebug()<<__PRETTY_FUNCTION__<<"qthread1 is running";
+        qthread1->requestInterruption();
+        qthread1->quit();
+    }
 }
 
 QStringList Widget::getFileList(QStringListModel *qlistmode)
 {
     qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
-    if (NULL != qlistmode)
+    if (0 != qlistmode)
     {        
         qDebug()<<"stringlist = " << qlistmode->stringList();
         return qlistmode->stringList();
@@ -58,11 +82,16 @@ void UpdatePro::countTotalFileSize(QStringList m_list)
     QStringList::iterator it = m_list.begin();
     while (it != m_list.end())
     {
-//        m_FileTotalSize += QFileInfo(*it).size() / 1024; // 计算出指定路径文件的大小
         m_FileTotalSize += QFile(*it).size(); // 计算出指定路径文件的大小
         qDebug()<<"*it = "<< *it << QFile(*it).size()<< m_FileTotalSize;
         ++ it;
     }
+}
+
+void UpdatePro::setCurCopyFileTotalSize(int i)
+{
+    QString fileName = m_listview.at(i);
+    m_FileTotalSize = QFile(fileName).size();
 }
 
 QString CopyThread::getFileName(QString filepath)
@@ -78,10 +107,10 @@ QMap<int, WorkThread *> Widget::initCopyThread()
 {
     qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
     wThreadMap.clear();
-    for (int j = 0; j < MAXSIZE; j++)
+    for (int j = 0; j < MAXSIZE; ++j)
     {
         WorkThread *cthread = new WorkThread();
-        if (NULL != cthread)
+        if (0 != cthread)
         {
             wThreadMap.insert(j, cthread);
         }
@@ -93,7 +122,7 @@ QMap<int, WorkThread *> Widget::initCopyThread()
 // 将全局的拷贝了字节数目的数组清零
 void Widget::resetCopyBytes()
 {
-    for(int i = 0; i < MAXSIZE; i++)
+    for(int i = 0; i < MAXSIZE; ++i)
     {
         CopyedBytes[i] = 0;
     }
@@ -103,7 +132,7 @@ void Widget::resetCopyBytes()
 void Widget::onClearFileList()
 {
     qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
-    m_filemodel = NULL;
+    m_filemodel = 0;
     this->ui->listView->setModel(m_filemodel);
     m_listview = getFileList(m_filemodel);  // 将m_listview 置为空
     ui->progressBar->setValue(0);
@@ -132,19 +161,17 @@ UpdatePro::UpdatePro()
 {
     m_DestPath = QApplication::applicationDirPath();
     m_curPercent = 0;
-    m_perPercent = 0;
+//    m_perPercent = 0;
     m_FileTotalSize = 0;
 }
 
 UpdatePro::~UpdatePro()
 {
-
+    qDebug()<<__PRETTY_FUNCTION__<<"is call";
 }
 
 void UpdatePro::onCountPercentage(int id, qint64 fbytes)
 {
-//    qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
-//    qDebug()<< __PRETTY_FUNCTION__ << "id = "<< id << " fbytes = "<< fbytes;
     qint64 tmp = 0;
     int percent = 0;
     CopyedBytes[id] = fbytes;
@@ -152,15 +179,17 @@ void UpdatePro::onCountPercentage(int id, qint64 fbytes)
     {
         tmp += CopyedBytes[i]; // 计算多线程总的拷贝长度
     }
-//    qDebug()<< "tmp = "<< tmp << "m_FileTotalsize = "<< m_FileTotalSize;
     percent = tmp * 100 / m_FileTotalSize ;
-    m_curPercent = percent;
-//    qDebug()<<"percent = "<< percent;
-    if (m_curPercent > m_perPercent)
+
+    if (percent > m_curPercent)
     {
-        m_perPercent = m_curPercent;
-        qDebug()<<"m_perPercent = "<< m_perPercent;
-        emit copyPercentages(m_curPercent);
+        m_curPercent = percent;
+        qDebug()<<"percent = "<< percent;
+        emit copyPercentages(percent);
+        if (m_curPercent >= 99)
+        {
+            m_curPercent = 0;
+        }
     }
 }
 
@@ -169,9 +198,7 @@ void Widget::onUpdateProgressBar(int value)
     qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
     if (value <= 100)
     {
-//        qDebug()<<"progressBar value = "<< value;
         ui->progressBar->setValue(value);
-//        QCoreApplication::processEvents();
     }
 }
 
@@ -202,7 +229,7 @@ void Widget::onCopyFileClick()
 
     connect(cpthread, &CopyThread::showLabelText, this, &Widget::onShowLabelText, Qt::QueuedConnection);
     connect(cpthread, &CopyThread::startCopy, cpthread, &CopyThread::startWork);
-
+    connect(cpthread, &CopyThread::newFileCopy, updatethread, &UpdatePro::setCurCopyFileTotalSize, Qt::QueuedConnection);
     connect(updatethread, &UpdatePro::showProgress, this, &Widget::onShowProgress, Qt::QueuedConnection);
     connect(updatethread, &UpdatePro::copyPercentages, this, &Widget::onUpdateProgressBar, Qt::QueuedConnection);
     qthread->start();
@@ -213,13 +240,20 @@ void Widget::onCopyFileClick()
     emit updatethread->showProgress(true);
 }
 
-QStringListModel * Widget::onDeleteFileList(/*QStringList files*/)
+QStringListModel * Widget::onDeleteFileList()
 {
-    int index = getFileList(m_filemodel).length() - 1;
-    m_filemodel->removeRow(index);
-    m_listview = getFileList(m_filemodel);
-    emit btnEnabledChanged(m_listview);
-    return m_filemodel;
+    if (m_filemodel)
+    {
+        int index = getFileList(m_filemodel).length() - 1;
+        m_filemodel->removeRow(index);
+        m_listview = getFileList(m_filemodel);
+        emit btnEnabledChanged(m_listview);
+        return m_filemodel;
+    }
+    else
+    {
+        return (QStringListModel *)0;
+    }
 }
 
 void Widget::onOpenmultifileDaliog()
@@ -243,14 +277,14 @@ CopyThread::CopyThread()
 
 CopyThread::~CopyThread()
 {
-    qDebug()<< __PRETTY_FUNCTION__;
+    qDebug()<<__PRETTY_FUNCTION__<<"is call";
 }
 
 // 连接所有新建线程的信号和槽函数
 void UpdatePro::connThreadSlot()
 {
     qDebug()<<__PRETTY_FUNCTION__<<"线程ID为："<<QThread::currentThreadId();
-    countTotalFileSize(m_listview);
+//    countTotalFileSize(m_listview);
     QMap<int, WorkThread*>::const_iterator itw = wThreadMap.constBegin();
     WorkThread *wjob;
     while (itw != wThreadMap.constEnd())
@@ -271,6 +305,7 @@ void CopyThread::startWork()
     for(int i = 0; i < temp_list.length(); ++i)
     {
         qDebug()<<"m_listview.at(i) = "<< temp_list.at(i);
+        emit newFileCopy(i);
         QString desFilename = m_DestPath + "/" + getFileName(temp_list.at(i)); // 目标文件的文件名以及路径
         QMap<int, WorkThread *>::const_iterator it = wThreadMap.constBegin();  // 获取多线程对象的头结点
         WorkThread *beginThread;
@@ -298,20 +333,18 @@ void CopyThread::startWork()
         bool flag = false;
         while(1) // 等待第一个文件拷贝结束之后，进行第二个文件的拷贝
         {
-            int k = 0; /*qDebug()<< "enter while 1";*/
+            int k = 0;
             while(itstart1 != wThreadMap.end())
             {
                 beginThread = itstart1.value();
                 if (beginThread->selfCopyEndFlag)
                 {
                     flagarr[k] = 1;
-//                    qDebug("flagarr[%d]=  %d",k, flagarr[k]);
                     ++k;
                 }
                 else
                 {
                     flagarr[k] = 0;
-//                    qDebug("flagarr[%d]=  %d",k, flagarr[k]);
                     ++k;
                 }
                 ++ itstart1;
@@ -327,15 +360,24 @@ void CopyThread::startWork()
                 {
                     flag = true; /*qDebug()<< "1 flag = "<< flag;*/
                 }
-//                QCoreApplication::processEvents();
             }
             if (flag)
             {
+                qDebug()<<"flag = true all copyThread is ended!";
+//                QMap<int, WorkThread *>::const_iterator it1 = wThreadMap.constBegin();  // 获取多线程对象的头结点
+//                while(it1 != wThreadMap.constEnd())
+//                {
+//                    qDebug()<< "*it1 = "<< *it1;
+//                    beginThread = it1.value();
+//                    beginThread->selfCopyEndFlag = false;
+//                    ++ it1;
+//                }
+
                 flag = false;
                 break;
             }
             itstart1 = wThreadMap.begin();
-            QtSleep(4);
+            QtSleep(20);
         }
     }
 }

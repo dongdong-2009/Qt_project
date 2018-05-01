@@ -30,22 +30,15 @@ public:
 
 public slots:
     void startWork();
-//    void connThreadSlot();
-//    void onCountPercentage(int id, qint64 fbytes);
-//    void countTotalFileSize(QStringList m_list);
 
 signals:
-//    void showProgress(bool flag);
-//    void updateProgess(int pvalue);
+
     void showLabelText(int i);
-//    void copyPercentages(int per);
     void startCopy();
+    void newFileCopy(int index);
 
 private:
     QString m_DestPath;
-//    int m_perPercent;
-//    int m_curPercent;
-//    qint64 m_FileTotalSize;
 };
 
 class UpdatePro:public QObject
@@ -54,14 +47,15 @@ class UpdatePro:public QObject
 public:
     UpdatePro();
     ~UpdatePro();
+
 public slots:
     void connThreadSlot();
     void onCountPercentage(int id, qint64 fbytes);
     void countTotalFileSize(QStringList m_list);
+    void setCurCopyFileTotalSize(int i);
 
 signals:
     void showProgress(bool flag);
-//    void updateProgess(int pvalue);
     void showLabelText(int i);
     void copyPercentages(int per);
 
@@ -88,10 +82,7 @@ public:
 
 private:
     Ui::Widget *ui;
-//    QStringList m_listview;
     QStringListModel *m_filemodel;
-
-//    QString m_DestPath;
 
     CopyThread *cpthread;
     UpdatePro *updatethread;
@@ -100,11 +91,9 @@ private:
 
 public slots:
     void onOpenmultifileDaliog();
-//    void startWork();
     QStringListModel * onDeleteFileList(); // 注意信号的参数要大于等于槽函数的信号的个数
     void onClearFileList();
     void onSetBtnEnabled(QStringList m_list);
-//    void onCountPercentage(int id, qint64 fbytes);
     void onUpdateProgressBar(int value);
     void onShowProgress(bool visflag);
     void onShowLabelText(int i);
@@ -113,7 +102,6 @@ public slots:
 signals:
     void btnEnabledChanged(QStringList m_list);
     void allCopyWork(bool flag);
-//    void copyPercentages(int per);
 };
 
 #endif // WIDGET_H
