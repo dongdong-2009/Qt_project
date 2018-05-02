@@ -9,14 +9,16 @@ Widget::Widget(QWidget *parent) :
     ui->setupUi(this);
     init();
     m_mdpParser->modifyItemElement("/configure/physical/lcd/rotation", "123");
-    m_themeParser->saveXmlAs(mRunPath + "theme2.xml");
+    m_mdpParser->saveXml();
+//    m_themeParser->saveXmlAs(mRunPath + "theme2.xml");
 //    m_mdpParser->saveMdp();
-    QString mProtocolType = m_mdpParser->getProtocolType();
-    qDebug()<<m_mdpParser->getPassword();
-    qDebug()<<mProtocolType;
-    m_mdpParser->modifyItemElement("/protocol", "saf");
-    m_mdpParser->saveXmlAs(mRunPath + "device.xml");
-
+//    m_themeParser->saveXml();
+//    QString mProtocolType = m_mdpParser->getProtocolType();
+//    qDebug()<<m_mdpParser->getPassword();
+//    qDebug()<<mProtocolType;
+//    m_mdpParser->modifyItemElement("/protocol", "saf");
+//    m_mdpParser->saveXmlAs(mRunPath + "device.xml");
+/*
     if (!QString::compare("canopen", mProtocolType, Qt::CaseInsensitive))
     {
         qDebug()<<"mProtocolType = "<<mProtocolType;
@@ -34,7 +36,7 @@ Widget::Widget(QWidget *parent) :
     if (m_mdpParser)
     {
         QDomElement tmpLancElement = m_mdpParser->m_PHElementGroup.value(P_LANC);
-        qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"mTcpPort = "/*<<mTcpPort*/;
+        qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"mTcpPort = ";
         if(!tmpLancElement.isNull())
         {
             QDomElement tmpElement = tmpLancElement.firstChildElement("tcp");
@@ -47,6 +49,7 @@ Widget::Widget(QWidget *parent) :
             }
         }
     }
+*/
 }
 
 Widget::~Widget()

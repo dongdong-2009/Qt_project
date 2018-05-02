@@ -531,7 +531,7 @@ bool cutFile(QString srcFile, QString dstFile)
     {
         return false;
     }
-    return QFile::remove(srcFile);
+    return true;
 }
 
 bool XmlParse::saveXml()
@@ -543,20 +543,26 @@ bool XmlParse::saveXml()
     }
     if(m_IsChanged)
     {
-        //将当前文件备份
         QString tmpString = m_FileDir + m_FileName + QString("_bk");
-        bool flag = saveXmlAs(tmpString);
-        IDE_TRACE_STR(tmpString);
+        if (QFile::exists(tmpString))
+        {
+            QFile::remove(tmpString);
+        }
+        //将当前文件备份
+        if(!cutFile(m_FileDir + m_FileName, tmpString))
+        {
+            IDE_TRACE();
+            return false;
+        }
+
+        bool flag = saveXmlAs(m_FileDir + m_FileName);
+        IDE_TRACE_STR(m_FileDir + m_FileName);
         if(flag == false)
         {
             IDE_TRACE();
             return false;
         }
-        if(!cutFile(tmpString, m_FileDir + m_FileName))
-        {
-            IDE_TRACE();
-            return false;
-        }
+
         m_IsChanged = false;
 #if (defined(UBUNTU) || defined(LINUX))
         system("sync");

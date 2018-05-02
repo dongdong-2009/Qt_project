@@ -1,5 +1,6 @@
 #include "gifplayer.h"
 #include "define.h"
+#include <QDebug>
 
 GifPlayer::GifPlayer(QWidget *parent) :
     QLabel(parent)
@@ -35,12 +36,25 @@ GifPlayer::GifPlayer(QString pGifFile, bool pRepeat, QWidget *parent) :
     Play(pGifFile, pRepeat);
 }
 
+GifPlayer::~GifPlayer()
+{
+    if (m_GifMovie)
+    {
+        qDebug()<<__PRETTY_FUNCTION__<<"is call";
+        delete m_GifMovie;
+    }
+}
+
 void GifPlayer::Play(QString pGifFile, bool pRepeat)
 {
     if(!QFile::exists(pGifFile))
+    {
         return;
+    }
     if(m_GifMovie->state() != QMovie::NotRunning)
+    {
         m_GifMovie->stop();
+    }
     m_Repeat = pRepeat;
     m_GifMovie->setFileName(pGifFile);
     m_GifMovie->start();
@@ -68,14 +82,19 @@ void GifPlayer::Stop()
 void GifPlayer::slot_Finished()
 {
     if(m_Repeat)
+    {
         m_GifMovie->start();
+    }
     else
+    {
         Stop();
+    }
     IDE_TRACE();
 }
 
 void GifPlayer::slot_Error(QImageReader::ImageReaderError pErr)
 {
+    Q_UNUSED(pErr);
     Stop();
     IDE_TRACE_INT(pErr);
 }

@@ -28,23 +28,10 @@ void Widget::ShowBusy(bool pFlag, quint64 pTimeout)
     mBusyTimeout.stop();
     if(pFlag)
     {
-        mNetTransFlag = false;
         setDisabled(true);
-#if 1
         mBusyFlagIcon->setFixedSize(100, 100);
         mBusyFlagIcon->move(QPoint(size().width()/2 - mBusyFlagIcon->size().width()/2.0, size().height()/2 - mBusyFlagIcon->size().height()/2.0));
-#else
-#ifdef PHONE
-        QDesktopWidget *desktop = qApp->desktop();
-        int screen_number = desktop->primaryScreen();
-        QRect rect = desktop->screenGeometry(screen_number);
-        QPoint tmpPoint = rect.topLeft() + QPoint(size().width()/2 - mBusyFlagIcon->size().width()/2.0, size().height()/2 - mBusyFlagIcon->size().height()/2.0);
-#else
-        QPoint tmpPoint = mapToGlobal(QPoint(0,0)) + QPoint(size().width()/2 - mBusyFlagIcon->size().width()/2.0, size().height()/2 - mBusyFlagIcon->size().height()/2.0);
-#endif
-        mBusyFlagIcon->setFixedSize(100, 100);
-        mBusyFlagIcon->move(tmpPoint);
-#endif
+
         if(pTimeout > 0)
         {
             mBusyFlagIcon->Play(":/image/rc/busy.gif", true);
@@ -62,7 +49,6 @@ void Widget::ShowBusy(bool pFlag, quint64 pTimeout)
 
 void Widget::slot_CloseBusy()
 {
-    mNetTransFlag = true;
     setEnabled(true);
     mBusyFlagIcon->Stop();
 }

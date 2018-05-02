@@ -12,6 +12,7 @@ class GifPlayer : public QLabel
 public:
     GifPlayer(QWidget *parent = 0);
     GifPlayer(QString pGifFile, bool pRepeat, QWidget *parent = 0);
+    ~GifPlayer();
     void Play(QString pGifFile, bool pRepeat);
     void Play();
     void Stop();

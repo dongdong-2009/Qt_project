@@ -24,7 +24,6 @@ public slots:
 private:
     Ui::Widget *ui;
     GifPlayer *mBusyFlagIcon;
-    bool mNetTransFlag;
     QTimer  mBusyTimeout;
 };
 
