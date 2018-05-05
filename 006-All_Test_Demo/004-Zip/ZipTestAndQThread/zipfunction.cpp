@@ -345,7 +345,7 @@ bool ZipFunction::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pI
 
     if(!QFile::exists(pZipFile))
     {
-        IDE_TRACE();
+        IDE_TRACE(); qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"errors";
         emit error();
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
         return false;
@@ -354,7 +354,7 @@ bool ZipFunction::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pI
     QuaZip zip(pZipFile);
     if(!zip.open(QuaZip::mdUnzip))
     {
-        IDE_TRACE();
+        IDE_TRACE();qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"errors";
         emit error();
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
         return false;
@@ -376,7 +376,7 @@ bool ZipFunction::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pI
     {
         QString tmpFileName = zip.getCurrentFileName();
         QString tmpString = pDstPath + tmpFileName;
-        IDE_TRACE_STR(tmpString);
+        IDE_TRACE_STR(tmpString);qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"errors";
         QFile outfile(tmpString);/* extract to path ....... */
         if(outfile.exists())
         {
@@ -461,7 +461,7 @@ bool ZipFunction::Unzip(QString pZipFile, QString pDstPath, bool pCover, bool pI
     {
         IDE_TRACE();
         emit message(QString("Unzip %1 to %2 error!").arg(pZipFile).arg(pDstPath));
-        emit error();
+        emit error();qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__<<"errors";
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1);
         return false;
     }
