@@ -6,7 +6,8 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    m_unZip.startUnZip();
+    m_unZip.startUnZip("sodimas_canopen.zip");
+
 }
 
 Widget::~Widget()
