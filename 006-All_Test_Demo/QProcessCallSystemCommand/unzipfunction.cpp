@@ -9,7 +9,7 @@ UnZipFunction::UnZipFunction(QObject *parent) : QObject(parent)
     connect(&m_ZipProcess, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(sltOcurrErrors(QProcess::ProcessError)));
     connect(&m_ZipProcess, SIGNAL(started()), this, SLOT(sltStarted()));
     generateAscendRandomNumber();
-    connect(&m_timer, &QTimer::timeout, )
+    connect(&m_timer, &QTimer::timeout, this, &UnZipFunction::sltTimeOut);
 }
 
 void UnZipFunction::generateAscendRandomNumber()
