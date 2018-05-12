@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>JianBianSe.qml</file>
+        <file>Z_ProPertyTest.qml</file>
+        <file>Item_Test.qml</file>
+    </qresource>
+</RCC>
