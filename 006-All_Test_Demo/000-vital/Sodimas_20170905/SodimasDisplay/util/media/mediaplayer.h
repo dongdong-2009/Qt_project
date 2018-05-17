@@ -32,7 +32,7 @@ public:
     void run();
 
     bool add(int pAoType, QString pSrc, int pLoop, bool pPrior, int pVolume, bool pEmitSig=false);
-    void playback(LOOP_TYPE pLoop=LOOP_NONE);  ///根据pLoop重新播放当前音频
+    void playback(LOOP_TYPE pLoop = LOOP_NONE);  ///根据pLoop重新播放当前音频
     void stopOne(QString pFile);
     void playNext();
     void playHead();

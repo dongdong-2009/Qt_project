@@ -17,10 +17,10 @@ typedef enum {
 } LOOP_TYPE;
 
 typedef enum {
-    AO_LIFTFLR=0,
-    AO_LIFTARV=1,
-    AO_BEEP=2,
-    AO_ADMUSIC=3,
+    AO_LIFTFLR = 0,
+    AO_LIFTARV = 1,
+    AO_BEEP = 2,
+    AO_ADMUSIC = 3,
     AO_NONE
 } AO_TYPE;
 
@@ -33,6 +33,7 @@ typedef struct _PLAY_MEDIA_INFO
         mVolume = -1;
         mEmitSig = false;
     }
+
     AO_TYPE         mType;
     QString         mPath;
     QString         mPara;
@@ -45,6 +46,7 @@ typedef struct _PLAY_MEDIA_INFO
 class Mplayer : public QThread
 {
     Q_OBJECT
+
 public:
     Mplayer();
     ~Mplayer();
@@ -60,11 +62,12 @@ public:
 
     bool updateMediaBuffer();
     bool clearMediaBuffer();
+
 public slots:
     void backgroundVolumeKeeper();
 
-
 private:
+
     int                     m_DefDelay;
     bool                    m_AbortAudio;
     int                     m_BufferIndex;
@@ -72,17 +75,12 @@ private:
     QList<PLAY_MEDIA_INFO*> m_MediaBuffer;
     PLAY_MEDIA_INFO*        m_CurMedia;
     QString                 m_CurCmdString;
-    //int                     m_Volume[2];
-    //volatile bool m_mainPlayerAlive;
+
     volatile bool m_backgroundPlayerAlive;
     volatile bool m_backgroundPlayerPaused;
 
     QTimer* m_TestTimer;
     int m_backgroundVolume;
-//    int m_AdmusicVol;
-//    int m_BeepVol;
-//    int m_LiftArvVol;
-//    int m_LiftFlrVol;
 };
 
 #endif // MPLAYER_H
