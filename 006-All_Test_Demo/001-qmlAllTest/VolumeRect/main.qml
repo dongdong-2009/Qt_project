@@ -7,10 +7,10 @@ Window {
     height: 480
     title: qsTr("Hello World")
 
-    VolumeRect {
-        x: 20
-        y: 20
-        width: 100
-        height: 100
+    VolumeRectNew {
+//        x: 20
+//        y: 20
+//        width: 100
+//        height: 100
     }
 }

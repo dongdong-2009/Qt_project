@@ -4,5 +4,6 @@
         <file>RectDefine.qml</file>
         <file>VolumeRect.qml</file>
         <file>images/cha.png</file>
+        <file>VolumeRectNew.qml</file>
     </qresource>
 </RCC>

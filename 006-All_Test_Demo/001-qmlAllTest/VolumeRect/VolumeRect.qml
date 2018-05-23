@@ -1,8 +1,10 @@
 import QtQuick 2.0
 
-Item {
+Rectangle {
     width: 100
     height: 40
+    clip: true
+    color: "red"
     signal rectClick(int index)
     property  variant opacityList: [5]
     property string imgSrc: ""
@@ -34,8 +36,8 @@ Item {
         color: "grey"
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.rightMargin: 20
-        anchors.topMargin: 20
+        anchors.rightMargin: 10
+        anchors.topMargin: 10
         MouseArea {
             anchors.fill: parent
             onClicked: {
