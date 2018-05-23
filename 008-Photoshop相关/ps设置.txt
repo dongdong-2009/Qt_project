@@ -5,3 +5,5 @@ http://www.jb51.net/photoshop/476877.html
 http://jingyan.baidu.com/article/08b6a591c9b4f714a80922bb.html
 设置快捷键，旋转一个图层  快捷键alt+shift+ctrl+K，弹出快捷键设置对话框，注意红框里面的选择
 我设置了ctrl+F1 180度旋转
+
+是的图层以图片原有的大小保存为png文件的方法，选择图像，裁切，存储为

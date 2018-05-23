@@ -18,11 +18,19 @@ Window {
     }
 
     Text {
-        text: "6"
+        id: floor_Text_ID
+        text: "B1"
         x: parent.width / 2.0
         y: parent.height / 2.0 - 150
         font.bold: true
         font.pixelSize: 30
         color: "white"
+    }
+
+    Connections {
+        target: DateAndTime
+        onSigAutoTestChanged: {
+            floor_Text_ID.text = pFloor
+        }
     }
 }

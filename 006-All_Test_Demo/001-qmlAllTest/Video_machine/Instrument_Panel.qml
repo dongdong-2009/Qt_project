@@ -3,9 +3,19 @@ import QtQuick 2.0
 Item {
     property string mWeekDayStr: ""
     property string mCurrentFloor: ""
+    property string imagesource: "qrc:/images/arrow/ArrowUp_Red.png"
+    property bool arrowDirectionUp: false
+    property string mFloorPath: "qrc:/images/Floor_Panel/"
+    property int mRotation: 0
     Image {
+        x: 4
         id: panelBlackBg
         source: "qrc:/images/panel_Background/PanelBackground.png"
+    }
+    Image {
+        id: frontWhite_ID
+        x: 120
+        source: "qrc:/images/panel_Background/Front_WhitePicture.png"
     }
 
     Item {
@@ -13,13 +23,14 @@ Item {
         height: 30
         x: 362
         y: 418 - 370
+
         Item {
             id: week_ID_Item
             width: 94
             height: parent.height
             Text {
                 id: week_ID_text
-                text: qsTr("周一")
+                text: DateAndTime.getWeekDay()
                 anchors.centerIn: parent
                 color: "white"
                 font.bold: true
@@ -57,7 +68,11 @@ Item {
             }
         }
     }
-
+    Image {
+        x: 120
+        y: -50
+        source: "qrc:/images/panel_Background/Front_GreyPicture.png"
+    }
     Image {
         id: blackBg_ID
         x: 24
@@ -66,6 +81,93 @@ Item {
         height: 335
         source: "qrc:/images/floor/floor_Bg.png"
     }
+
+    Rectangle {
+        x: 24 + (335 - 245) / 2.0
+        y: 36 + (335 - 245) / 2.0
+        width: 245/*335*/
+        height: 245/*335*/
+        color: "transparent"
+//        color: "red"
+        radius: width/2
+        clip: true
+        Item {
+//            x: (335 - 245) / 2.0
+//            y: (335 - 245) / 2.0 // 406 - 370 //  x: 24 //   y: 406
+            width: 245
+            height: 245
+            id: showArrowArea_ID
+            Image {
+                width: showArrowArea_ID.width
+                height: showArrowArea_ID.height
+                source: imagesource
+                rotation: mRotation
+            }
+            Image {
+                width: showArrowArea_ID.width
+                height: showArrowArea_ID.height
+                source: imagesource
+                rotation: mRotation
+                y: showArrowArea_ID.height
+            }
+            NumberAnimation {
+                id: arrowUp_ID
+                target: showArrowArea_ID
+                property: "y"
+                from: 0; to: -showArrowArea_ID.height ;
+                alwaysRunToEnd: true
+                duration: 1000
+                loops: Animation.Infinite
+            }
+
+            NumberAnimation {
+                id: arrowDown_ID
+                target: showArrowArea_ID
+                property: "y"
+                from: -showArrowArea_ID.height; to: 0;
+                duration: 1000
+                loops: Animation.Infinite
+            }
+        }
+    }
+
+//    Item {
+//        x: 24 + (335 - 245) / 2.0
+//        y: 36 + (335 - 245) / 2.0 // 406 - 370 //  x: 24 //   y: 406
+//        width: 245
+//        height: 245
+//        id: showArrowArea_ID
+//        Image {
+//            width: showArrowArea_ID.width
+//            height: showArrowArea_ID.height
+//            source: imagesource
+//        }
+//        Image {
+//            clip: true
+//            width: showArrowArea_ID.width
+//            height: showArrowArea_ID.height
+//            source: imagesource
+//            y: showArrowArea_ID.height
+//        }
+//        NumberAnimation {
+//            id: arrowUp_ID
+//            target: showArrowArea_ID
+//            property: "y"
+//            from: 0; to: -showArrowArea_ID.height ;
+//            alwaysRunToEnd: true
+//            duration: 1000
+//            loops: Animation.Infinite
+//        }
+
+//        NumberAnimation {
+//            id: arrowDown_ID
+//            target: showArrowArea_ID
+//            property: "y"
+//            from: -showArrowArea_ID.height; to: 0;
+//            duration: 1000
+//            loops: Animation.Infinite
+//        }
+//    }
 
     Image {
         id: frame_blue
@@ -161,8 +263,7 @@ Item {
         y: 36 - 14
         width: 336
         height: 335
-        Image {
-            property string mFloorPath: "qrc:/images/Floor_Panel/"
+        Image {            
             id: showFloor
             anchors.centerIn: parent
             source: mFloorPath + "Floor_AllBlack.png"
@@ -212,8 +313,8 @@ Item {
     }
     Image {
         id : logo_OTIS
-        x: 280
-        y: 708 - 370
+        x: 276
+        y: 702 - 370
         source: "qrc:/images/OTIS/OTIS_logoBg.png"
         Image {
             anchors.centerIn: parent
@@ -240,6 +341,86 @@ Item {
         target: DateAndTime
         onSignalTimeAndDate: {
             time_TextID.text = pTime;
+        }
+    }
+
+    Connections {
+        target: DateAndTime
+        onSigWeekChanged: {
+            week_ID_text.text = pWeekDay;
+        }
+    }
+
+    Connections {
+        target: DateAndTime
+        onSigAutoTestChanged: {
+            if (arrowDirectionUp != pArrowUp)
+            {
+                arrowDirectionUp = pArrowUp;
+                if (arrowDirectionUp)
+                {
+                    mRotation = 0;
+                    imagesource = "qrc:/images/arrow/ArrowUp_Red.png"
+                }
+                else
+                {
+                    mRotation = 180
+                    imagesource = "qrc:/images/arrow/ArrowUp_Blue.png"
+                }
+                ctrlArrowScroll();
+            }
+        }
+    }
+
+    function changeFloorPicture(indexStr)
+    {
+        if ("B1" === indexStr)
+        {
+            showFloor.source = mFloorPath + "Floor_B1.png"
+        }
+        else if ("1" === indexStr)
+        {
+            showFloor.source = mFloorPath + "Floor_1F.png"
+        }
+        else if ("2" === indexStr)
+        {
+            showFloor.source = mFloorPath + "Floor_2F.png"
+        }
+        else if ("3" === indexStr)
+        {
+            showFloor.source = mFloorPath + "Floor_3F.png"
+        }
+        else if ("4" === indexStr)
+        {
+            showFloor.source = mFloorPath + "Floor_4F.png"
+        }
+        else if ("5" === indexStr)
+        {
+            showFloor.source = mFloorPath + "Floor_5F.png"
+        }
+        else if ("6" === indexStr)
+        {
+            showFloor.source = mFloorPath + "Floor_6F.png"
+        }
+    }
+
+    function ctrlArrowScroll()
+    {
+        if(arrowDirectionUp)
+        {
+            arrowDown_ID.stop();
+            arrowUp_ID.start();
+        }
+        else
+        {
+            arrowUp_ID.stop();
+            arrowDown_ID.start();
+        }
+    }
+    Connections {
+        target: DateAndTime
+        onSigAutoTestChanged: {
+            changeFloorPicture(pFloor);
         }
     }
 }

@@ -30,7 +30,15 @@ QString DateAndTime::getTimeFormat(bool is12)
 
 void DateAndTime::autoTest(int pFloorNum, bool upArrowFlag)
 {
-    QString tmpFloor = QString::number(pFloorNum);
+    QString tmpFloor;
+    if (0 == pFloorNum)
+    {
+        tmpFloor = QString("B1");
+    }
+    else
+    {
+        tmpFloor = QString::number(pFloorNum);
+    }
     emit sigAutoTestChanged(tmpFloor, upArrowFlag);
 }
 
@@ -38,7 +46,7 @@ QString DateAndTime::getWeekDay()
 {
     QString tmpString;
     tmpString = QDateTime::currentDateTime().toString("ddd");
-    qDebug()<<__PRETTY_FUNCTION__<<__LINE__<<"tmpString = "<<tmpString;
+//    qDebug()<<__PRETTY_FUNCTION__<<__LINE__<<"tmpString = "<<tmpString;
     if (tmpString != mWeekString)
     {
         mWeekString = tmpString;
@@ -48,37 +56,44 @@ QString DateAndTime::getWeekDay()
 //        qDebug()<<__PRETTY_FUNCTION__<<__LINE__<<"tmpString is same";
         return mWeekString;
     }
-    int tmpWeek = 1;
+//    int tmpWeek = 1;
     if (!QString::compare(tmpString, "Mon", Qt::CaseInsensitive))
     {
-        tmpWeek = 1;
+//        tmpWeek = 1;
+        mWeekString = QString("周一");
     }
     else if (!QString::compare(tmpString, "Tue", Qt::CaseInsensitive))
     {
-        tmpWeek = 2;
+//        tmpWeek = 2;
+        mWeekString = QString("周二");
     }
     else if (!QString::compare(tmpString, "Wed", Qt::CaseInsensitive))
     {
-        tmpWeek = 3;
+//        tmpWeek = 3;
+        mWeekString = QString("周三");
     }
     else if (!QString::compare(tmpString, "Thu", Qt::CaseInsensitive))
     {
-        tmpWeek = 4;
+//        tmpWeek = 4;
+        mWeekString = QString("周四");
     }
     else if (!QString::compare(tmpString, "Fri", Qt::CaseInsensitive))
     {
-        tmpWeek = 5;
+//        tmpWeek = 5;
+        mWeekString = QString("周五");
     }
     else if (!QString::compare(tmpString, "Sat", Qt::CaseInsensitive))
     {
-        tmpWeek = 6;
+//        tmpWeek = 6;
+        mWeekString = QString("周六");
     }
     else if (!QString::compare(tmpString, "Sun", Qt::CaseInsensitive))
     {
-        tmpWeek = 7;
+//        tmpWeek = 7;
+        mWeekString = QString("周日");
     }
-    qDebug()<<__PRETTY_FUNCTION__<<__LINE__<<"tmpWeek = "<<tmpWeek;
-    emit sigWeekChanged(tmpWeek);
+//    qDebug()<<__PRETTY_FUNCTION__<<__LINE__<<"tmpWeek = "<<tmpWeek;
+    emit sigWeekChanged(mWeekString);
     return mWeekString;
 }
 

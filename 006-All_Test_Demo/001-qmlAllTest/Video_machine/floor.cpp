@@ -10,7 +10,7 @@ void Floor::autoTestFloorChanage()
 {
     if (mArrowUp)
     {
-        if (mCurrentFloor <= 6)
+        if (mCurrentFloor < 6)
         {
             ++mCurrentFloor;
         }
@@ -22,7 +22,7 @@ void Floor::autoTestFloorChanage()
     }
     else
     {
-        if (mCurrentFloor >= -1)
+        if (mCurrentFloor > 0)
         {
             --mCurrentFloor;
         }

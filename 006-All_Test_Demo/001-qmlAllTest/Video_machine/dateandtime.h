@@ -15,7 +15,7 @@ public:
 signals:
     void signalTimeAndDate(QString pTime);
     void sigAutoTestChanged(QString pFloor, bool pArrowUp);
-    void sigWeekChanged(int pWeekDay);
+    void sigWeekChanged(QString pWeekDay);
 
 public slots:
     QString getTimeFormat(bool is12);
