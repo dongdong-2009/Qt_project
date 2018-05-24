@@ -1,4 +1,4 @@
-#include "usbhelper_linux.h"
+ï»¿#include "usbhelper_linux.h"
 #include "define.h"
 
 #include <QFileInfo>
@@ -13,15 +13,15 @@ UsbHelper::UsbHelper(QObject *parent) : QObject(parent)
 
 void UsbHelper::scanHD()
 {
-    qDebug()<<__PRETTY_FUNCTION__;
-    // ubuntuÏÂÅÐ¶ÏÊÇ·ñ²åÈëÁËUÅÌ
+    qDebug()<<__PRETTY_FUNCTION__<<"lines = "<<__LINE__;
+    // ubuntuä¸‹åˆ¤æ–­æ˜¯å¦æ’å…¥äº†Uç›˜
     if (QFile::exists("/proc/scsi/usb-storage"))
     {
         qDebug()<<__PRETTY_FUNCTION__<<"U disk is insert";
         detectUsbIsInsert("/media/");
         if (!mUsbPath.isEmpty())
         {
-            foreach (QString DiskName, mUsbPath) // UÅÌÔÚ³ÌÐòÆô¶¯Ö®Ç°¾Í²åÈëµÄÐèÒª²¹·¢Í¨Öª
+            foreach (QString DiskName, mUsbPath) // Uç›˜åœ¨ç¨‹åºå¯åŠ¨ä¹‹å‰å°±æ’å…¥çš„éœ€è¦è¡¥å‘é€šçŸ¥
             {
                 qDebug()<<__PRETTY_FUNCTION__<<"DiskName = "<<DiskName;
                 emit sigDeviceAdd(DiskName);
@@ -45,7 +45,7 @@ void UsbHelper::addDisk(QString &DiskName)
     }
     USB_DISK_INFO usbtemp;
     usbtemp.DirPath = DiskName;
-    getMemorySize(usbtemp);//»ñÈ¡Éè±¸ÄÚ´æÐÅÏ¢
+    getMemorySize(usbtemp);//èŽ·å–è®¾å¤‡å†…å­˜ä¿¡æ¯
     this->usb_disk_info.push_back(usbtemp);
     emit sigDeviceAdd(DiskName);
     //IDE_TRACE();
@@ -109,7 +109,7 @@ void UsbHelper::detectUsbIsInsert(const QString &path)
     {
         qDebug()<<__PRETTY_FUNCTION__<<"tmp = "<< tmp;
 
-        if (!tmp.contains("floppy",  Qt::CaseInsensitive)) // È¥µô/mediaÂ·¾¶ÏÂfloppyµÄÎÄ¼þ¼Ð
+        if (!tmp.contains("floppy",  Qt::CaseInsensitive)) // åŽ»æŽ‰/mediaè·¯å¾„ä¸‹floppyçš„æ–‡ä»¶å¤¹
         {
             QDir dir2(path + tmp + "/");
             mMntPath = path + tmp + "/";  // /meida/libo/

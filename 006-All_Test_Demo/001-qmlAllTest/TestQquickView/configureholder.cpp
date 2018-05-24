@@ -13,10 +13,6 @@ QString yysArrays[3][3] = {QString("China Mobile"), QString("China Unicom"), QSt
 ConfigureHolder::ConfigureHolder(QObject *parent) : QObject(parent)
 {
     clearParameters();
-//    appropriateJobNumber = 2;
-//    isMultiThreadCopying = false;
-//    fileTotalBytes = 0;
-//    copyedBytes = 0;
 }
 
 void ConfigureHolder::InitDoc()
@@ -307,7 +303,7 @@ bool ConfigureHolder::createXml(QString dir)
         if(resourceElement.hasChildNodes())
             rootElement.appendChild(resourceElement);
     }
-#if defined(Q_OS_window)
+#if defined(Q_OS_WIN)
     QString strPath = dir + "\\update\\" + "mediascreen.xml";
 #elif defined(Q_OS_LINUX)
     QString strPath = dir + "/update/" + "mediascreen.xml";
@@ -374,7 +370,7 @@ void ConfigureHolder::orderFile(QString dir)
         return;
     }
     QString usbdir = dir;
-#if defined(Q_OS_window)
+#if defined(Q_OS_WIN)
     if (dir.endsWith("\\"))
     {
         usbdir  = dir + "update\\multimedia\\";
@@ -590,7 +586,7 @@ void ConfigureHolder::clearParameters()
 void ConfigureHolder::setDelDirPath(const QString path)
 {
     QString mPath = path;
-#if defined(Q_OS_window)
+#if defined(Q_OS_WIN)
     if (!mPath.endsWith("\\"))
     {
         mPath = mPath + "\\update";
@@ -713,7 +709,7 @@ bool ConfigureHolder::updateMultiMedia(bool isMediaContentEnabled, bool videoOrP
     if(videoOrPicture || isAudio)
     {
         //IDE_TRACE_STR(paths);
-#if defined(Q_OS_window)
+#if defined(Q_OS_WIN)
         videoPath = toWindwosPath(paths);
 #elif defined(Q_OS_LINUX)
         if (!videoPath.startsWith("/"))
@@ -732,7 +728,7 @@ bool ConfigureHolder::updateMultiMedia(bool isMediaContentEnabled, bool videoOrP
             QString img = tmpList.at(i);
             if(!img.isEmpty())
             {
-                #if defined(Q_OS_window)
+                #if defined(Q_OS_WIN)
                     pictureList.append(toWindwosPath(img));
                 #elif defined(Q_OS_LINUX)
                     if (!img.startsWith("/"))
@@ -757,7 +753,7 @@ QVariant ConfigureHolder::retPicturePath(QString paths)
         QString img = tmpList.at(i);
         if(!img.isEmpty())
         {
-            #if defined(Q_OS_window)
+            #if defined(Q_OS_WIN)
                 pictureList2.append(img);
             #elif defined(Q_OS_LINUX)
                 if (!img.startsWith("/"))

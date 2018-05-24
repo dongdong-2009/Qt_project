@@ -396,7 +396,7 @@ ApplicationWindow {
                 text: qsTr("Нажмите, чтобы подтвердить.Размещение страницы будет перезагружен.Необходимо перезагрузить USB!")
                 wrapMode:Text.Wrap
             }
-            RowLayout{
+            RowLayout {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 10
@@ -406,9 +406,8 @@ ApplicationWindow {
                     width: parent.width
                     ButtonSelfDefine {
                         id: mainColse_btn_OK
-    //                    text: qsTr("确认")
                         x: 50
-                        btext: qsTr("Уточнение")
+                        btext: qsTr("Уточнение") // text: qsTr("确认")
                         bwidth: 140
                         bheight: 36
                         onButtonClick: {
@@ -418,19 +417,18 @@ ApplicationWindow {
                             MediaScreen.sendUdiskInformation(); // 切换界面显示Usb
                         }
                     }
-                }
-
-                ButtonSelfDefine{
-                    id: mainColse_btn_Cancel
-//                    text: qsTr("取消")
-                    x: parent.width - 50 - bwidth
-                    btext:qsTr("Отмена")
-                    bwidth: 140
-                    bheight: 36
-                    onButtonClick: {
-                        MediaScreen.setIndex(3);
-                        are4_languageChanges.ischeckedchange();
-                        id_ColseWarnningBox.close();
+                    ButtonSelfDefine {
+                        id: mainColse_btn_Cancel
+    //                    text: qsTr("取消")
+                        x: parent.width - 50 - bwidth
+                        btext:qsTr("Отмена") //取消
+                        bwidth: 140
+                        bheight: 36
+                        onButtonClick: {
+                            MediaScreen.setIndex(3);
+                            are4_languageChanges.ischeckedchange();
+                            id_ColseWarnningBox.close();
+                        }
                     }
                 }
             }
