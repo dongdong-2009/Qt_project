@@ -43,5 +43,8 @@
         <file>images/arrow/ArrowUp_Red.png</file>
         <file>images/panel_Background/Front_GreyPicture.png</file>
         <file>images/panel_Background/Front_WhitePicture.png</file>
+        <file>images/panel_Background/video_Bg.png</file>
+        <file>images/panel_Background/blackBg.png</file>
+        <file>images/panel_Background/video_lastFrame.png</file>
     </qresource>
 </RCC>

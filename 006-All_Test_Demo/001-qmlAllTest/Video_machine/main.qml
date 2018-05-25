@@ -7,6 +7,10 @@ Window {
     height: 768
     title: qsTr("Hello World")
 
+    Image {
+        source: "qrc:/images/panel_Background/video_lastFrame.png"
+    }
+
     BackGroundVideo {
         width: parent.width
         height: parent.height
