@@ -66,7 +66,7 @@ void CMySplashScreen::setLogoPosition(QString path)
         }
         else if (m_direction == Vertical)
         {
-            bootLogo->setGeometry((272 - tmpix.width())/2, 50 , tmpix.width(), tmpix.height());
+            bootLogo->setGeometry((272 - tmpix.height())/2, 50 , tmpix.width(), tmpix.height());
         }
         bootLogo->setPixmap(tmpix);
     }
