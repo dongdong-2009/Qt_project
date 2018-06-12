@@ -60,7 +60,13 @@ TcpServer 端口为60001 (根据配置文件设定)，Ip: 192.168.1.10(固定不
     "type":"appupdateFinished",
     "info":true
 }
+设备端进入解压文件的操作
 
+解压
+{"type":"unZip","info": "success"// 0} success 解压完成，
+success  解压成功
+failed   解压失败
+error    解压出错
 
 获取参数信息：
 	手机客户端向设备请求获取参数信息
@@ -139,7 +145,8 @@ windowApp客户端发送：
 
 服务器端发送，服务器端自登录成功后，每5秒发送一次心跳帧
 {"type":"heartBeat","info": "isonline" } 
-	
+
+
 windowApp客户端回复
 {"type":"heartBeat","info": 1 // 0} 1 在线， 0不在线
 
@@ -174,6 +181,12 @@ windowApp客户端发送上传文件的进度
     "type":"appupdateFinished",
     "info":true
 }
+
+解压
+{"type":"unZip","info": "success"// 0} success 解压完成，
+success  解压成功
+failed   解压失败
+error    解压出错
 
 
 下载文件
