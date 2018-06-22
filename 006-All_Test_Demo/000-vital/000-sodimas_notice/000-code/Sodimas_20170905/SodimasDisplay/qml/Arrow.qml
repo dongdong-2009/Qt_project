@@ -1,7 +1,7 @@
 import QtQuick 1.1
 
-UiElement{
-    id:id_arrow
+UiElement {
+    id: id_arrow
 
     property string upArrow: ""
     property string downArrow: ""
@@ -11,13 +11,13 @@ UiElement{
 
     property bool isDoubleArrow:false
 
-    clip:true
-    Column{
-        id:id_scrollArrow
+    clip: true
+    Column {
+        id: id_scrollArrow
         width: id_arrow.width
         height: id_arrow.height
         Image {
-            id:arrorimage
+            id: arrorimage
             width: id_arrow.width
             height: id_arrow.height
             source: arrowUrl
@@ -29,28 +29,28 @@ UiElement{
         }
     }
 
-    Image{
+    Image {
         width: id_arrow.width
         height: id_arrow.height
         source: doubleArrow
         visible: isDoubleArrow
         //z: visible ? 1: -1
-        z:1
+        z: 1
     }
 
     NumberAnimation {
-        id:animatUp
-        target:id_scrollArrow
+        id: animatUp
+        target: id_scrollArrow
         property: "y"
-        from:0; to:-id_arrow.height ;
+        from: 0; to: -id_arrow.height ;
         alwaysRunToEnd: true
         duration: inervalPerScroll //l_speedLeve;
         loops: Animation.Infinite
     }
 
     NumberAnimation {
-        id:animatDown
-        target:id_scrollArrow
+        id: animatDown
+        target: id_scrollArrow
         property: "y"
         alwaysRunToEnd: true
         from: -id_arrow.height; to: 0;
@@ -58,28 +58,41 @@ UiElement{
         loops: Animation.Infinite
     }
 
-    function arrowCtrl(orienteRun,isScroll){
+    function arrowCtrl(orienteRun, isScroll)
+    {
         ///console.log("qml arrowCtrl");
         animatUp.stop();
         animatDown.stop();
-        if(orienteRun === 0){
+        if (orienteRun === 0)
+        {
             arrowUrl = "";
             isDoubleArrow = false;
-        }else if(orienteRun === 1){
+        }
+        else if (orienteRun === 1)
+        {
             isDoubleArrow = false;
             arrowUrl = upArrow;
-            if(isScroll)
+            if (isScroll)
+            {
                 animatUp.start();
-        }else if(orienteRun === 2){
+            }
+        }
+        else if (orienteRun === 2)
+        {
             isDoubleArrow = false;
             arrowUrl = downArrow;
-            if(isScroll)
+            if (isScroll)
+            {
                 animatDown.start();
-        }else if(orienteRun === 3){
+            }
+        }
+        else if (orienteRun === 3)
+        {
             arrowUrl = "";
             isDoubleArrow = true;
         }
-        else{
+        else
+        {
             isDoubleArrow = false;
             animatUp.stop();
             animatDown.stop();
@@ -87,8 +100,8 @@ UiElement{
         }
     }
 
-    function arrowSpeed(interval){
-        if(interval>1000&&interval<60000){
+    function arrowSpeed(interval) {
+        if (interval>1000&&interval<60000) {
             ///inervalPerScroll = interval
             inervalPerScroll = interval/2
         }
@@ -96,24 +109,24 @@ UiElement{
 }
 
 
-//function arrowCtrl(orienteRun,isScroll){
+//function arrowCtrl(orienteRun,isScroll) {
 //    ///console.log("qml arrowCtrl");
 //    animatUp.stop();
 //    animatDown.stop();
-//    if(orienteRun === 0){
+//    if (orienteRun === 0) {
 //        arrowUrl = ""
-//    }else if(orienteRun === 1){
+//    }else if (orienteRun === 1) {
 //        arrowUrl = upArrow;
-//        if(isScroll)
+//        if (isScroll)
 //            animatUp.start();
-//    }else if(orienteRun === 2){
+//    }else if (orienteRun === 2) {
 //        arrowUrl = downArrow;
-//        if(isScroll)
+//        if (isScroll)
 //            animatDown.start();
-//    }else if(orienteRun === 3){
+//    }else if (orienteRun === 3) {
 //        arrowUrl = doubleArrow;
 //    }
-//    else{
+//    else {
 //        animatUp.stop();
 //        animatDown.stop();
 //        arrowUrl = "";

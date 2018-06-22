@@ -3,28 +3,35 @@ import QtQuick 1.1
 Image {
     property int actionFlag: -1
     fillMode: Image.PreserveAspectFit
-    property int tinkInterval:1000
+    property int tinkInterval: 1000
 
     visible: false ///Icon默认都是不可见的
-    Timer{
-        id:id_tinkTimer
+    Timer {
+        id: id_tinkTimer
         interval: tinkInterval
         repeat: true
         onTriggered: {
-            if(opacity == 1){
+            if(opacity == 1)
+            {
                 opacity = 0;
-            }else{
+            }
+            else
+            {
                 opacity = 1
             }
         }
     }
 
     //-1——不显示，0——静态显示，1-1秒闪烁2次，2-1秒闪烁1次
-    function action(flag){
+    function action(flag)
+    {
         if(actionFlag === flag)
+        {
             return;
+        }
         id_tinkTimer.stop();
-        switch(flag){
+        switch(flag)
+        {
         case -1:
             visible = false;
             break;
@@ -46,7 +53,8 @@ Image {
         actionFlag = flag;
     }
 
-    function setIcon(icon){
+    function setIcon(icon)
+    {
         source = icon;
     }
 }

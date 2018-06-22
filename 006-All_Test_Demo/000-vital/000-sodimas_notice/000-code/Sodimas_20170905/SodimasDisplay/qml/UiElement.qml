@@ -13,7 +13,8 @@ Item {
 //        }
 //    }
 
-    function setGeometry(rect){
+    function setGeometry(rect)
+    {
         ///console.log(objectName ,": ",rect.x,",",rect.y,",",rect.width,",",rect.height);
         x = rect.x
         y = rect.y

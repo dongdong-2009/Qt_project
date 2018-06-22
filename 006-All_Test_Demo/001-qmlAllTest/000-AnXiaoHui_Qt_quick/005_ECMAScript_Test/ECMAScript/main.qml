@@ -10,7 +10,10 @@ Window {
 //    ECMAScript {
 
 //    }
-    String_Test {
+//    String_Test {
+
+//    }
+    RegExp_Test {
 
     }
 }

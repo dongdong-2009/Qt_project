@@ -1,7 +1,7 @@
 import QtQuick 1.1
 
 Item{
-    id:id_bootscreen
+    id: id_bootscreen
     objectName: "bootscreenUI"
 
     property int windowsWidth: 480
@@ -9,29 +9,29 @@ Item{
     property int rotateYOffset: (windowsHeight- windowsWidth)/2
     property int transformedRot: 0
 
-    width:windowsWidth
-    height:windowsHeight
+    width: windowsWidth
+    height: windowsHeight
 
-    Column{
+    Column {
         anchors.centerIn: parent
         spacing: 40
-        Image{
-            id:id_bootlogo
+        Image {
+            id: id_bootlogo
             objectName: "bootlogo"
             width: 200
             height: 35
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
-        ProgressBar{
-            id:id_bootprogressbar
+        ProgressBar {
+            id: id_bootprogressbar
             objectName: "bootprogressbar"
             width: 240
             height: 20
         }
 
-        Text{
-            id:id_bootversion
+        Text {
+            id: id_bootversion
             objectName: "bootversion"
             anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: 20
@@ -40,32 +40,32 @@ Item{
     }
 
     Image {
-        id:id_bootbackground
+        id: id_bootbackground
         objectName: "bootbackground"
         anchors.fill: parent
-        z:-10
+        z: -10
     }
 
     //state:"horizental"
     states: [
         State {
             name: "horizental"
-            when: transformedRot == 0  ||transformedRot == 180
+            when: transformedRot == 0 || transformedRot == 180
             PropertyChanges {
                 target: id_bootscreen
-                y:0;
+                y: 0;
                 width:windowsWidth;
                 height:windowsHeight;
             }
         },
         State {
             name: "vertical"
-            when: transformedRot == 90  ||transformedRot == 270
+            when: transformedRot == 90 || transformedRot == 270
             PropertyChanges {
                 target: id_bootscreen
-                y:rotateYOffset;
-                width:windowsHeight;
-                height:windowsWidth ;
+                y: rotateYOffset;
+                width: windowsHeight;
+                height: windowsWidth ;
             }
         }
     ]

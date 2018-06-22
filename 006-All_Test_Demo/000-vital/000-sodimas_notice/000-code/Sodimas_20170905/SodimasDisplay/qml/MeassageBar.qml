@@ -1,11 +1,11 @@
 import QtQuick 1.1
 
 UiElement {
-    id:id_rootItem
+    id: id_rootItem
 
-    property string information:""
+    property string information: ""
     clip: true
-    Text{
+    Text {
         anchors.fill: parent
         anchors.margins: 6
         color: "white"
@@ -20,32 +20,37 @@ UiElement {
         anchors.fill: parent
         //opacity: 0.8
         radius: height/6
-        border.width:6
+        border.width: 6
         border.color: "blue"
         color: "transparent"
-        z:-10
+        z: -10
     }
 
 
     property int modeFlag: 0
 
-    function updateMsg(msg){
+    function updateMsg(msg)
+    {
         id_rootItem.visible = true
         information = msg;
         setMode(2000);
     }
 
-    function setMode(flag){
-        if(flag <=0 ){
+    function setMode(flag)
+    {
+        if(flag <=0 )
+        {
             id_rootItem.visible = true
             id_messageWindowsTimer.stop();
-        }else{
+        }
+        else
+        {
             id_messageWindowsTimer.interval = flag;
             id_messageWindowsTimer.restart();
         }
     }
 
-    Timer{
+    Timer {
         id:id_messageWindowsTimer
         interval: 0
         repeat: false

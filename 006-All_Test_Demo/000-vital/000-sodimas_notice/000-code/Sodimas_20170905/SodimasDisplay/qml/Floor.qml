@@ -1,9 +1,9 @@
 import QtQuick 1.1
 
 UiElement {
-    property string baiImage:""
-    property string shiImage:""
-    property string geImage:""
+    property string baiImage: ""
+    property string shiImage: ""
+    property string geImage: ""
 //    property string baiImage :"file:///opt/theme/sodimas/floor/T51.png"
 //    property string shiImage :"file:///opt/theme/sodimas/floor/T51.png"
 //    property string geImage:  "file:///opt/theme/sodimas/floor/T51.png"
@@ -12,36 +12,36 @@ UiElement {
     property int cellWidth: width/3
     property int offsetintverval: width/6
 
-    Item{
+    Item {
         anchors.fill: parent
-        Image{
+        Image {
             id:id_floor_bai
             height: parent.height
             width: cellWidth
             fillMode: Image.PreserveAspectFit
             source: baiImage
-            opacity: shiImage == "" ? 0 : 1
-            x:0
+            opacity: shiImage === "" ? 0 : 1
+            x: 0
         }
 
-        Image{
-            id:id_floor_shi
+        Image {
+            id: id_floor_shi
             height: parent.height
             width: cellWidth
             fillMode: Image.PreserveAspectFit
             source: shiImage
-            opacity: shiImage == "" ? 0 : 1
-            x:cellWidth
+            opacity: shiImage === "" ? 0 : 1
+            x: cellWidth
         }
 
         Image{
-            id:id_floor_ge
+            id: id_floor_ge
             height: parent.height
             width: cellWidth
             fillMode: Image.PreserveAspectFit
             source: geImage
-            opacity: geImage == "" ? 0 : 1
-            x:2*cellWidth
+            opacity: geImage === "" ? 0 : 1
+            x: 2*cellWidth
         }
     }
 

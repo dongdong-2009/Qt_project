@@ -4,34 +4,37 @@ UiElement {
     property int value: 0
     property real percentLength: width/100
 
-    Text{
+    Text {
         anchors.centerIn: parent
-        text:value
+        text: value
         color: "black"
-        z:10
+        z: 10
     }
 
-    Rectangle{
+    Rectangle {
         width: parent.width
         height: parent.height*0.8
         anchors.centerIn: parent
         radius: height/2
         border.color: "yellow"
         border.width: 2
-        clip:true
+        clip: true
 
-        Rectangle{
-            x:2
+        Rectangle {
+            x: 2
             color: "green"
-            height: parent.height-2
+            height: parent.height - 2
             width: percentLength*value
             radius: height/2
             anchors.verticalCenter: parent.verticalCenter
         }
     }
 
-    function updateProgress(progress){
-        if(progress>=0 && progress <=100)
+    function updateProgress(progress)
+    {
+        if(progress >= 0 && progress <= 100)
+        {
             value = progress
+        }
     }
 }

@@ -38,3 +38,10 @@ inputrc              profile              wpa_supplicant.conf
 cat /etc/init.d/S70vsftpd 
 
 cat /etc/init.d/
+
+替换/etc下面的vsftpd.conf文件
+
+在/home/ftp
+下创建目录pub
+
+修改/etc/init.d的开机启动的内容
