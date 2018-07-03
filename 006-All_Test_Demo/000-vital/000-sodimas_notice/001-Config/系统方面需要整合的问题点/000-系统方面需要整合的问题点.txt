@@ -1,0 +1,7 @@
+1. ftp文件传输的vsftpd.conf                      ----->    /etc/vsftpd.conf
+2. wifi的ip配置文件udhcpd.conf                   ----->    /usr/module/udhcpd.conf
+3. /home/ftp/下需要生成一个pub目录文件            ----->    mkdir -p /home/ftp/pub
+4. 修改/etc/init.d下的reboot时的脚本rcK          ----->   /etc/init.d/rcK
+5. 修改/etc/init.d/S85qt.sh                      ----->   /etc/init.d/S85qt.sh
+6. 拷贝字体到/usr/local/arm-qt5.7.1/lib/fonts
+

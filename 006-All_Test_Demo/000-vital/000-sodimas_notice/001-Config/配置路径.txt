@@ -45,3 +45,8 @@ cat /etc/init.d/
 下创建目录pub
 
 修改/etc/init.d的开机启动的内容
+rcK 关机的脚本  rcS开机脚本
+
+替换字体DejaVuSansMono.ttf 到以下目录里面
+
+/usr/local/arm-qt5.7.1/lib/fonts
