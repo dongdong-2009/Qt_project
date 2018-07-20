@@ -56,6 +56,7 @@ mkdir_pub()
 {
     if [ ! -d "/home/ftp/pub" ];then
         mkdir -p /home/ftp/pub
+        chmod -R 777 /home/ftp/pub
         echo "/home/ftp/pub is not exist will create"
     else
         echo "/home/ftp/pub is exist donothing"
