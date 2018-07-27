@@ -188,3 +188,16 @@ windowApp接收到命令之后，启动ftp客户端进行下载文件的操作
 ====================================================================================================================
 
 
+
+
+{"type":"sendallparameter","info":{"admusicvol":0}}
+{"type":"sendallparameter","info":{"admusicvol":30}}
+{"type":"sendallparameter","info":{"luminance":0}}
+{"type":"sendallparameter","info":{"luminance":30}}
+
+{"type":"sendallparameter","info":{"autotest":true}}
+{"type":"sendallparameter","info":{"autotest":false}}
+{"type":"sendallparameter","info":{"layout":0}}
+{"type":"sendallparameter","info":{"layout":1}}
+{"type":"sendallparameter","info":{"rotation":90}}
+{"type":"sendallparameter","info":{"rotation":180}}

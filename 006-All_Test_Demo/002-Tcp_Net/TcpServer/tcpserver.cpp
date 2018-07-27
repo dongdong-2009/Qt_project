@@ -18,9 +18,9 @@ TcpServer::TcpServer(QWidget *parent, Qt::WindowFlags f)
     mainLayout->addWidget(PortLineEdit, 1, 1);
     mainLayout->addWidget(CreateBtn, 2, 0, 1, 2);
 
-    port = 8010;
+    port = 60001;
     PortLineEdit->setText(QString::number(port));
-
+    port = PortLineEdit->text().toInt();
     connect(CreateBtn, SIGNAL(clicked()), this, SLOT(slotCreateServer()));
 }
 
