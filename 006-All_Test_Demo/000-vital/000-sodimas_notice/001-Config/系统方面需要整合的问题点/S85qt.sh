@@ -77,6 +77,7 @@ else
 	source /etc/profile
 	/usr/bst/usrfs/TFT &
 	mkdir_pub
+	/usr/bin/boa &
 	#cd /usr/bst/usrfs
 	#./TFT &
 fi

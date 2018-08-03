@@ -2,5 +2,10 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>PhoneList.qml</file>
+        <file>PhoneList_Header.qml</file>
+        <file>PhoneList_Footer.qml</file>
+        <file>PhoneList_Change.qml</file>
+        <file>PhoneList_Change_2.qml</file>
+        <file>PhoneList_Animation.qml</file>
     </qresource>
 </RCC>

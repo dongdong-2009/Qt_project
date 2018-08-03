@@ -7,7 +7,22 @@ ApplicationWindow {
     height: 480
     title: qsTr("Hello World")
 
-    PhoneList {
+//    PhoneList {
+
+//    }
+//    PhoneList_Header {
+
+//    }
+//    PhoneList_Footer {
+
+//    }
+//    PhoneList_Change {
+
+//    }
+//    PhoneList_Change {
+
+//    }
+    PhoneList_Animation {
 
     }
 }
