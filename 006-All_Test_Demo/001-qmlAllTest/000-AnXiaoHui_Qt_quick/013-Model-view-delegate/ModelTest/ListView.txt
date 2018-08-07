@@ -118,7 +118,15 @@ ListModel的get()方法获取到对应的数据对象，最后呢，把name， c
     add动画中改变Item的高度，因为这样会引起它下面的其他Item被重新布局进而错放位置，也会带来性能上的损耗。
     
 
-
+    populate属性指定一个过渡动画，在ListView第一次实例化或者因Model变化而需要创建Item时应用。
+    populate: Transition {
+            NumberAnimation {
+                property: "opacity"
+                from: 0
+                to: 0.1
+                duration: 1000
+            }
+        }
 
 
    

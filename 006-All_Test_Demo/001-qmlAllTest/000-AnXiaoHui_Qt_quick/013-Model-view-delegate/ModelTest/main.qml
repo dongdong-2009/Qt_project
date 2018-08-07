@@ -22,7 +22,10 @@ ApplicationWindow {
 //    PhoneList_Change {
 
 //    }
-    PhoneList_Animation {
+//    PhoneList_Animation {
+
+//    }
+    PhoneList_AnimationNew {
 
     }
 }
