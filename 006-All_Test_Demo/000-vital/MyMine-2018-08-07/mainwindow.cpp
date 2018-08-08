@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QAction>
 #include "logcat.h"
+#include "mygraphicsscene.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -9,11 +10,19 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     initWindow();
+    mCurScene = nullptr;
+    mLastScene = nullptr;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    if (mCurScene)
+    {
+        delete mCurScene;
+        mCurScene = nullptr;
+        MYDebug("will delete mCurScene");
+    }
 }
 
 void MainWindow::initWindow()
@@ -34,6 +43,22 @@ void MainWindow::initWindow()
 void MainWindow::sltNewGame()
 {
     MYDebug();
+    mLastScene = mCurScene;
+    mCurScene = new MyGraphicsScene;
+    if (mCurScene)
+    {
+        mCurScene->setMineScene(9, 9, 10);
+        mCurScene->initMineScenery();
+        mCurScene->layMines();
+        mCurScene->setItemMineCounts();
+        ui->graphicsView->setScene(mCurScene); // 加入场景
+    }
+    if (mLastScene)
+    {
+        delete mLastScene;
+        mLastScene = nullptr;
+        MYDebug("will delete mLastScene");
+    }
 }
 
 void MainWindow::sltExitGame()

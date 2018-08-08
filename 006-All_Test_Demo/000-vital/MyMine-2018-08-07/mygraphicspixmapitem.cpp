@@ -73,6 +73,7 @@ void MyGraphicsPixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (Qt::RightButton == event->button())
     {
+        MYDebug("is rightBtn Clicked mButtonStatus = %d", mButtonStatus);
         if (NONE_PRESSED == mButtonStatus) // 右键点击1次
         {
             setImage(":/images/flag.png"); // 右键点击1次, 标记为旗子图标，认为是雷

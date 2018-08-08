@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+class MyGraphicsScene;
 namespace Ui {
 class MainWindow;
 }
@@ -30,7 +30,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
+    MyGraphicsScene *mCurScene;
+    MyGraphicsScene *mLastScene;
 };
 
 #endif // MAINWINDOW_H
