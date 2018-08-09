@@ -8,13 +8,23 @@ MyGraphicsPixmapItem::MyGraphicsPixmapItem()
     mIsMineflag = 0;                    // 标识是否为雷
     mButtonStatus = NONE_PRESSED;       // 标识按钮状态 0未按  1按下右键  2 按下左键
     mMineSNumber = 0;                   // 标识周围雷数
+    mRowPos = 0;
+    mRowPos = 0;
+    mAlreadyOpenFlag = 0;
     setImage(":/images/FirstInit.png");
 }
 
 void MyGraphicsPixmapItem::showMine()
 {
-    QString tmpPath =QString(":/images/%1.png").arg(mMineSNumber);
-    setImage(tmpPath);
+    if (getIsMineflag())
+    {
+        setImage(":/images/foundMine.png");
+    }
+    else
+    {
+        QString tmpPath = QString(":/images/%1.png").arg(mMineSNumber);
+        setImage(tmpPath);
+    }
 }
 
 void MyGraphicsPixmapItem::setImage(QString pPicName)
@@ -22,12 +32,22 @@ void MyGraphicsPixmapItem::setImage(QString pPicName)
     setPixmap(pPicName);
 }
 
-int MyGraphicsPixmapItem::getMineSNumber() const
+int MyGraphicsPixmapItem::getAlreadyOpenFlag() const
+{
+    return mAlreadyOpenFlag;
+}
+
+void MyGraphicsPixmapItem::setAlreadyOpenFlag(int alreadyOpenFlag)
+{
+    mAlreadyOpenFlag = alreadyOpenFlag;
+}
+
+int MyGraphicsPixmapItem::getMinesNumber() const
 {
     return mMineSNumber;
 }
 
-void MyGraphicsPixmapItem::setMineSNumber(int mineSNumber)
+void MyGraphicsPixmapItem::setMinesNumber(int mineSNumber)
 {
     if (mineSNumber < 0 || mineSNumber > 8)
     {
@@ -36,6 +56,13 @@ void MyGraphicsPixmapItem::setMineSNumber(int mineSNumber)
         return;
     }
     mMineSNumber = mineSNumber;
+}
+
+void MyGraphicsPixmapItem::setRowAndColPos(int pRow, int pCol)
+{
+    mRowPos = pRow;
+    mColPos = pCol;
+//    MYDebug("mRowPos = %d mColPos = %d", mRowPos, mColPos);
 }
 
 MyGraphicsPixmapItem::~MyGraphicsPixmapItem()
@@ -91,6 +118,8 @@ void MyGraphicsPixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
     else if (Qt::LeftButton == event->button())
     {
+        mAlreadyOpenFlag = 1;
+        MYDebug("is leftBtn Clicked mButtonStatus = %d", mButtonStatus);
         /*没有按下过，并且本身是雷，显示雷的图片，游戏失败了！*/
         if (1 == mIsMineflag && NONE_PRESSED == mButtonStatus)
         {
@@ -102,6 +131,11 @@ void MyGraphicsPixmapItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         {
             QString tmpPath =QString(":/images/%1.png").arg(mMineSNumber);
             setImage(tmpPath);
+            if (0 == mMineSNumber) // 只有是空白时，发送信号触发递归函数
+            {
+                MYDebug("is blank block send signal");
+                emit sigLeftBtnClicked(mRowPos, mColPos);
+            }
         }
         mButtonStatus = LEFT_PRESSED; // 左键按下标记以后，点击右键也不会起到作用
     }

@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     initWindow();
     mCurScene = nullptr;
     mLastScene = nullptr;
+    connect(&mMyMsgBox, &MyMsgBox::sigBtnSelect, this, &MainWindow::sltBtnClikced);
 }
 
 MainWindow::~MainWindow()
@@ -52,6 +53,8 @@ void MainWindow::sltNewGame()
         mCurScene->layMines();
         mCurScene->setItemMineCounts();
         ui->graphicsView->setScene(mCurScene); // 加入场景
+        mCurScene->printMinePos();
+        mCurScene->prinMineNumber();
     }
     if (mLastScene)
     {
@@ -74,6 +77,10 @@ void MainWindow::sltGameEnded()
 void MainWindow::sltGameRulesIntroduce()
 {
     MYDebug();
+    // Qt::WindowModal 点击了最小化之后，可以再点击主界面
+    // Qt::ApplicationModal 点击了最小化之后，再点击主界面，也不能点击
+    mIntroduceMine.setWindowModality(Qt::ApplicationModal);
+    mIntroduceMine.show();
 }
 
 void MainWindow::sltGamePrompt()
@@ -84,19 +91,76 @@ void MainWindow::sltGamePrompt()
 void MainWindow::sltGame9And9And10()
 {
     MYDebug();
+    MYDebug();
+    mLastScene = mCurScene;
+    mCurScene = new MyGraphicsScene;
+    if (mCurScene)
+    {
+        mCurScene->setMineScene(9, 9, 10);
+        mCurScene->initMineScenery();
+        mCurScene->layMines();
+        mCurScene->setItemMineCounts();
+        ui->graphicsView->setScene(mCurScene); // 加入场景
+        mCurScene->printMinePos();
+        mCurScene->prinMineNumber();
+    }
+    if (mLastScene)
+    {
+        delete mLastScene;
+        mLastScene = nullptr;
+        MYDebug("will delete mLastScene");
+    }
 }
 
 void MainWindow::sltGame16And16And40()
 {
     MYDebug();
+    MYDebug();
+    mLastScene = mCurScene;
+    mCurScene = new MyGraphicsScene;
+    if (mCurScene)
+    {
+        mCurScene->setMineScene(16, 16, 40);
+        mCurScene->initMineScenery();
+        mCurScene->layMines();
+        mCurScene->setItemMineCounts();
+        ui->graphicsView->setScene(mCurScene); // 加入场景
+        mCurScene->printMinePos();
+        mCurScene->prinMineNumber();
+    }
+    if (mLastScene)
+    {
+        delete mLastScene;
+        mLastScene = nullptr;
+        MYDebug("will delete mLastScene");
+    }
 }
 
 void MainWindow::sltSelfDefineGame()
 {
     MYDebug();
+    mMyselfDefineGame.setWindowModality(Qt::ApplicationModal);
+    mMyselfDefineGame.show();
 }
 
 void MainWindow::sltWinnerHistory()
 {
     MYDebug();
+    mMyMsgBox.setTextContent("this is history");
+    mMyMsgBox.setTitleName("this is history");
+    mMyMsgBox.exec();
+}
+
+void MainWindow::sltBtnClikced(QString pYes)
+{
+    if (!QString::compare("yes", pYes))
+    {
+        mMyMsgBox.accept();
+        MYDebug("is yes clicked");
+    }
+    else if (!QString::compare("no", pYes))
+    {
+        mMyMsgBox.reject();
+        MYDebug("is no clicked");
+    }
 }

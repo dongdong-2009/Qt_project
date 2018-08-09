@@ -75,7 +75,7 @@ color: qconicalgradient(cx:0.5, cy:0.5, angle:0, stop:0 rgba(255, 255, 255, 255)
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="mineLength">
+           <widget class="QLineEdit" name="mineRow">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -99,7 +99,7 @@ color: qconicalgradient(cx:0.5, cy:0.5, angle:0, stop:0 rgba(255, 255, 255, 255)
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="MineWidth">
+           <widget class="QLineEdit" name="MineColumn">
             <property name="placeholderText">
              <string>宽度9~50</string>
             </property>

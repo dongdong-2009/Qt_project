@@ -14,9 +14,28 @@ class MySelfDefineGame : public QDialog
 public:
     explicit MySelfDefineGame(QWidget *parent = 0);
     ~MySelfDefineGame();
+    int getRows() const;
+    int getColumns() const;
+    int getMines() const;
+
+signals:
+    void sigNewGameEnableChanged();
+private:
+    void initWindow();
+
+private slots:
+    void sltMineCountsChanged();
+    void sltRowsChanged();
+    void sltColumnChanged();
+    void sltBtnCancled();
+    void sltBtnNewGame();
+    void sltBtnNewGameEnableChanged();
 
 private:
     Ui::MySelfDefineGame *ui;
+    int mRows;
+    int mColumns;
+    int mMines;
 };
 
 #endif // MYSELFDEFINEGAME_H

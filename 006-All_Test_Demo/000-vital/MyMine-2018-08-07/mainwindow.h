@@ -2,7 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "introducemine.h"
+#include "myselfdefinegame.h"
+#include "mymsgbox.h"
+
 class MyGraphicsScene;
+
 namespace Ui {
 class MainWindow;
 }
@@ -28,10 +33,14 @@ private slots:
     void sltSelfDefineGame();             // 自定义游戏
     void sltWinnerHistory();              // 胜利者的历史游戏记录
 
+    void sltBtnClikced(QString pYes);
 private:
     Ui::MainWindow *ui;
     MyGraphicsScene *mCurScene;
     MyGraphicsScene *mLastScene;
+    IntroduceMine mIntroduceMine;
+    MySelfDefineGame mMyselfDefineGame;
+    MyMsgBox mMyMsgBox;
 };
 
 #endif // MAINWINDOW_H

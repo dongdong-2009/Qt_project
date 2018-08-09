@@ -75,16 +75,20 @@ void MyGraphicsScene::initMineScenery()
             for (int j = 0; j < mColumns + 2; ++j)
             {
                 mMineCountRecordArray[i][j] = 0;
-                qDebug("mMineCountRecordArray[%d][%d] = %d", i, j, mMineCountRecordArray[i][j]);
-                if (j == mColumns + 1)
-                {
-                    printf("\n");
-                }
+//                qDebug("mMineCountRecordArray[%d][%d] = %d", i, j, mMineCountRecordArray[i][j]);
+//                if (j == mColumns + 1)
+//                {
+//                    printf("\n");
+//                }
                 if (i < mRows && j < mColumns)
                 {
-                    mItemsArray[i][j].setPos(i*32, j*32);
+//                    qDebug("mMineCountRecordArray[%d][%d] = %d", i, j, mMineCountRecordArray[i][j]);
+                    mItemsArray[i][j].setPos(j*32, i*32);  // 注意需要横排放置每一个图元
                     // 根据图片的像素来的，图片是30×30的，稍微大一点即可
                     this->addItem(&mItemsArray[i][j]);
+                    mItemsArray[i][j].setRowAndColPos(i, j);
+                    connect(&mItemsArray[i][j], &MyGraphicsPixmapItem::sigLeftBtnClicked,
+                            this, &MyGraphicsScene::spreadAlgorithm);
                 }
             }
         }
@@ -102,7 +106,7 @@ void MyGraphicsScene::layMines()
     {
         x = qrand() % mRows;
         y = qrand() % mColumns;
-        MYDebug("x = %d, y = %d", x, y);
+//        MYDebug("x = %d, y = %d", x, y);
         // 只有产生的随机数x，y是没有被设置成雷的图元，才能生效
         if (0 == mItemsArray[x][y].getIsMineflag())
         {
@@ -129,12 +133,124 @@ void MyGraphicsScene::setItemMineCounts()
             num = mMineCountRecordArray[i-1][j-1] + mMineCountRecordArray[i-1][j] + mMineCountRecordArray[i-1][j+1]
                     + mMineCountRecordArray[i][j-1] + mMineCountRecordArray[i][j+1]
                     + mMineCountRecordArray[i+1][j-1] + mMineCountRecordArray[i+1][j] + mMineCountRecordArray[i+1][j+1];
-            mItemsArray[i-1][j-1].setMineSNumber(num);
+            mItemsArray[i-1][j-1].setMinesNumber(num);
         }
     }
 }
 
-void MyGraphicsScene::spreadAlgorithm()
+/*
+    扩算算法 Algorithm 英 [ˈælgərɪðəm]
+*/
+void MyGraphicsScene::spreadAlgorithm(int x, int y)
 {
-
+    for (int i = -1; i < 2; ++i)
+    {
+        for (int j = -1; j < 2; ++j)
+        {
+            /*排除越界问题*/
+            if (x+i >= mRows || x+i < 0
+                || y+j >= mColumns || y+j < 0 || (0 == i && 0 == j))
+            {
+                continue;
+            }
+            /* 已经点开过的，不能再点开，否则会进入死循环，这些情况都要排除掉 */
+            if (1 == mItemsArray[x+i][y+j].getIsMineflag()
+                || 1 == mItemsArray[x+i][y+j].getAlreadyOpenFlag())
+            {
+                continue;
+            }
+            mItemsArray[x+i][y+j].setAlreadyOpenFlag(1);
+            if (0 == mItemsArray[x+i][y+j].getMinesNumber()) // 空白
+            {
+                mItemsArray[x+i][y+j].showMine();
+                spreadAlgorithm(x+i, y+j);
+//                MYDebug("x = %d, y = %d, x+i = %d, y+j = %d", x, y, x+i, y+j);
+            }
+            else
+            {
+                if (0 == mItemsArray[x+i][y+j].getIsMineflag()) // 不是雷的显示出来
+                {
+                    mItemsArray[x+i][y+j].showMine();
+                }
+            }
+        }
+    }
 }
+
+void MyGraphicsScene::printMinePos()
+{
+    for (int i = 0; i < mRows; ++i)
+    {
+        for (int j = 0; j < mColumns; ++j)
+        {
+            printf("%d ", mItemsArray[i][j].getIsMineflag());
+            fflush(stdout);
+            if (mColumns - 1 == j)
+            {
+                printf("\n");
+            }
+        }
+    }
+    printf("\n");
+    fflush(stdout);
+}
+
+void MyGraphicsScene::prinMineNumber()
+{
+    for (int i = 0; i < mRows; ++i)
+    {
+        for (int j = 0; j < mColumns; ++j)
+        {
+            printf("%d ", mItemsArray[i][j].getMinesNumber());
+            fflush(stdout);
+            if (mColumns - 1 == j)
+            {
+                printf("\n");
+            }
+        }
+    }
+    printf("\n");
+    fflush(stdout);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

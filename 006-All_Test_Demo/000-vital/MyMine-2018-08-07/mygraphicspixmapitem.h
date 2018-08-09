@@ -15,6 +15,8 @@ class MyGraphicsPixmapItem : public QObject, public QGraphicsPixmapItem
     Q_OBJECT
 public:
     explicit MyGraphicsPixmapItem();
+    ~MyGraphicsPixmapItem();
+
     void showMine();
 
     int getIsMineflag() const;
@@ -23,9 +25,16 @@ public:
     int getButtonStatus() const;
     void setButtonStatus(int buttonStatus);
 
-    int getMineSNumber() const;
-    void setMineSNumber(int mineSNumber);
-    ~MyGraphicsPixmapItem();
+    int getMinesNumber() const;
+    void setMinesNumber(int mineSNumber);
+
+    void setRowAndColPos(int pRow, int pCol);
+
+    int getAlreadyOpenFlag() const;
+    void setAlreadyOpenFlag(int alreadyOpenFlag);
+
+signals:
+    void sigLeftBtnClicked(int pRow, int pCol);
 
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event ); //鼠标点击事件
@@ -43,7 +52,9 @@ private:
     int mIsMineflag;        // 标识是否为雷
     int mButtonStatus;      // 标识按钮状态 0未按  1按下右键  2 按下左键
     int mMineSNumber;       // 标识周围雷数
-
+    int mRowPos;
+    int mColPos;
+    int mAlreadyOpenFlag;   // 已经翻开了
 };
 
 #endif // MYGRAPHICSPIXMAPITEM_H

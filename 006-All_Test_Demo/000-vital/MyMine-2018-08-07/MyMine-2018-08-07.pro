@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     mygraphicsscene.cpp \
     myselfdefinegame.cpp \
     gamewinner.cpp \
-    historywinner.cpp
+    historywinner.cpp \
+    mymsgbox.cpp
 
 HEADERS  += mainwindow.h \
     introducemine.h \
@@ -39,13 +40,15 @@ HEADERS  += mainwindow.h \
     myselfdefinegame.h \
     gamewinner.h \
     historywinner.h \
-    logcat.h
+    logcat.h \
+    mymsgbox.h
 
 FORMS    += mainwindow.ui \
     introducemine.ui \
     myselfdefinegame.ui \
     gamewinner.ui \
-    historywinner.ui
+    historywinner.ui \
+    mymsgbox.ui
 
 RESOURCES += \
     images.qrc

@@ -19,7 +19,9 @@ public:
 
     void layMines();            // 布雷
     void setItemMineCounts();   // 为每一个图元设置雷的数目，根据周围8个的雷的情况来设置的
-    void spreadAlgorithm();     // 扩散算法
+    void spreadAlgorithm(int x, int y);     // 扩散算法
+    void printMinePos();
+    void prinMineNumber();
 signals:
 
 public slots:
