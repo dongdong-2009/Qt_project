@@ -53,6 +53,11 @@ void MyGraphicsScene::setMineScene(int pRows, int pColumns, int pMineCount)
     mMineCounts = pMineCount;
 }
 
+int MyGraphicsScene::getMineCounts() const
+{
+    return mMineCounts;
+}
+
 /*调用前需要先设置行列和雷数 setMineScene(int pRows, int pColumns, int pMineCount)*/
 void MyGraphicsScene::initMineScenery()
 {

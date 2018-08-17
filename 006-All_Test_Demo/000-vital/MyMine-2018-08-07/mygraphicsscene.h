@@ -15,6 +15,7 @@ public:
     int getGameOverFlag() const;
     void setGameOverFlag(int gameOverFlag);
     void setMineScene(int pRows, int pColumns, int pMineCount);
+    int getMineCounts() const;
     void initMineScenery();
 
     void layMines();            // 布雷

@@ -34,6 +34,8 @@ private slots:
     void sltWinnerHistory();              // 胜利者的历史游戏记录
 
     void sltBtnClikced(QString pYes);
+
+    void sltSetMineCounts(int pMineNumber); // 设置label显示剩余的雷数
 private:
     Ui::MainWindow *ui;
     MyGraphicsScene *mCurScene;

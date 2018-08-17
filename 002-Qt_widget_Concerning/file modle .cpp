@@ -7,7 +7,7 @@
 #include <QStringListModel>
 //#include "copyfilethread.h"
 #define MAX_DIR_NUMBER 20
-//×î´óµÄÅÌ·ûÊýÁ¿
+//æœ€å¤§çš„ç›˜ç¬¦æ•°é‡
 #define RELEASE_VERSION ("1.0.0")
 
 Widget::Widget(QWidget *parent) :
@@ -112,7 +112,7 @@ void Widget::formatUdisk(QString diskDir)
     }
     else
     {
-        //QString cmd = QString("FORMAT %1 /FS:FAT32 /q /x /y").arg(diskDir);/XÎªÐ¶ÔØÅÌ·û
+        //QString cmd = QString("FORMAT %1 /FS:FAT32 /q /x /y").arg(diskDir);/Xä¸ºå¸è½½ç›˜ç¬¦
         QString cmd = QString("FORMAT %1 /FS:FAT32 /q /y").arg(diskDir);
         QByteArray ba;
         ba.append(cmd);
@@ -168,7 +168,7 @@ bool Widget::nativeEvent(const QByteArray &eventType, void *message, long *resul
                 PDEV_BROADCAST_VOLUME lpdbv = (PDEV_BROADCAST_VOLUME)lpdb;
                 if (lpdbv -> dbcv_flags == 0)
                 {
-                    //²åÈëUÅÌ£¬»ñÈ¡ÅÌ·û
+                    //æ’å…¥Uç›˜ï¼ŒèŽ·å–ç›˜ç¬¦
                     DirPath = QString(this->FirstDriveFromMask(lpdbv ->dbcv_unitmask));
                     DirPath += ":";
                     this->AddDisk(DirPath);
@@ -201,10 +201,10 @@ void Widget::ScanHD()
 {
     //qDebug()<<"startup scan";
     char diskPath[6] = { 0 };
-    DWORD allDisk = GetLogicalDrives(); //·µ»ØÒ»¸ö32Î»ÕûÊý£¬½«Ëû×ª»»³É¶þ½øÖÆºó£¬±íÊ¾´ÅÅÌ,×îµÍÎ»ÎªAÅÌ
+    DWORD allDisk = GetLogicalDrives(); //è¿”å›žä¸€ä¸ª32ä½æ•´æ•°ï¼Œå°†ä»–è½¬æ¢æˆäºŒè¿›åˆ¶åŽï¼Œè¡¨ç¤ºç£ç›˜,æœ€ä½Žä½ä¸ºAç›˜
     if (allDisk!=0)
     {
-        for (int i=0;i<MAX_DIR_NUMBER;i++)     //¼Ù¶¨×î¶àÓÐ12¸ö´ÅÅÌ´ÓA¿ªÊ¼¼ÆÊý
+        for (int i=0;i<MAX_DIR_NUMBER;i++)     //å‡å®šæœ€å¤šæœ‰12ä¸ªç£ç›˜ä»ŽAå¼€å§‹è®¡æ•°
         {
             if ((allDisk & 1)==1)
             {
@@ -214,7 +214,7 @@ void Widget::ScanHD()
 
                 if (GetDriveType(RootPathName) ==  DRIVE_REMOVABLE)
                 {
-                    if( GetVolumeInformation(RootPathName,0,0,0,0,0,0,0) ) //ÅÐ¶ÏÇý¶¯ÊÇ·ñ×¼±¸¾ÍÐ÷
+                    if( GetVolumeInformation(RootPathName,0,0,0,0,0,0,0) ) //åˆ¤æ–­é©±åŠ¨æ˜¯å¦å‡†å¤‡å°±ç»ª
                     {
                         //qDebug()<<"usb Driver is allready: "<<diskPath;
                         QString  path(diskPath);
@@ -236,7 +236,7 @@ void Widget::AddDisk(QString &DiskName)
     }
     USB_DISK_INFO usbtemp;
     usbtemp.DirPath = DiskName;
-    GetMemorySize(usbtemp);//»ñÈ¡Éè±¸ÄÚ´æÐÅÏ¢
+    GetMemorySize(usbtemp);//èŽ·å–è®¾å¤‡å†…å­˜ä¿¡æ¯
     this->usb_disk_info.push_back(usbtemp);
     this->AddComboBoxItem(DiskName);
 }
@@ -273,8 +273,8 @@ void Widget::GetMemorySize(USB_DISK_INFO &disk)
         qDebug() << "ERROR: Call to GetDiskFreeSpaceEx() failed.";
         return ;
     }
-    disk.FreeMemory  = (float)liTotalFreeBytes.QuadPart/1024/1024/1024; //Ê£ÓàÄÚ´æ
-    disk.TotalMemory = (float)liTotalBytes.QuadPart/1024/1024/1024;     //×ÜÄÚ´æ
+    disk.FreeMemory  = (float)liTotalFreeBytes.QuadPart/1024/1024/1024; //å‰©ä½™å†…å­˜
+    disk.TotalMemory = (float)liTotalBytes.QuadPart/1024/1024/1024;     //æ€»å†…å­˜
 }
 
 char Widget::FirstDriveFromMask(ULONG unitmask)
@@ -315,7 +315,7 @@ USB_DISK_INFO Widget::GetCheckedDisk()
 
 void Widget::OpenfileDaliog()
 {
-    //Ñ¡ÔñÎÄ¼þ
+    //é€‰æ‹©æ–‡ä»¶
     QString filename = QFileDialog::getOpenFileName(this, tr("Selete one video file"),".",
                                                     tr("file format(*.avi *.mp4 *.rmvb *.mkv)"));
     qDebug()<<"\n" << filename;

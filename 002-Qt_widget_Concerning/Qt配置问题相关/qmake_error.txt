@@ -6,3 +6,12 @@
 
 sudo ln -s /home/libo/Qt5.5.1/5.5/gcc/bin/qmake /usr/local/sbin/
 
+在~/.bashrc中添加了导出了路径：export PATH=$PATH:/home/libo/Qt5.7.1/5.7/gcc_64/bin
+source之后还是有如下错误
+qmake: could not exec '/usr/lib/x86_64-linux-gnu/qt4/bin/qmake': No such file or directory
+
+/usr/lib/x86_64-linux-gnu/qt-default/qtchooser下的default.conf
+改为以下的，第一条为当前你要使用的qt的版本的qmake
+/home/libo/Qt5.7.1/5.7/gcc_64/bin
+/usr/lib/x86_64-linux-gnu/qt4/bin
+/usr/lib/x86_64-linux-gnu

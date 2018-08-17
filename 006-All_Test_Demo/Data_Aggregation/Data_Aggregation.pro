@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2018-07-26T19:35:46
+# Project created by QtCreator 2018-08-17T10:22:27
 #
 #-------------------------------------------------
 
@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = untitled
+TARGET = Data_Aggregation
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -16,7 +16,7 @@ TEMPLATE = app
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-
+DESTDIR += $$PWD/000_ExePath
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -24,11 +24,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        widget.cpp
+        widget.cpp \
+    datahandle.cpp
 
-HEADERS  += widget.h
+HEADERS  += widget.h \
+    datahandle.h
 
 FORMS    += widget.ui
-
-RESOURCES += \
-    images.qrc

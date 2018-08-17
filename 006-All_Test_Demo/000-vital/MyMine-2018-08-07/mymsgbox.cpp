@@ -8,7 +8,7 @@ MyMsgBox::MyMsgBox(QWidget *parent) :
     ui->setupUi(this);
     mContentText = QString();
     mTitleName = QString();
-//    this->setWindowFlags(Qt::Dialog| Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::Dialog| Qt::FramelessWindowHint);
     initMsgDailog();
 }
 
