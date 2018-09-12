@@ -10,6 +10,11 @@ public:
     explicit ProtectADC(QThread *parent = 0);
     void readAdcValue();
     virtual void run();
+    void setPressed();
+    void setLight(unsigned char c, unsigned char pos);
+    void initGpiosFd();
+    int sysExecuteKoFile(const char *str);
+    static void mySignalFunc(int signum);
 signals:
 
 public slots:

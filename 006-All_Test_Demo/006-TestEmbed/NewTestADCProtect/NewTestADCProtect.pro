@@ -25,9 +25,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         widget.cpp \
-    protectadc.cpp
+    protectadc.cpp \
+    gpios.cpp
 
 HEADERS  += widget.h \
-    protectadc.h
+    protectadc.h \
+    gpios.h
 
 FORMS    += widget.ui

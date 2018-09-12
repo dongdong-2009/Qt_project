@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "protectadc.h"
+#include "gpios.h"
 
 namespace Ui {
 class Widget;
@@ -19,6 +20,7 @@ public:
 private:
     Ui::Widget *ui;
     ProtectADC mADC;
+//    Gpios mGpio;
 };
 
 #endif // WIDGET_H
